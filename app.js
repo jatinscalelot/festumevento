@@ -20,7 +20,6 @@ app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(express.static(path.join(__dirname, 'public')));
-app.use("/angular", express.static(__dirname + "/node_modules/angular"));
 mongoose.set('runValidators', true);
 mongoose.connect(process.env.MONGO_URI, {
   useNewUrlParser: true,
