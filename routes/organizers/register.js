@@ -35,7 +35,7 @@ router.post('/', async (req, res, next) => {
             axios.get(url ,config).then((response) => {
                 ( async () => {
                     console.log('response', response);
-                    obj.otpVerifyKey = response.Details;
+                    obj.otpVerifyKey = response.data.Details;
                     await primary.model(constants.MODELS.organizers, organizerModel).create(obj);
                     return responseManager.onSuccess('Organizer register successfully!', response, res);
                 })().catch((error) => {
