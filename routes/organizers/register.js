@@ -32,18 +32,14 @@ router.post('/', async (req, res, next) => {
                 mobileverified : false
             };
             const url = process.env.FACTOR_URL + mobile + "/AUTOGEN";
-            axios.get(url ,config).then((response) => {
-                ( async () => {
-                    console.log('response', response);
-                    obj.otpVerifyKey = response.data.Details;
-                    await primary.model(constants.MODELS.organizers, organizerModel).create(obj);
-                    return responseManager.onSuccess('Organizer register successfully!', response, res);
-                })().catch((error) => {
-                    return responseManager.onError(error, res);
-                });
-            }).catch((error) => {
-                return responseManager.onError(error, res);
-            });
+            let otpSend = await axios.get(url,config);
+            if(otpSend.data.Details){
+                obj.otpVerifyKey = response.data.Details;
+                await primary.model(constants.MODELS.organizers, organizerModel).create(obj);
+                return responseManager.onSuccess('Organizer register successfully!', {key : otpSend.data.Details}, res);
+            }else{
+                return responseManager.onSuccess('Something went wrong, unable to send otp for given mobile number, please try again!', 0, res);
+            }
         }else{
             return responseManager.badrequest({message : 'Organizer already exist with same mobile or email, Please try again...'}, res);
         }
@@ -57,6 +53,7 @@ router.post('/verifyotp', async (req, res, next) => {
         let organizerData = await primary.model(constants.MODELS.organizers, organizerModel).findOne({mobile : mobile, otpVerifyKey : key}).lean();
         if(organizerData){
             const url = process.env.FACTOR_URL + "VERIFY/" + key + "/" + otp;
+            
             axios.get(url ,config).then((response) => {
                 ( async () => {
                     if(response.Status == 'Success'){
