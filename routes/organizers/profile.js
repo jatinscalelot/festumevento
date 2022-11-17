@@ -72,18 +72,22 @@ router.post('/businessprofile', helper.authenticateToken, async (req, res, next)
     const { name, email, mobile, country_code, address, dob, country, about } = req.body;
     let primary = mongoConnection.useDb(constants.DEFAULT_DB);
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
-        let obj = {
-            name : name,
-            email : email,
-            mobile : mobile,
-            country_code : country_code,
-            address : address,
-            dob : dob,
-            country : country,
-            about : about
-        };
-        await primary.model(constants.MODELS.organizers, organizerModel).findByIdAndUpdate(req.token.organizerid, {businessProfile : obj});
-        return responseManager.onSuccess('Organizer business profile updated successfully!', 1, res);
+        let existingData = await primary.model(constants.MODELS.organizers, organizerModel).findById(req.token.organizerid).lean();
+        if(existingData){
+            let obj = {
+                profile_pic : (existingData.businessProfile && existingData.businessProfile.profile_pic &&  existingData.businessProfile.profile_pic != '') ? existingData.businessProfile.profile_pic : '',
+                name : name,
+                email : email,
+                mobile : mobile,
+                country_code : country_code,
+                address : address,
+                dob : dob,
+                country : country,
+                about : about
+            };
+            await primary.model(constants.MODELS.organizers, organizerModel).findByIdAndUpdate(req.token.organizerid, {businessProfile : obj});
+            return responseManager.onSuccess('Organizer business profile updated successfully!', 1, res);
+        }
     }else{
         return responseManager.badrequest({ message: 'Invalid token to update organizer business profile, please try again' }, res);
     }
