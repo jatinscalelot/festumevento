@@ -48,6 +48,7 @@ router.post('/', async (req, res, next) => {
     } 
 });
 router.post('/verifyotp', async (req, res, next) => {
+    let primary = mongoConnection.useDb(constants.DEFAULT_DB);
     const { key, otp, mobile } = req.body;
     if(key && key.trim() != '' && otp && otp.trim() != '' && otp.length == 6 && mobile && mobile.length == 10){
         let organizerData = await primary.model(constants.MODELS.organizers, organizerModel).findOne({mobile : mobile, otpVerifyKey : key}).lean();
