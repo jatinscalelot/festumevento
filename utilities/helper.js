@@ -21,7 +21,7 @@ exports.generateAccessToken = async (userData) => {
     return jwt.sign(userData, process.env.APP_LOGIN_AUTH_TOKEN, {});
 };
 exports.authenticateToken = async (req, res, next) => {
-    const bearerHeader = req.headers['Authorization'];
+    const bearerHeader = req.headers['authorization'];
     if (typeof bearerHeader !== 'undefined') {
         const bearer = bearerHeader.split(' ');
         const token = bearer[1];

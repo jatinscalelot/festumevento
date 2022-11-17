@@ -38,9 +38,10 @@ const executivepaths = [
   { pathUrl: '/', routeFile: 'index'}
 ];
 const organizerpaths = [
-  { pathUrl: '/', routeFile: 'index'},
-  { pathUrl: '/login', routeFile: 'login'},
-  { pathUrl: '/register', routeFile: 'register'},
+  { pathUrl: '/', routeFile: 'index' },
+  { pathUrl: '/login', routeFile: 'login' },
+  { pathUrl: '/register', routeFile: 'register' },
+  { pathUrl: '/profile', routeFile: 'profile'}
 ];
 const subadminpaths = [
   { pathUrl: '/', routeFile: 'index'}
