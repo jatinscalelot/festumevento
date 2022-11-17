@@ -5,6 +5,12 @@ const responseManager = require('../../utilities/response.manager');
 const constants = require('../../utilities/constants');
 const helper = require('../../utilities/helper');
 const organizerModel = require('../../models/organizers.model');
+const axios = require('axios');
+const config = {
+    headers : {
+        'content-type': 'application/x-www-form-urlencoded'
+    }
+};
 router.post('/', async (req, res, next) => {
     const { name, email, mobile, country_code, password, refer_code, fcm_token } = req.body;
     if(name && name.trim() != '' && email && email.trim() != '' && (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)) && mobile && mobile.length == 10 && country_code && country_code.trim() != '' && password && password.length >= 6){
@@ -23,14 +29,51 @@ router.post('/', async (req, res, next) => {
                 my_refer_code : my_referCode,
                 fcm_token : fcm_token,
                 status : false,
+                mobileverified : false
             };
-            await primary.model(constants.MODELS.organizers, organizerModel).create(obj);
-            return responseManager.onSuccess('Organizer register successfully!', 1, res);
+            const url = process.env.FACTOR_URL + mobile + "/AUTOGEN";
+            axios.get(url ,config).then((response) => {
+                ( async () => {
+                    console.log('response', response);
+                    obj.otpVerifyKey = response.Details;
+                    await primary.model(constants.MODELS.organizers, organizerModel).create(obj);
+                    return responseManager.onSuccess('Organizer register successfully!', response, res);
+                })().catch((error) => {
+                    return responseManager.onError(error, res);
+                });
+            }).catch((error) => {
+                return responseManager.onError(error, res);
+            });
         }else{
             return responseManager.badrequest({message : 'Organizer already exist with same mobile or email, Please try again...'}, res);
         }
     }else{
         return responseManager.badrequest({message : 'Invalid data to register organizer, please try again'}, res);
+    } 
+});
+router.post('/verifyotp', async (req, res, next) => {
+    const { key, otp, mobile } = req.body;
+    if(key && key.trim() != '' && otp && otp.trim() != '' && otp.length == 6 && mobile && mobile.length == 10){
+        let organizerData = await primary.model(constants.MODELS.organizers, organizerModel).findOne({mobile : mobile, otpVerifyKey : key}).lean();
+        if(organizerData){
+            const url = process.env.FACTOR_URL + "VERIFY/" + key + "/" + otp;
+            axios.get(url ,config).then((response) => {
+                ( async () => {
+                    if(response.Status == 'Success'){
+                        await primary.model(constants.MODELS.organizers, organizerModel).findByIdAndUpdate(organizerData._id, {mobileverified : true});
+                        return responseManager.onSuccess('Organizer mobile number verified successfully!', 1, res);
+                    }
+                })().catch((error) => {
+                    return responseManager.onError(error, res);
+                });
+            }).catch((error) => {
+                return responseManager.onError(error, res);
+            });
+        }else{
+            return responseManager.badrequest({message : 'Invalid data to verify organizer mobile number, please try again'}, res);
+        } 
+    }else{
+        return responseManager.badrequest({message : 'Invalid otp or mobile number to verify organizer mobile number, please try again'}, res);
     } 
 });
 module.exports = router;
