@@ -34,7 +34,7 @@ router.post('/', async (req, res, next) => {
             const url = process.env.FACTOR_URL + mobile + "/AUTOGEN";
             let otpSend = await axios.get(url,config);
             if(otpSend.data.Details){
-                obj.otpVerifyKey = response.data.Details;
+                obj.otpVerifyKey = otpSend.data.Details;
                 await primary.model(constants.MODELS.organizers, organizerModel).create(obj);
                 return responseManager.onSuccess('Organizer register successfully!', {key : otpSend.data.Details}, res);
             }else{
