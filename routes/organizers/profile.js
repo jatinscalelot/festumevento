@@ -68,7 +68,7 @@ router.post('/profilepic', helper.authenticateToken, fileHelper.memoryUpload.sin
         return responseManager.badrequest({ message: 'Invalid token to update organizer profile, please try again' }, res);
     }
 });
-router.post('/businessprofile',  helper.authenticateToken, async (req, res, next) => {
+router.post('/businessprofile', helper.authenticateToken, async (req, res, next) => {
     const { name, email, mobile, country_code, address, dob, country, about } = req.body;
     let primary = mongoConnection.useDb(constants.DEFAULT_DB);
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
