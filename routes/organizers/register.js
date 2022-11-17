@@ -29,7 +29,8 @@ router.post('/', async (req, res, next) => {
                 my_refer_code : my_referCode,
                 fcm_token : fcm_token,
                 status : false,
-                mobileverified : false
+                mobileverified : false,
+                businessProfile : {}
             };
             const url = process.env.FACTOR_URL + mobile + "/AUTOGEN";
             let otpSend = await axios.get(url,config);

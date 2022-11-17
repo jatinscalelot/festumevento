@@ -68,4 +68,53 @@ router.post('/profilepic', helper.authenticateToken, fileHelper.memoryUpload.sin
         return responseManager.badrequest({ message: 'Invalid token to update organizer profile, please try again' }, res);
     }
 });
+router.post('/businessprofile',  helper.authenticateToken, async (req, res, next) => {
+    const { name, email, mobile, country_code, address, dob, country, about } = req.body;
+    let primary = mongoConnection.useDb(constants.DEFAULT_DB);
+    if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
+        let obj = {
+            name : name,
+            email : email,
+            mobile : mobile,
+            country_code : country_code,
+            address : address,
+            dob : dob,
+            country : country,
+            about : about
+        };
+        await primary.model(constants.MODELS.organizers, organizerModel).findByIdAndUpdate(req.token.organizerid, {businessProfile : obj});
+        return responseManager.onSuccess('Organizer business profile updated successfully!', 1, res);
+    }else{
+        return responseManager.badrequest({ message: 'Invalid token to update organizer business profile, please try again' }, res);
+    }
+});
+router.post('/businessprofilepic', helper.authenticateToken, fileHelper.memoryUpload.single('file'), async (req, res, next) => {
+    if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
+        let primary = mongoConnection.useDb(constants.DEFAULT_DB);
+        if (req.file) {
+            if (allowedContentTypes.imagearray.includes(req.file.mimetype)) {
+                let filesizeinMb = parseFloat(parseFloat(req.file.size) / 1000000);
+                if (filesizeinMb <= 5) {
+                    AwsCloud.saveToS3(req.file.buffer, req.token.organizerid.toString(), req.file.mimetype, 'organizerbusinessprofile').then((result) => {
+                        primary.model(constants.MODELS.organizers, organizerModel).findByIdAndUpdate(req.token.organizerid, {"businessProfile.profile_pic" : result.data.Key}).then((updateResult) => {
+                            return responseManager.onSuccess('Organizer business profile pic updated successfully!', 1, res);
+                        }).catch((error) => {
+                            return responseManager.onError(error, res);
+                        });
+                    }).catch((error) => {
+                        return responseManager.onError(error, res);
+                    });
+                }else{
+                    return responseManager.badrequest({ message: 'Image file must be <= 5 MB for business profile pic, please try again' }, res);
+                }
+            }else{
+                return responseManager.badrequest({ message: 'Invalid file type only image files allowed for business profile pic, please try again' }, res);
+            }
+        }else{
+            return responseManager.badrequest({ message: 'Invalid file to update organizer business profile pic, please try again' }, res);
+        }
+    }else{
+        return responseManager.badrequest({ message: 'Invalid token to update organizer business profile, please try again' }, res);
+    }
+});
 module.exports = router;
