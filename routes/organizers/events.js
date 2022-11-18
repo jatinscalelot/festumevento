@@ -20,10 +20,7 @@ const companydetailCtrl = require('../../controllers/events/companydetail');
 const personaldetailCtrl = require('../../controllers/events/personaldetail');
 const tandcCtrl = require('../../controllers/events/tandc');
 const discountCtrl = require('../../controllers/events/discount');
-function validateLatLng(lat, lng) {
-    let pattern = new RegExp('^-?([1-8]?[1-9]|[1-9]0)\\.{1}\\d{1,6}');
-    return pattern.test(lat) && pattern.test(lng);
-};
+
 router.post('/create', helper.authenticateToken, createCtrl.createevent);
 router.post('/about', helper.authenticateToken, aboutCtrl.aboutevent);
 router.post('/arrangement', helper.authenticateToken, arrangementCtrl.arrangement);
