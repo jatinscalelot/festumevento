@@ -150,10 +150,102 @@ router.post('/permission', helper.authenticateToken, async (req, res) => {
         return responseManager.badrequest({ message: 'Invalid token to update event permission data, please try again' }, res);
     }
 });
+router.post('/companydetail', helper.authenticateToken, async (req, res) => {
+    if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
+        const { eventid } = req.body;
+        if(eventid && eventid != '' && mongoose.Types.ObjectId.isValid(eventid)){
+            let obj = {
+                name : (req.body.name) ? req.body.name : '', 
+                gst: (req.body.gst) ? req.body.gst : '',
+                contact_no: (req.body.contact_no) ? req.body.contact_no : '', 
+                email: (req.body.email) ? req.body.email : '',
+                about: (req.body.about) ? req.body.about : '',
+                flat_no: (req.body.flat_no) ? req.body.flat_no : '',
+                street: (req.body.street) ? req.body.street : '',
+                area : (req.body.area) ? req.body.area : '',
+                city : (req.body.city) ? req.body.city : '', 
+                state : (req.body.state) ? req.body.state : '',  
+                pincode : (req.body.pincode) ? req.body.pincode : ''
+            };
+            let primary = mongoConnection.useDb(constants.DEFAULT_DB);
+            await primary.model(constants.MODELS.events, eventModel).findByIdAndUpdate(eventid, {updatedBy : mongoose.Types.ObjectId(req.token.organizerid), companydetail : obj});
+            let eventData = await primary.model(constants.MODELS.events, eventModel).findById(eventid).lean();
+            return responseManager.onSuccess('Organizer event company data updated successfully!', eventData, res);
+        }else{
+            return responseManager.badrequest({message : 'Invalid event id to add event company data, please try again'}, res);
+        }
+    }else{
+        return responseManager.badrequest({ message: 'Invalid token to update event company data, please try again' }, res);
+    }
+});
+router.post('/personaldetail', helper.authenticateToken, async (req, res) => {
+    if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
+        const { eventid } = req.body;
+        if(eventid && eventid != '' && mongoose.Types.ObjectId.isValid(eventid)){
+            if(req.body.full_name && req.body.full_name.trim() != '' && req.body.mobile_no && req.body.mobile_no.trim() != '' && req.body.mobile_no.trim().length == 10 && req.body.email && req.body.email.trim() != '' && req.body.city && req.body.city.trim() != '' && req.body.state && req.body.state.trim() != '' && req.body.pincode && req.body.pincode.trim() != ''){
+                if((/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(req.body.email))){
+                    let obj = {
+                        full_name : (req.body.full_name) ? req.body.full_name : '', 
+                        mobile_no: (req.body.mobile_no) ? req.body.mobile_no : '',
+                        is_mobile_hidden: (req.body.is_mobile_hidden) ? req.body.is_mobile_hidden : false, 
+                        alt_mobile_no: (req.body.alt_mobile_no) ? req.body.alt_mobile_no : '',
+                        is_alt_mobile_hidden: (req.body.is_alt_mobile_hidden) ? req.body.is_alt_mobile_hidden : false,
+                        email: (req.body.email) ? req.body.email : '',
+                        is_email_hidden: (req.body.is_email_hidden) ? req.body.is_email_hidden : false,
+                        flat_no : (req.body.flat_no) ? req.body.flat_no : '',
+                        street : (req.body.street) ? req.body.street : '', 
+                        area : (req.body.area) ? req.body.area : '',  
+                        city : (req.body.city) ? req.body.city : '',
+                        state : (req.body.state) ? req.body.state : '',
+                        pincode : (req.body.pincode) ? req.body.pincode : ''
+                    };
+                    let primary = mongoConnection.useDb(constants.DEFAULT_DB);
+                    await primary.model(constants.MODELS.events, eventModel).findByIdAndUpdate(eventid, {updatedBy : mongoose.Types.ObjectId(req.token.organizerid), personaldetail : obj});
+                    let eventData = await primary.model(constants.MODELS.events, eventModel).findById(eventid).lean();
+                    return responseManager.onSuccess('Organizer event personal data updated successfully!', eventData, res);        
+                }else{
+                    return responseManager.badrequest({message : 'Invalid email id, please try again'}, res);
+                }
+            }else{
+                return responseManager.badrequest({message : 'Invalid personal details full name, mobile no, email, city, state and pincode can not be empty, please try again'}, res);
+            }
+        }else{
+            return responseManager.badrequest({message : 'Invalid event id to add event personal data, please try again'}, res);
+        }
+    }else{
+        return responseManager.badrequest({ message: 'Invalid token to update event personal data, please try again' }, res);
+    }
+});
+router.post('/tandc', helper.authenticateToken, async (req, res) => {
+    if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
+        const { eventid, status } = req.body;
+        if(status && status == true){
+            if(eventid && eventid != '' && mongoose.Types.ObjectId.isValid(eventid)){
+                let obj = {
+                    t_and_c : (req.body.t_and_c) ? req.body.t_and_c : '', 
+                    facebook: (req.body.facebook) ? req.body.facebook : '',
+                    twitter: (req.body.twitter) ? req.body.twitter : '', 
+                    youtube: (req.body.youtube) ? req.body.youtube : '',
+                    pinterest: (req.body.pinterest) ? req.body.pinterest : '',
+                    instagram: (req.body.instagram) ? req.body.instagram : '',
+                    linkedin: (req.body.linkedin) ? req.body.linkedin : '',
+                    status: (req.body.status) ? req.body.status : false,
+                };
+                let primary = mongoConnection.useDb(constants.DEFAULT_DB);
+                await primary.model(constants.MODELS.events, eventModel).findByIdAndUpdate(eventid, {updatedBy : mongoose.Types.ObjectId(req.token.organizerid), tandc : obj});
+                let eventData = await primary.model(constants.MODELS.events, eventModel).findById(eventid).lean();
+                return responseManager.onSuccess('Organizer event personal data updated successfully!', eventData, res);        
+            }else{
+                return responseManager.badrequest({message : 'Invalid event id to add event terms and conditions data, please try again'}, res);
+            }
+        }else{
+            return responseManager.badrequest({ message: 'Please accept terms and condition to update tandc data for event, please try again' }, res);
+        }
+    }else{
+        return responseManager.badrequest({ message: 'Invalid token to update event terms and conditions data, please try again' }, res);
+    }
+});
 router.post('/discount', helper.authenticateToken, async (req, res) => {});
-router.post('/companydetail', helper.authenticateToken, async (req, res) => {});
-router.post('/personaldetail', helper.authenticateToken, async (req, res) => {});
-router.post('/tandc', helper.authenticateToken, async (req, res) => {});
 // media apis
 router.post('/image', helper.authenticateToken, fileHelper.memoryUpload.single('file'), async (req, res) => {
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
