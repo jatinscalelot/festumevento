@@ -253,6 +253,7 @@ router.post('/image', helper.authenticateToken, fileHelper.memoryUpload.single('
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
         if (req.file) {
             if (allowedContentTypes.imagearray.includes(req.file.mimetype)) {
+                let filesizeinMb = parseFloat(parseFloat(req.file.size) / 1000000);
                 if (filesizeinMb <= 3) {
                     AwsCloud.saveToS3(req.file.buffer, req.token.organizerid.toString(), req.file.mimetype, 'event').then((result) => {
                         let obj = {
@@ -280,6 +281,7 @@ router.post('/video', helper.authenticateToken, fileHelper.memoryUpload.single('
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
         if (req.file) {
             if (allowedContentTypes.videoarray.includes(req.file.mimetype)) {
+                let filesizeinMb = parseFloat(parseFloat(req.file.size) / 1000000);
                 if (filesizeinMb <= 512) {
                     if(filesizeinMb > 25){
                         AwsCloud.saveToS3Multipart(req.file.buffer, req.token.organizerid.toString(), req.file.mimetype, 'event').then((result) => {
@@ -319,6 +321,7 @@ router.post('/banner', helper.authenticateToken, fileHelper.memoryUpload.single(
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
         if (req.file) {
             if (allowedContentTypes.imagearray.includes(req.file.mimetype)) {
+                let filesizeinMb = parseFloat(parseFloat(req.file.size) / 1000000);
                 if (filesizeinMb <= 10) {
                     AwsCloud.saveToS3(req.file.buffer, req.token.organizerid.toString(), req.file.mimetype, 'event').then((result) => {
                         let obj = {
@@ -346,6 +349,7 @@ router.post('/document', helper.authenticateToken, fileHelper.memoryUpload.singl
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
         if (req.file) {
             if (allowedContentTypes.docarray.includes(req.file.mimetype)) {
+                let filesizeinMb = parseFloat(parseFloat(req.file.size) / 1000000);
                 if (filesizeinMb <= 25) {
                     AwsCloud.saveToS3(req.file.buffer, req.token.organizerid.toString(), req.file.mimetype, 'event').then((result) => {
                         let obj = {
