@@ -48,7 +48,7 @@ const subadminpaths = [
   { pathUrl: '/', routeFile: 'index'}
 ];
 const superadminpaths = [
-  { pathUrl: '/', routeFile: 'index'}
+  { pathUrl: '/login', routeFile: 'login' },
 ];
 const userpaths = [
   { pathUrl: '/', routeFile: 'index'}
