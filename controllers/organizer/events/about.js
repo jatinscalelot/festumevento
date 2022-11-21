@@ -4,6 +4,7 @@ const mongoConnection = require('../../../utilities/connections');
 const constants = require('../../../utilities/constants');
 const mongoose = require('mongoose');
 exports.aboutevent = async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
         const { eventid, start_date, end_date, start_time, end_time, about_event } = req.body;
         if(eventid && eventid != '' && mongoose.Types.ObjectId.isValid(eventid)){

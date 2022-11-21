@@ -4,6 +4,7 @@ const mongoConnection = require('../../../utilities/connections');
 const constants = require('../../../utilities/constants');
 const mongoose = require('mongoose');
 exports.personaldetail = async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
         const { eventid } = req.body;
         if(eventid && eventid != '' && mongoose.Types.ObjectId.isValid(eventid)){

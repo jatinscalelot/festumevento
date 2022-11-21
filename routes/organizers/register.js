@@ -12,6 +12,7 @@ const config = {
     }
 };
 router.post('/', async (req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
     const { name, email, mobile, country_code, password, refer_code, fcm_token } = req.body;
     if(name && name.trim() != '' && email && email.trim() != '' && (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)) && mobile && mobile.length == 10 && country_code && country_code.trim() != '' && password && password.length >= 6){
         let ecnPassword = await helper.passwordEncryptor(password);
@@ -49,6 +50,7 @@ router.post('/', async (req, res, next) => {
     } 
 });
 router.post('/verifyotp', async (req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
     let primary = mongoConnection.useDb(constants.DEFAULT_DB);
     const { key, otp, mobile } = req.body;
     if(key && key.trim() != '' && otp && otp.trim() != '' && otp.length == 6 && mobile && mobile.length == 10){

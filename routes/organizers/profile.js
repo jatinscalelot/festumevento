@@ -10,6 +10,7 @@ const AwsCloud = require('../../utilities/aws');
 const allowedContentTypes = require("../../utilities/content-types");
 const mongoose = require('mongoose');
 router.get('/', helper.authenticateToken, async (req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
         let organizerData = await primary.model(constants.MODELS.organizers, organizerModel).findById(req.token.organizerid).select('-password').lean();
@@ -19,6 +20,7 @@ router.get('/', helper.authenticateToken, async (req, res, next) => {
     }
 });
 router.post('/', helper.authenticateToken, async (req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
     const { name, dob, city, pincode, state, country, about } = req.body;
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
@@ -39,6 +41,7 @@ router.post('/', helper.authenticateToken, async (req, res, next) => {
     }
 });
 router.post('/profilepic', helper.authenticateToken, fileHelper.memoryUpload.single('file'), async (req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
         if (req.file) {
@@ -69,6 +72,7 @@ router.post('/profilepic', helper.authenticateToken, fileHelper.memoryUpload.sin
     }
 });
 router.post('/businessprofile', helper.authenticateToken, async (req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
     const { name, email, mobile, country_code, address, dob, country, about } = req.body;
     let primary = mongoConnection.useDb(constants.DEFAULT_DB);
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
@@ -93,6 +97,7 @@ router.post('/businessprofile', helper.authenticateToken, async (req, res, next)
     }
 });
 router.post('/businessprofilepic', helper.authenticateToken, fileHelper.memoryUpload.single('file'), async (req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
         if (req.file) {

@@ -6,6 +6,7 @@ const constants = require('../../utilities/constants');
 const helper = require('../../utilities/helper');
 const organizerModel = require('../../models/organizers.model');
 router.post('/', async (req, res, next) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
     const { mobile, password } = req.body;
     if(mobile && password && mobile.length == 10 && password.length >= 6){
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);

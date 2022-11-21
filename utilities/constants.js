@@ -9,7 +9,7 @@ let constants = {
         users: 'users',
         events: 'events',
         offers: 'offers',
-        
+        items: 'items'
     }
 };
 module.exports = constants;

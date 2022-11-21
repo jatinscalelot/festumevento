@@ -4,6 +4,7 @@ const mongoConnection = require('../../../utilities/connections');
 const constants = require('../../../utilities/constants');
 const mongoose = require('mongoose');
 exports.createevent = async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
         const { name, event_type, event_category, other } = req.body;
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);

@@ -8,6 +8,7 @@ function validateLatLng(lat, lng) {
     return pattern.test(lat) && pattern.test(lng);
 };
 exports.location = async (req, res) => {
+    res.setHeader('Access-Control-Allow-Origin', '*');
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
         const { eventid, flat_no, street_name, area_name, location_address, address, city, state, pincode, longitude, latitude } = req.body;
         if(eventid && eventid != '' && mongoose.Types.ObjectId.isValid(eventid)){
