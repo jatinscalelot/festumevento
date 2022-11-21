@@ -1,7 +1,7 @@
-const eventModel = require('../../models/events.model');
-const responseManager = require('../../utilities/response.manager');
-const mongoConnection = require('../../utilities/connections');
-const constants = require('../../utilities/constants');
+const eventModel = require('../../../models/events.model');
+const responseManager = require('../../../utilities/response.manager');
+const mongoConnection = require('../../../utilities/connections');
+const constants = require('../../../utilities/constants');
 const mongoose = require('mongoose');
 function validateLatLng(lat, lng) {
     let pattern = new RegExp('^-?([1-8]?[1-9]|[1-9]0)\\.{1}\\d{1,6}');
