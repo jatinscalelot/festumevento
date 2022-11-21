@@ -15,6 +15,8 @@ router.post('/', async (req, res, next) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS, PUT, PATCH, DELETE');
     res.setHeader('Access-Control-Allow-Headers', 'X-Requested-With,content-type');
+    console.log('request', req);
+    console.log('request.body', req.body);
     // res.setHeader('Access-Control-Allow-Credentials', true);
     const { name, email, mobile, country_code, password, refer_code, fcm_token } = req.body;
     if(name && name.trim() != '' && email && email.trim() != '' && (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)) && mobile && mobile.length == 10 && country_code && country_code.trim() != '' && password && password.length >= 6){
