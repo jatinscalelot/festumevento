@@ -10,7 +10,8 @@ let constants = {
         events: 'events',
         offers: 'offers',
         items: 'items',
-        eventcategories : 'eventcategories'
+        eventcategories : 'eventcategories',
+        discounts : 'discounts'
     }
 };
 module.exports = constants;

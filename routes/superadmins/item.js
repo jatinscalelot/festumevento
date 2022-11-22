@@ -74,10 +74,10 @@ router.post('/save', helper.authenticateToken, async (req, res) => {
                 }
             }
         }else{
-            return responseManager.badrequest({ message: 'Invalid token to get items list, please try again' }, res);
+            return responseManager.badrequest({ message: 'Invalid token to save items data, please try again' }, res);
         }
     }else{
-        return responseManager.badrequest({ message: 'Invalid token to get items list, please try again' }, res);
+        return responseManager.badrequest({ message: 'Invalid token save items data, please try again' }, res);
     }
 });
 router.post('/remove', helper.authenticateToken, async (req, res) => {
