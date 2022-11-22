@@ -15,6 +15,7 @@ router.get('/', helper.authenticateToken, async (req, res, next) => {
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
         let organizerData = await primary.model(constants.MODELS.organizers, organizerModel).findById(req.token.organizerid).select('-password').lean();
+        organizerData.s3Url = process.env.AWS_BUCKET_URI;
         return responseManager.onSuccess('Organizer profile!', organizerData, res);
     }else{
         return responseManager.badrequest({ message: 'Invalid token to get organizer profile, please try again' }, res);
