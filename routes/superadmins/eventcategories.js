@@ -4,27 +4,27 @@ const mongoConnection = require('../../utilities/connections');
 const responseManager = require('../../utilities/response.manager');
 const constants = require('../../utilities/constants');
 const helper = require('../../utilities/helper');
+const eventcategoryModel = require('../../models/eventcategories.model');
 const superadminModel = require('../../models/superadmins.model');
-const itemModel = require('../../models/items.model');
-const mongoose = require('mongoose');
+const { default: mongoose } = require("mongoose");
 router.post('/', helper.authenticateToken, async (req, res) => {
     if (req.token.superadminid && mongoose.Types.ObjectId.isValid(req.token.superadminid)) {
         const { page, limit, search, sortfield, sortoption } = req.body;
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
         let superadmin = await primary.model(constants.MODELS.superadmins, superadminModel).findById(req.token.superadminid).lean();
         if(superadmin){
-            primary.model(constants.MODELS.items, itemModel).paginate({
+            primary.model(constants.MODELS.eventcategories, eventcategoryModel).paginate({
                 $or: [
-                    { name : { '$regex' : new RegExp(search, "i") } },
-                    { description : { '$regex' : new RegExp(search, "i") } },
+                    { categoryname : { '$regex' : new RegExp(search, "i") } },
+                    { description : { '$regex' : new RegExp(search, "i") } }
                 ]
             },{
                 page,
                 limit: parseInt(limit),
                 sort: { [sortfield] : [sortoption] },
                 lean: true
-            }).then((items) => {
-                return responseManager.onSuccess('Items list!', items, res);
+            }).then((categories) => {
+                return responseManager.onSuccess('Categories list!', categories, res);
             }).catch((error) => {
                 return responseManager.onError(error, res);
             })
@@ -32,71 +32,69 @@ router.post('/', helper.authenticateToken, async (req, res) => {
             return responseManager.unauthorisedRequest(res);
         }
     }else{
-        return responseManager.badrequest({ message: 'Invalid token to get items list, please try again' }, res);
+        return responseManager.badrequest({ message: 'Invalid token to get categories list, please try again' }, res);
     }
 });
 router.post('/save', helper.authenticateToken, async (req, res) => {
     if (req.token.superadminid && mongoose.Types.ObjectId.isValid(req.token.superadminid)) {
-        const { itemid, itemname, itemimage, description, status } = req.body;
+        const { categoryid, categoryname, description, status } = req.body;
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
         let superadmin = await primary.model(constants.MODELS.superadmins, superadminModel).findById(req.token.superadminid).lean();
         if(superadmin){
-            if(itemid && itemid != '' && mongoose.Types.ObjectId.isValid(itemid)){
-                let existingitem = await primary.model(constants.MODELS.items, itemModel).findOne({_id : {$ne : itemid}, itemname : itemname}).lean();
-                if(existingitem == null){
+            if(categoryid && categoryid != '' && mongoose.Types.ObjectId.isValid(categoryid)){
+                let existingCategory = await primary.model(constants.MODELS.eventcategories, eventcategoryModel).findOne({_id : {$ne : categoryid}, categoryname : categoryname}).lean();
+                if(existingCategory == null){
                     let obj = {
-                        itemname : itemname,
-                        itemimage : itemimage,
+                        categoryname : categoryname,
                         description : description,
                         status : status,
                         updatedBy : mongoose.Types.ObjectId(req.token.superadminid)
                     };
-                    await primary.model(constants.MODELS.items, itemModel).findByIdAndUpdate(itemid, obj);
-                    return responseManager.onSuccess('Item updated sucecssfully!', 1, res);
+                    await primary.model(constants.MODELS.eventcategories, eventcategoryModel).findByIdAndUpdate(categoryid, obj);
+                    return responseManager.onSuccess('Category updated sucecssfully!', 1, res);
                 }else{
-                    return responseManager.badrequest({ message: 'Item name can not be identical, please try again' }, res);
+                    return responseManager.badrequest({ message: 'Category name can not be identical, please try again' }, res);
                 }
             }else{
-                let existingitem = await primary.model(constants.MODELS.items, itemModel).findOne({itemname : itemname}).lean();
-                if(existingitem == null) {
+                let existingCategory = await primary.model(constants.MODELS.eventcategories, eventcategoryModel).findOne({categoryname : categoryname}).lean();
+                if(existingCategory == null) {
                     let obj = {
-                        itemname : itemname,
-                        itemimage : itemimage,
+                        categoryname : categoryname,
                         description : description,
                         status : status,
                         createdBy : mongoose.Types.ObjectId(req.token.superadminid),
                         updatedBy : mongoose.Types.ObjectId(req.token.superadminid)
                     };
-                    await primary.model(constants.MODELS.items, itemModel).create(obj);
-                    return responseManager.onSuccess('Item created sucecssfully!', 1, res);
+                    await primary.model(constants.MODELS.eventcategories, eventcategoryModel).create(obj);
+                    return responseManager.onSuccess('Category created sucecssfully!', 1, res);
                 }else{
-                    return responseManager.badrequest({ message: 'Item name can not be identical, please try again' }, res);
+                    return responseManager.badrequest({ message: 'Category name can not be identical, please try again' }, res);
                 }
-            }
-        }else{
-            return responseManager.badrequest({ message: 'Invalid token to get items list, please try again' }, res);
-        }
-    }else{
-        return responseManager.badrequest({ message: 'Invalid token to get items list, please try again' }, res);
-    }
-});
-router.post('/remove', helper.authenticateToken, async (req, res) => {
-    if (req.token.superadminid && mongoose.Types.ObjectId.isValid(req.token.superadminid)) {
-        const { itemid } = req.body;
-        let primary = mongoConnection.useDb(constants.DEFAULT_DB);
-        let superadmin = await primary.model(constants.MODELS.superadmins, superadminModel).findById(req.token.superadminid).lean();
-        if(superadmin){
-            if(itemid && itemid != '' && mongoose.Types.ObjectId.isValid(itemid)){
-                await primary.model(constants.MODELS.items, itemModel).findOneAndRemove(itemid);
-                return responseManager.onSuccess('Item removed sucecssfully!', 1, res);
-            }else{
-                return responseManager.badrequest({ message: 'Invalid item id to remove item data, please try again' }, res);
             }
         }else{
             return responseManager.unauthorisedRequest(res);
         }
     }else{
-        return responseManager.badrequest({ message: 'Invalid token to remove item data, please try again' }, res);
+        return responseManager.badrequest({ message: 'Invalid token to save category data, please try again' }, res);
+    }
+});
+router.post('/remove', helper.authenticateToken, async (req, res) => {
+    if (req.token.superadminid && mongoose.Types.ObjectId.isValid(req.token.superadminid)) {
+        const { categoryid } = req.body;
+        let primary = mongoConnection.useDb(constants.DEFAULT_DB);
+        let superadmin = await primary.model(constants.MODELS.superadmins, superadminModel).findById(req.token.superadminid).lean();
+        if(superadmin){
+            if(categoryid && categoryid != '' && mongoose.Types.ObjectId.isValid(categoryid)){
+                await primary.model(constants.MODELS.eventcategories, eventcategoryModel).findOneAndRemove(categoryid);
+                return responseManager.onSuccess('Category removed sucecssfully!', 1, res);
+            }else{
+                return responseManager.badrequest({ message: 'Invalid category id to remove category data, please try again' }, res);
+            }
+        }else{
+            return responseManager.unauthorisedRequest(res);
+        }
+    }else{
+        return responseManager.badrequest({ message: 'Invalid token to remove category data, please try again' }, res);
     }
 });
 router.post('/list', helper.authenticateToken, async (req, res) => {
@@ -104,8 +102,8 @@ router.post('/list', helper.authenticateToken, async (req, res) => {
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
         let superadmin = await primary.model(constants.MODELS.superadmins, superadminModel).findById(req.token.superadminid).lean();
         if(superadmin){
-            primary.model(constants.MODELS.items, itemModel).find({}).then((itemslist) => {
-                return responseManager.onSuccess('Items list!', itemslist, res);
+            primary.model(constants.MODELS.eventcategories, eventcategoryModel).find({}).then((categories) => {
+                return responseManager.onSuccess('Categories list!', categories, res);
             }).catch((error) => {
                 return responseManager.onError(error, res);
             })
@@ -113,26 +111,26 @@ router.post('/list', helper.authenticateToken, async (req, res) => {
             return responseManager.unauthorisedRequest(res);
         }
     }else{
-        return responseManager.badrequest({ message: 'Invalid token to get items list, please try again' }, res);
+        return responseManager.badrequest({ message: 'Invalid token to get categories list, please try again' }, res);
     }
 });
 router.post('/getone', helper.authenticateToken, async (req, res) => {
     if (req.token.superadminid && mongoose.Types.ObjectId.isValid(req.token.superadminid)) {
-        const { itemid } = req.body;
+        const { categoryid } = req.body;
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
         let superadmin = await primary.model(constants.MODELS.superadmins, superadminModel).findById(req.token.superadminid).lean();
         if(superadmin){
-            if(itemid && itemid != '' && mongoose.Types.ObjectId.isValid(itemid)){
-                let itemData = await primary.model(constants.MODELS.items, itemModel).findById(itemid);
-                return responseManager.onSuccess('Item removed sucecssfully!', itemData, res);
+            if(categoryid && itemid != '' && mongoose.Types.ObjectId.isValid(categoryid)){
+                let categoryData = await primary.model(constants.MODELS.eventcategories, eventcategoryModel).findById(categoryid);
+                return responseManager.onSuccess('Category data !', categoryData, res);
             }else{
-                return responseManager.badrequest({ message: 'Invalid item id to get item data, please try again' }, res);
+                return responseManager.badrequest({ message: 'Invalid category id to get item data, please try again' }, res);
             }
         }else{
             return responseManager.unauthorisedRequest(res);
         }
     }else{
-        return responseManager.badrequest({ message: 'Invalid token to get item data, please try again' }, res);
+        return responseManager.badrequest({ message: 'Invalid token to get category data, please try again' }, res);
     }
 });
 module.exports = router;
