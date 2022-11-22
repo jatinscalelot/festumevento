@@ -38,7 +38,9 @@ router.post('/', helper.authenticateToken, async (req, res, next) => {
             updatedBy : mongoose.Types.ObjectId(req.token.organizerid)
         };
         await primary.model(constants.MODELS.organizers, organizerModel).findByIdAndUpdate(req.token.organizerid, obj);
-        return responseManager.onSuccess('Organizer profile updated successfully!', 1, res);
+        let organizerData = await primary.model(constants.MODELS.organizers, organizerModel).findById(req.token.organizerid).select('-password').lean();
+        organizerData.s3Url = process.env.AWS_BUCKET_URI;
+        return responseManager.onSuccess('Organizer profile updated successfully!', organizerData, res);
     }else{
         return responseManager.badrequest({ message: 'Invalid token to update organizer profile, please try again' }, res);
     }
@@ -55,7 +57,13 @@ router.post('/profilepic', helper.authenticateToken, fileHelper.memoryUpload.sin
                     AwsCloud.saveToS3(req.file.buffer, req.token.organizerid.toString(), req.file.mimetype, 'organizerprofile').then((result) => {
                         let obj = {profile_pic : result.data.Key};
                         primary.model(constants.MODELS.organizers, organizerModel).findByIdAndUpdate(req.token.organizerid, obj).then((updateResult) => {
-                            return responseManager.onSuccess('Organizer profile pic updated successfully!', 1, res);
+                            ( async () => {
+                                let organizerData = await primary.model(constants.MODELS.organizers, organizerModel).findById(req.token.organizerid).select('-password').lean();
+                                organizerData.s3Url = process.env.AWS_BUCKET_URI;
+                                return responseManager.onSuccess('Organizer profile pic updated successfully!', organizerData, res);
+                            })().catch((error) => {
+                                return responseManager.onError(error, res);
+                            });
                         }).catch((error) => {
                             return responseManager.onError(error, res);
                         });
@@ -95,7 +103,9 @@ router.post('/businessprofile', helper.authenticateToken, async (req, res, next)
                 about : about
             };
             await primary.model(constants.MODELS.organizers, organizerModel).findByIdAndUpdate(req.token.organizerid, {businessProfile : obj});
-            return responseManager.onSuccess('Organizer business profile updated successfully!', 1, res);
+            let organizerData = await primary.model(constants.MODELS.organizers, organizerModel).findById(req.token.organizerid).select('-password').lean();
+            organizerData.s3Url = process.env.AWS_BUCKET_URI;
+            return responseManager.onSuccess('Organizer business profile updated successfully!', organizerData, res);
         }
     }else{
         return responseManager.badrequest({ message: 'Invalid token to update organizer business profile, please try again' }, res);
@@ -112,7 +122,13 @@ router.post('/businessprofilepic', helper.authenticateToken, fileHelper.memoryUp
                 if (filesizeinMb <= 5) {
                     AwsCloud.saveToS3(req.file.buffer, req.token.organizerid.toString(), req.file.mimetype, 'organizerbusinessprofile').then((result) => {
                         primary.model(constants.MODELS.organizers, organizerModel).findByIdAndUpdate(req.token.organizerid, {"businessProfile.profile_pic" : result.data.Key}).then((updateResult) => {
-                            return responseManager.onSuccess('Organizer business profile pic updated successfully!', 1, res);
+                            ( async () => {
+                                let organizerData = await primary.model(constants.MODELS.organizers, organizerModel).findById(req.token.organizerid).select('-password').lean();
+                                organizerData.s3Url = process.env.AWS_BUCKET_URI;
+                                return responseManager.onSuccess('Organizer business profile pic updated successfully!', organizerData, res);
+                            })().catch((error) => {
+                                return responseManager.onError(error, res);
+                            });
                         }).catch((error) => {
                             return responseManager.onError(error, res);
                         });
