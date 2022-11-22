@@ -97,7 +97,7 @@ router.post('/changepassword', async (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     let primary = mongoConnection.useDb(constants.DEFAULT_DB);
     const { password, mobile } = req.body;
-    if(password && password.trim() != '' && password.length > 6 && mobile && mobile.length == 10){
+    if(password && password.trim() != '' && password.length >= 6 && mobile && mobile.length == 10){
         let organizerData = await primary.model(constants.MODELS.organizers, organizerModel).findOne({mobile : mobile}).lean();
         if(organizerData){
             let ecnPassword = await helper.passwordEncryptor(password);
