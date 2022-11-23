@@ -8,7 +8,10 @@ let schema = new mongoose.Schema({
 	updatedBy: {
 		type: mongoose.Types.ObjectId,
 		default: null
-	}
+	},
+	items : [
+		
+	]
 }, { timestamps: true, strict: false, autoIndex: true });
 schema.plugin(mongoosePaginate);
 module.exports = schema;
