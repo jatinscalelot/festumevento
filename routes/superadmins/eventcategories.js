@@ -135,7 +135,7 @@ router.post('/getone', helper.authenticateToken, async (req, res) => {
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
         let superadmin = await primary.model(constants.MODELS.superadmins, superadminModel).findById(req.token.superadminid).lean();
         if (superadmin) {
-            if (categoryid && itemid != '' && mongoose.Types.ObjectId.isValid(categoryid)) {
+            if (categoryid && categoryid != '' && mongoose.Types.ObjectId.isValid(categoryid)) {
                 let categoryData = await primary.model(constants.MODELS.eventcategories, eventcategoryModel).findById(categoryid);
                 return responseManager.onSuccess('Category data !', categoryData, res);
             } else {
