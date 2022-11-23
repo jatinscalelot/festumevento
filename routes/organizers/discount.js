@@ -6,6 +6,7 @@ const constants = require('../../utilities/constants');
 const helper = require('../../utilities/helper');
 const dicountModel = require('../../models/discounts.model');
 const itemModel = require('../../models/items.model');
+const mongoose = require('mongoose');
 router.get('/list', helper.authenticateToken, async (req, res) => {
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
