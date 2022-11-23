@@ -23,4 +23,25 @@ router.get('/list', helper.authenticateToken, async (req, res) => {
         return responseManager.unauthorisedRequest(res);
     }
 });
+router.get('/getone', helper.authenticateToken, async (req, res) => {
+    if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
+        const { discountid } = req.body;
+        if(discountid && discountid != '' && mongoose.Types.ObjectId.isValid(discountid)){
+            let primary = mongoConnection.useDb(constants.DEFAULT_DB);
+            primary.model(constants.MODELS.discounts, dicountModel).findById(discountid).populate({
+                path: "items",
+                model: primary.model(constants.MODELS.items, itemModel),
+                select: '-createdAt -updatedAt -__v -createdBy -updatedBy -status'
+            }).lean().then((dicsount) => {
+                return responseManager.onSuccess('Discount data!', dicsount, res);
+            }).catch((error) => {
+                return responseManager.onError(error, res);
+            });
+        }else{
+            return responseManager.unauthorisedRequest(res);
+        }
+    }else{
+        return responseManager.unauthorisedRequest(res);
+    }
+});
 module.exports = router;
