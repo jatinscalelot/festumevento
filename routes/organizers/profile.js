@@ -13,6 +13,7 @@ router.get('/', helper.authenticateToken, async (req, res, next) => {
     res.setHeader('Access-Control-Allow-Headers','Content-Type,Authorization');
     res.setHeader('Access-Control-Allow-Origin', '*');
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
+        console.log('req.token.organizerid', req.token.organizerid);
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
         let organizerData = await primary.model(constants.MODELS.organizers, organizerModel).findById(req.token.organizerid).select('-password').lean();
         if(organizerData){
