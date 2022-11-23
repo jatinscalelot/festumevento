@@ -100,7 +100,7 @@ router.post('/remove', helper.authenticateToken, async (req, res) => {
         let superadmin = await primary.model(constants.MODELS.superadmins, superadminModel).findById(req.token.superadminid).lean();
         if(superadmin){
             if(discountid && discountid != '' && mongoose.Types.ObjectId.isValid(discountid)){
-                await primary.model(constants.MODELS.discounts, discountModel).findOneAndRemove(discountid);
+                await primary.model(constants.MODELS.discounts, discountModel).findByIdAndRemove(discountid);
                 return responseManager.onSuccess('Discount removed sucecssfully!', 1, res);
             }else{
                 return responseManager.badrequest({ message: 'Invalid discount id to remove discount data, please try again' }, res);
