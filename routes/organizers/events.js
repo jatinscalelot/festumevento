@@ -20,7 +20,8 @@ const companydetailCtrl = require('../../controllers/organizer/events/companydet
 const personaldetailCtrl = require('../../controllers/organizer/events/personaldetail');
 const tandcCtrl = require('../../controllers/organizer/events/tandc');
 const discountCtrl = require('../../controllers/organizer/events/discount');
-router.post('/create', helper.authenticateToken, createCtrl.createevent);
+// post apis
+router.post('/save', helper.authenticateToken, createCtrl.createevent);
 router.post('/about', helper.authenticateToken, aboutCtrl.aboutevent);
 router.post('/arrangement', helper.authenticateToken, arrangementCtrl.arrangement);
 router.post('/location', helper.authenticateToken, locationCtrl.location);
@@ -30,6 +31,18 @@ router.post('/companydetail', helper.authenticateToken, companydetailCtrl.compan
 router.post('/personaldetail', helper.authenticateToken, personaldetailCtrl.personaldetail);
 router.post('/tandc', helper.authenticateToken, tandcCtrl.tandc);
 router.post('/discount', helper.authenticateToken, discountCtrl.discount);
+// get apis
+router.get('/', helper.authenticateToken, createCtrl.getevent);
+router.get('/about', helper.authenticateToken, aboutCtrl.getaboutevent);
+router.get('/arrangement', helper.authenticateToken, arrangementCtrl.getarrangement);
+router.get('/location', helper.authenticateToken, locationCtrl.getlocation);
+router.get('/media', helper.authenticateToken, mediaCtrl.getmedia);
+router.get('/permission', helper.authenticateToken, permissionCtrl.getpermission);
+router.get('/companydetail', helper.authenticateToken, companydetailCtrl.getcompanydetail);
+router.get('/personaldetail', helper.authenticateToken, personaldetailCtrl.getpersonaldetail);
+router.get('/tandc', helper.authenticateToken, tandcCtrl.gettandc);
+router.get('/discount', helper.authenticateToken, discountCtrl.getdiscount);
+
 router.post('/image', helper.authenticateToken, fileHelper.memoryUpload.single('file'), async (req, res) => {
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
         if (req.file) {
