@@ -52,6 +52,13 @@ const subadminpaths = [
 const superadminpaths = [
   { pathUrl: '/login', routeFile: 'login' },
   { pathUrl: '/item', routeFile: 'item' },
+  { pathUrl: '/discount', routeFile: 'discount' },
+  { pathUrl: '/eventcategories', routeFile: 'eventcategories' },
+  { pathUrl: '/organizer', routeFile: 'organizer' },
+  { pathUrl: '/event', routeFile: 'event' },
+  { pathUrl: '/admin', routeFile: 'admin' },
+  { pathUrl: '/subadmin', routeFile: 'subadmin' },
+  { pathUrl: '/executive', routeFile: 'executive' }
 ];
 const userpaths = [
   { pathUrl: '/', routeFile: 'index'}
