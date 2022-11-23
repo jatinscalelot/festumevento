@@ -124,7 +124,7 @@ router.post('/getone', helper.authenticateToken, async (req, res) => {
         if(superadmin){
             if(itemid && itemid != '' && mongoose.Types.ObjectId.isValid(itemid)){
                 let itemData = await primary.model(constants.MODELS.items, itemModel).findById(itemid);
-                return responseManager.onSuccess('Item removed sucecssfully!', itemData, res);
+                return responseManager.onSuccess('Item data!', itemData, res);
             }else{
                 return responseManager.badrequest({ message: 'Invalid item id to get item data, please try again' }, res);
             }
