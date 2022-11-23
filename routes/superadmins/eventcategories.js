@@ -110,9 +110,14 @@ router.post('/remove', helper.authenticateToken, async (req, res) => {
 router.post('/list', helper.authenticateToken, async (req, res) => {
     if (req.token.superadminid && mongoose.Types.ObjectId.isValid(req.token.superadminid)) {
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
+        const { event_type } = req.body;
+        let query = {};
+        if(event_type != 'all'){
+            query.event_type = event_type;
+        }
         let superadmin = await primary.model(constants.MODELS.superadmins, superadminModel).findById(req.token.superadminid).lean();
         if (superadmin) {
-            primary.model(constants.MODELS.eventcategories, eventcategoryModel).find({}).then((categories) => {
+            primary.model(constants.MODELS.eventcategories, eventcategoryModel).find({...query}).then((categories) => {
                 return responseManager.onSuccess('Categories list!', categories, res);
             }).catch((error) => {
                 return responseManager.onError(error, res);
