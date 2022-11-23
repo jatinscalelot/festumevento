@@ -39,6 +39,12 @@ router.post('/', helper.authenticateToken, async (req, res) => {
 router.post('/save', helper.authenticateToken, async (req, res) => {
     if (req.token.superadminid && mongoose.Types.ObjectId.isValid(req.token.superadminid)) {
         const { discountid, discountname, discounttype, description, discount, status, tandc, items } = req.body;
+        let itemsArray = [];
+        if(items && items.length > 0){
+            items.forEach(element => {
+                itemsArray.push(mongoose.Types.ObjectId(element));
+            });
+        }
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
         let superadmin = await primary.model(constants.MODELS.superadmins, superadminModel).findById(req.token.superadminid).lean();
         if(superadmin){
@@ -52,7 +58,7 @@ router.post('/save', helper.authenticateToken, async (req, res) => {
                         discount : discount,
                         tandc : tandc,
                         status : status,
-                        items : items,
+                        items : itemsArray,
                         updatedBy : mongoose.Types.ObjectId(req.token.superadminid)
                     };
                     await primary.model(constants.MODELS.discounts, discountModel).findByIdAndUpdate(discountid, obj);
@@ -70,7 +76,7 @@ router.post('/save', helper.authenticateToken, async (req, res) => {
                         discount : discount,
                         tandc : tandc,
                         status : status,
-                        items : items,
+                        items : itemsArray,
                         createdBy : mongoose.Types.ObjectId(req.token.superadminid),
                         updatedBy : mongoose.Types.ObjectId(req.token.superadminid)
                     };
