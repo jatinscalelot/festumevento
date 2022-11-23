@@ -46,7 +46,8 @@ const organizerpaths = [
   { pathUrl: '/profile', routeFile: 'profile'},
   { pathUrl: '/events', routeFile: 'events'},
   { pathUrl: '/discount', routeFile: 'discount' },
-  { pathUrl: '/item', routeFile: 'item'}
+  { pathUrl: '/item', routeFile: 'item'},
+  { pathUrl: '/categories', routeFile: 'categories'}
 ];
 const subadminpaths = [
   { pathUrl: '/', routeFile: 'index'}
