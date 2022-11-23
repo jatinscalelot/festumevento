@@ -137,7 +137,7 @@ router.post('/getone', helper.authenticateToken, async (req, res) => {
         if(superadmin){
             if( discountid && discountid != '' && mongoose.Types.ObjectId.isValid(discountid)){
                 let discountData = await primary.model(constants.MODELS.discounts, discountModel).findById(discountid);
-                return responseManager.onSuccess('Discount removed sucecssfully!', discountData, res);
+                return responseManager.onSuccess('Discount data!', discountData, res);
             }else{
                 return responseManager.badrequest({ message: 'Invalid discount id to get discount data, please try again' }, res);
             }
