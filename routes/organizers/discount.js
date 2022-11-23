@@ -13,7 +13,7 @@ router.get('/list', helper.authenticateToken, async (req, res) => {
         primary.model(constants.MODELS.discounts, dicountModel).find({status : true}).populate({
             path: "items",
             model: primary.model(constants.MODELS.items, itemModel),
-            select: '-createdAt -updatedAt -__v -createdBy -updatedBy'
+            select: '-createdAt -updatedAt -__v -createdBy -updatedBy -status'
         }).lean().then((dicsounts) => {
             return responseManager.onSuccess('Discount list!', dicsounts, res);
         }).catch((error) => {
