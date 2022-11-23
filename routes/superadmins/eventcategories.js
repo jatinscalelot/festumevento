@@ -95,7 +95,7 @@ router.post('/remove', helper.authenticateToken, async (req, res) => {
         let superadmin = await primary.model(constants.MODELS.superadmins, superadminModel).findById(req.token.superadminid).lean();
         if (superadmin) {
             if (categoryid && categoryid != '' && mongoose.Types.ObjectId.isValid(categoryid)) {
-                await primary.model(constants.MODELS.eventcategories, eventcategoryModel).findOneAndRemove(categoryid);
+                await primary.model(constants.MODELS.eventcategories, eventcategoryModel).findByIdAndRemove(categoryid);
                 return responseManager.onSuccess('Category removed sucecssfully!', 1, res);
             } else {
                 return responseManager.badrequest({ message: 'Invalid category id to remove category data, please try again' }, res);
