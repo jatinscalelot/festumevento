@@ -87,7 +87,7 @@ router.post('/remove', helper.authenticateToken, async (req, res) => {
         let superadmin = await primary.model(constants.MODELS.superadmins, superadminModel).findById(req.token.superadminid).lean();
         if(superadmin){
             if(itemid && itemid != '' && mongoose.Types.ObjectId.isValid(itemid)){
-                await primary.model(constants.MODELS.items, itemModel).findOneAndRemove(itemid);
+                await primary.model(constants.MODELS.items, itemModel).findByIdAndRemove(itemid);
                 return responseManager.onSuccess('Item removed sucecssfully!', 1, res);
             }else{
                 return responseManager.badrequest({ message: 'Invalid item id to remove item data, please try again' }, res);
