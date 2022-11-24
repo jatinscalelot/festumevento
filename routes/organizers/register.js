@@ -11,9 +11,9 @@ const config = {
         'content-type': 'application/x-www-form-urlencoded'
     }
 };
-router.post('/', async (req, res, next) => {
+router.post('/', async (req, res) => {
+    res.setHeader('Access-Control-Allow-Headers','Content-Type,Authorization');
     res.setHeader('Access-Control-Allow-Origin', '*');
-    console.log('body', req.body);
     const { name, email, mobile, country_code, password, refer_code, fcm_token } = req.body;
     if(name && name.trim() != '' && email && email.trim() != '' && (/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(email)) && mobile && mobile.length == 10 && country_code && country_code.trim() != '' && password && password.length >= 6){
         let ecnPassword = await helper.passwordEncryptor(password);
@@ -50,7 +50,8 @@ router.post('/', async (req, res, next) => {
         return responseManager.badrequest({message : 'Invalid data to register organizer, please try again'}, res);
     } 
 });
-router.post('/verifyotp', async (req, res, next) => {
+router.post('/verifyotp', async (req, res) => {
+    res.setHeader('Access-Control-Allow-Headers','Content-Type,Authorization');
     res.setHeader('Access-Control-Allow-Origin', '*');
     let primary = mongoConnection.useDb(constants.DEFAULT_DB);
     const { key, otp, mobile } = req.body;
@@ -73,6 +74,7 @@ router.post('/verifyotp', async (req, res, next) => {
     } 
 });
 router.post('/forgotpassword', async (req, res) => {
+    res.setHeader('Access-Control-Allow-Headers','Content-Type,Authorization');
     res.setHeader('Access-Control-Allow-Origin', '*');
     const { mobile } = req.body;
     if(mobile && mobile != '' && mobile.length == 10){
@@ -95,6 +97,7 @@ router.post('/forgotpassword', async (req, res) => {
     }
 });
 router.post('/changepassword', async (req, res) => {
+    res.setHeader('Access-Control-Allow-Headers','Content-Type,Authorization');
     res.setHeader('Access-Control-Allow-Origin', '*');
     let primary = mongoConnection.useDb(constants.DEFAULT_DB);
     const { password, mobile } = req.body;

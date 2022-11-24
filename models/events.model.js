@@ -1,6 +1,10 @@
 let mongoose = require("mongoose");
 let mongoosePaginate = require("mongoose-paginate-v2");
 let schema = new mongoose.Schema({
+    event_category : {
+        type: mongoose.Types.ObjectId,
+		default: null
+    },
     event_location : {
         location: {
             type: {

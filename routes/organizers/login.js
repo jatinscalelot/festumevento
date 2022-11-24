@@ -5,7 +5,8 @@ const responseManager = require('../../utilities/response.manager');
 const constants = require('../../utilities/constants');
 const helper = require('../../utilities/helper');
 const organizerModel = require('../../models/organizers.model');
-router.post('/', async (req, res, next) => {
+router.post('/', async (req, res) => {
+    res.setHeader('Access-Control-Allow-Headers','Content-Type,Authorization');
     res.setHeader('Access-Control-Allow-Origin', '*');
     const { mobile, password } = req.body;
     if(mobile && password && mobile.length == 10 && password.length >= 6){
