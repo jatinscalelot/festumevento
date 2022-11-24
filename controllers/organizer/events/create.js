@@ -55,7 +55,7 @@ exports.createevent = async (req, res) => {
                                 path: "event_category",
                                 model: primary.model(constants.MODELS.categories, categoryModel),
                                 select: '-createdAt -updatedAt -__v -createdBy -updatedBy -status'
-                            }).lean();
+                            });
                             console.log('eventData', eventData);
                             // return responseManager.onSuccess('Organizer event created successfully!', eventData, res);
                         } else {
