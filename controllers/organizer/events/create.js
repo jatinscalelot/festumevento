@@ -28,7 +28,8 @@ exports.createevent = async (req, res) => {
                             model: primary.model(constants.MODELS.categories, categoryModel),
                             select: '-createdAt -updatedAt -__v -createdBy -updatedBy -status'
                         }).lean();
-                        return responseManager.onSuccess('Organizer event updated successfully!', {_id : eventData._id, name: eventData.name, event_type: eventData.event_type, event_category : eventData.event_category, other: eventData.other, status : eventData.status}, res);
+                        console.log('eventData', eventData);
+                        // return responseManager.onSuccess('Organizer event updated successfully!', {_id : eventData._id, name: eventData.name, event_type: eventData.event_type, event_category : eventData.event_category, other: eventData.other, status : eventData.status}, res);
                     } else {
                         return responseManager.badrequest({ message: 'Invalid event category to update event, please try again' }, res);
                     }
@@ -54,7 +55,8 @@ exports.createevent = async (req, res) => {
                             model: primary.model(constants.MODELS.categories, categoryModel),
                             select: '-createdAt -updatedAt -__v -createdBy -updatedBy -status'
                         }).lean();
-                        return responseManager.onSuccess('Organizer event created successfully!', eventData, res);
+                        console.log('eventData', eventData);
+                        // return responseManager.onSuccess('Organizer event created successfully!', eventData, res);
                     } else {
                         return responseManager.badrequest({ message: 'Invalid event category to create event, please try again' }, res);
                     }
