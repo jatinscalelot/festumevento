@@ -21,14 +21,16 @@ exports.discount = async (req, res) => {
                         discount.items.forEach(element => {
                             itemArray.push(mongoose.Types.ObjectId(element));
                         });
-                        discount.items = itemArray;
-                        finalDiscount.push(discount);
+                        let xdiscount = {...discount};
+                        xdiscount.items = itemArray;
+                        finalDiscount.push(xdiscount);
                     }else{
                         finalDiscount.push(discount);
                     }
                     next_discount();
                 }, () => {
                     ( async () => {
+                        console.log('finalDiscount', finalDiscount);
                         if (eventid && eventid != '' && mongoose.Types.ObjectId.isValid(eventid)) {
                             await primary.model(constants.MODELS.events, eventModel).findByIdAndUpdate(eventid, { updatedBy: mongoose.Types.ObjectId(req.token.organizerid), discounts: finalDiscount });
                             let eventData = await primary.model(constants.MODELS.events, eventModel).findById(eventid).populate({
