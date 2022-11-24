@@ -14,7 +14,7 @@ exports.location = async (req, res) => {
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
         let organizerData = await primary.model(constants.MODELS.organizers, organizerModel).findById(req.token.organizerid).select('-password').lean();
         if (organizerData && organizerData.status == true && organizerData.mobileverified == true) {
-            const { eventid, flat_no, street_name, area_name, location_address, address, city, state, pincode, longitude, latitude } = req.body;
+            const { eventid, flat_no, street_name, area_name, city, state, pincode, longitude, latitude } = req.body;
             if (eventid && eventid != '' && mongoose.Types.ObjectId.isValid(eventid)) {
                 if (city && city.trim() != '' && state && state.trim() != '' && pincode && pincode != '') {
                     if (latitude && latitude != '' && longitude && longitude != '' && validateLatLng(parseFloat(latitude), parseFloat(longitude))) {
@@ -22,8 +22,6 @@ exports.location = async (req, res) => {
                             flat_no: flat_no,
                             street_name: street_name,
                             area_name: area_name,
-                            location_address: location_address,
-                            address: address,
                             city: city,
                             state: state,
                             pincode: pincode,
