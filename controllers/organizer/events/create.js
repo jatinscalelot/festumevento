@@ -30,7 +30,24 @@ exports.createevent = async (req, res) => {
                         }).lean();
                         return responseManager.onSuccess('Organizer event updated successfully!', {_id : eventData._id, name: eventData.name, event_type: eventData.event_type, event_category : eventData.event_category, other: eventData.other, status : eventData.status}, res);
                     } else {
-                        return responseManager.badrequest({ message: 'Invalid event category to update event, please try again' }, res);
+                        if(other && other != ''){
+                            let obj = {
+                                name: name,
+                                event_type: event_type,
+                                event_category: null,
+                                other: other,
+                                updatedBy: mongoose.Types.ObjectId(req.token.organizerid),
+                            };
+                            await primary.model(constants.MODELS.events, eventModel).findByIdAndUpdate(eventid, obj);
+                            let eventData = await primary.model(constants.MODELS.events, eventModel).findById(eventid).populate({
+                                path: "event_category",
+                                model: primary.model(constants.MODELS.eventcategories, categoryModel),
+                                select: '-createdAt -updatedAt -__v -createdBy -updatedBy -status'
+                            }).lean();
+                            return responseManager.onSuccess('Organizer event updated successfully!', {_id : eventData._id, name: eventData.name, event_type: eventData.event_type, event_category : eventData.event_category, other: eventData.other, status : eventData.status}, res);    
+                        }else{
+                            return responseManager.badrequest({ message: 'Invalid event category or other value to update event, please try again' }, res);
+                        }
                     }
                 } else {
                     return responseManager.badrequest({ message: 'Invalid data to update event, please try again' }, res);
@@ -56,7 +73,27 @@ exports.createevent = async (req, res) => {
                         }).lean();
                         return responseManager.onSuccess('Organizer event created successfully!', eventData, res);
                     } else {
-                        return responseManager.badrequest({ message: 'Invalid event category to create event, please try again' }, res);
+                        if(other && other != ''){
+                            let obj = {
+                                name: name,
+                                event_type: event_type,
+                                event_category: null,
+                                other: other,
+                                createdBy: mongoose.Types.ObjectId(req.token.organizerid),
+                                updatedBy: mongoose.Types.ObjectId(req.token.organizerid),
+                                timestamp: Date.now(),
+                                status: false
+                            };
+                            let createdEvent = await primary.model(constants.MODELS.events, eventModel).create(obj);
+                            let eventData = await primary.model(constants.MODELS.events, eventModel).findById(createdEvent._id).populate({
+                                path: "event_category",
+                                model: primary.model(constants.MODELS.eventcategories, categoryModel),
+                                select: '-createdAt -updatedAt -__v -createdBy -updatedBy -status'
+                            }).lean();
+                            return responseManager.onSuccess('Organizer event created successfully!', eventData, res);
+                        }else{
+                            return responseManager.badrequest({ message: 'Invalid event category or other to create event, please try again' }, res);
+                        }
                     }
                 } else {
                     return responseManager.badrequest({ message: 'Invalid data to create event, please try again' }, res);
