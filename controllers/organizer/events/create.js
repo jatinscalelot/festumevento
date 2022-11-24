@@ -79,7 +79,7 @@ exports.getevent = async (req, res) => {
             if (eventid && eventid != '' && mongoose.Types.ObjectId.isValid(eventid)) {
                 let eventData = await primary.model(constants.MODELS.events, eventModel).findById(eventid).populate({
                     path: "event_category",
-                    model: primary.model(constants.MODELS.categories, categoryModel),
+                    model: primary.model(constants.MODELS.eventcategories, categoryModel),
                     select: '-createdAt -updatedAt -__v -createdBy -updatedBy -status'
                 }).lean();
                 return responseManager.onSuccess('Organizer event data!', {_id : eventData._id, name: eventData.name, event_type: eventData.event_type, event_category : eventData.event_category, other: eventData.other}, res);
