@@ -33,7 +33,7 @@ exports.discount = async (req, res) => {
                         if (eventid && eventid != '' && mongoose.Types.ObjectId.isValid(eventid)) {
                             await primary.model(constants.MODELS.events, eventModel).findByIdAndUpdate(eventid, { updatedBy: mongoose.Types.ObjectId(req.token.organizerid), discounts: finalDiscount });
                             let eventData = await primary.model(constants.MODELS.events, eventModel).findById(eventid).populate({
-                                path: "discounts.$.items",
+                                path: "discounts.items",
                                 model: primary.model(constants.MODELS.items, itemModel),
                                 select: '-createdAt -updatedAt -__v -createdBy -updatedBy -status'
                             }).lean();
@@ -62,7 +62,7 @@ exports.getdiscount = async (req, res) => {
             const { eventid } = req.query;
             if (eventid && eventid != '' && mongoose.Types.ObjectId.isValid(eventid)) {
                 let eventData = await primary.model(constants.MODELS.events, eventModel).findById(eventid).populate({
-                    path: "discounts.$.items",
+                    path: "discounts.items",
                     model: primary.model(constants.MODELS.items, itemModel),
                     select: '-createdAt -updatedAt -__v -createdBy -updatedBy -status'
                 }).lean();
