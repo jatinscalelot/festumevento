@@ -18,7 +18,7 @@ exports.list = async (req, res) => {
                     { event_type : { '$regex' : new RegExp(search, "i") } },
                     { other : { '$regex' : new RegExp(search, "i") } }
                 ],
-                createdBy : mongoose.Types.ObjectId(req.token.organizerid);
+                createdBy : mongoose.Types.ObjectId(req.token.organizerid)
             },{
                 page,
                 limit: parseInt(limit),
