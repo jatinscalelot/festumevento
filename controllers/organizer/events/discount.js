@@ -37,7 +37,11 @@ exports.discount = async (req, res) => {
                                 model: primary.model(constants.MODELS.items, itemModel),
                                 select: '-createdAt -updatedAt -__v -createdBy -updatedBy -status'
                             }).lean();
-                            return responseManager.onSuccess('Organizer event discounts data updated successfully!', { _id: eventData._id, discounts: eventData.discounts }, res);
+                            if(eventData && eventData != null){
+                                return responseManager.onSuccess('Organizer event discounts data updated successfully!', { _id: eventData._id, discounts: eventData.discounts }, res);
+                            }else{
+                                return responseManager.badrequest({ message: 'Invalid event id get event data, please try again' }, res);
+                            }
                         } else {
                             return responseManager.badrequest({ message: 'Invalid event id to add event discounts data, please try again' }, res);
                         }
@@ -66,7 +70,11 @@ exports.getdiscount = async (req, res) => {
                     model: primary.model(constants.MODELS.items, itemModel),
                     select: '-createdAt -updatedAt -__v -createdBy -updatedBy -status'
                 }).lean();
-                return responseManager.onSuccess('Organizer event data!', { _id: eventData._id, discounts: eventData.discounts }, res);
+                if(eventData && eventData != null){
+                    return responseManager.onSuccess('Organizer event data!', { _id: eventData._id, discounts: eventData.discounts }, res);
+                }else{
+                    return responseManager.badrequest({ message: 'Invalid event id get event data, please try again' }, res);
+                }
             } else {
                 return responseManager.badrequest({ message: 'Invalid event id get event data, please try again' }, res);
             }

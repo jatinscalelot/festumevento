@@ -31,7 +31,11 @@ exports.personaldetail = async (req, res) => {
                         };
                         await primary.model(constants.MODELS.events, eventModel).findByIdAndUpdate(eventid, {updatedBy : mongoose.Types.ObjectId(req.token.organizerid), personaldetail : obj});
                         let eventData = await primary.model(constants.MODELS.events, eventModel).findById(eventid).lean();
-                        return responseManager.onSuccess('Organizer event personal data updated successfully!', {_id : eventData._id, personaldetail : eventData.personaldetail}, res);        
+                        if(eventData && eventData != null){
+                            return responseManager.onSuccess('Organizer event personal data updated successfully!', {_id : eventData._id, personaldetail : eventData.personaldetail}, res);        
+                        }else{
+                            return responseManager.badrequest({ message: 'Invalid event id get event data, please try again' }, res);
+                        }
                     }else{
                         return responseManager.badrequest({message : 'Invalid email id, please try again'}, res);
                     }
@@ -57,7 +61,11 @@ exports.getpersonaldetail = async (req, res) => {
             const { eventid } = req.query;
             if (eventid && eventid != '' && mongoose.Types.ObjectId.isValid(eventid)) {
                 let eventData = await primary.model(constants.MODELS.events, eventModel).findById(eventid);
-                return responseManager.onSuccess('Organizer event data!', {_id : eventData._id, personaldetail : eventData.personaldetail}, res);
+                if(eventData && eventData != null){
+                    return responseManager.onSuccess('Organizer event data!', {_id : eventData._id, personaldetail : eventData.personaldetail}, res);
+                }else{
+                    return responseManager.badrequest({ message: 'Invalid event id get event data, please try again' }, res);
+                }
             } else {
                 return responseManager.badrequest({ message: 'Invalid event id get event data, please try again' }, res);
             }

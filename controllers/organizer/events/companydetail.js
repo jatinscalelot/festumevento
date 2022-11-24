@@ -27,7 +27,11 @@ exports.companydetail = async (req, res) => {
                 };
                 await primary.model(constants.MODELS.events, eventModel).findByIdAndUpdate(eventid, { updatedBy: mongoose.Types.ObjectId(req.token.organizerid), companydetail: obj });
                 let eventData = await primary.model(constants.MODELS.events, eventModel).findById(eventid).lean();
-                return responseManager.onSuccess('Organizer event company data updated successfully!', {_id : eventData._id, companydetail : eventData.companydetail}, res);
+                if(eventData && eventData != null){
+                    return responseManager.onSuccess('Organizer event company data updated successfully!', {_id : eventData._id, companydetail : eventData.companydetail}, res);
+                }else{
+                    return responseManager.badrequest({ message: 'Invalid event id get event data, please try again' }, res);
+                }
             } else {
                 return responseManager.badrequest({ message: 'Invalid event id to add event company data, please try again' }, res);
             }
@@ -47,7 +51,11 @@ exports.getcompanydetail = async (req, res) => {
             const { eventid } = req.query;
             if (eventid && eventid != '' && mongoose.Types.ObjectId.isValid(eventid)) {
                 let eventData = await primary.model(constants.MODELS.events, eventModel).findById(eventid);
-                return responseManager.onSuccess('Organizer event data!', { _id: eventData._id, companydetail: eventData.companydetail }, res);
+                if(eventData && eventData != null){
+                    return responseManager.onSuccess('Organizer event data!', { _id: eventData._id, companydetail: eventData.companydetail }, res);
+                }else{
+                    return responseManager.badrequest({ message: 'Invalid event id get event data, please try again' }, res);
+                }
             } else {
                 return responseManager.badrequest({ message: 'Invalid event id get event data, please try again' }, res);
             }

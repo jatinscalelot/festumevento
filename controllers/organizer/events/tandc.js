@@ -25,7 +25,11 @@ exports.tandc = async (req, res) => {
                     };
                     await primary.model(constants.MODELS.events, eventModel).findByIdAndUpdate(eventid, { updatedBy: mongoose.Types.ObjectId(req.token.organizerid), tandc: obj });
                     let eventData = await primary.model(constants.MODELS.events, eventModel).findById(eventid).lean();
-                    return responseManager.onSuccess('Organizer event personal data updated successfully!', { _id: eventData._id, tandc: eventData.tandc }, res);
+                    if(eventData && eventData != null){
+                        return responseManager.onSuccess('Organizer event personal data updated successfully!', { _id: eventData._id, tandc: eventData.tandc }, res);
+                    }else{
+                        return responseManager.badrequest({ message: 'Invalid event id get event data, please try again' }, res);
+                    }
                 } else {
                     return responseManager.badrequest({ message: 'Invalid event id to add event terms and conditions data, please try again' }, res);
                 }
@@ -48,7 +52,11 @@ exports.gettandc = async (req, res) => {
             const { eventid } = req.query;
             if (eventid && eventid != '' && mongoose.Types.ObjectId.isValid(eventid)) {
                 let eventData = await primary.model(constants.MODELS.events, eventModel).findById(eventid);
-                return responseManager.onSuccess('Organizer event data!', { _id: eventData._id, tandc: eventData.tandc }, res);
+                if(eventData && eventData != null){
+                    return responseManager.onSuccess('Organizer event data!', { _id: eventData._id, tandc: eventData.tandc }, res);
+                }else{
+                    return responseManager.badrequest({ message: 'Invalid event id get event data, please try again' }, res);
+                }
             } else {
                 return responseManager.badrequest({ message: 'Invalid event id get event data, please try again' }, res);
             }

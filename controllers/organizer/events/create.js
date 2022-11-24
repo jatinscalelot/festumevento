@@ -28,7 +28,11 @@ exports.createevent = async (req, res) => {
                             model: primary.model(constants.MODELS.eventcategories, categoryModel),
                             select: '-createdAt -updatedAt -__v -createdBy -updatedBy -status'
                         }).lean();
-                        return responseManager.onSuccess('Organizer event updated successfully!', {_id : eventData._id, name: eventData.name, event_type: eventData.event_type, event_category : eventData.event_category, other: eventData.other, status : eventData.status}, res);
+                        if(eventData && eventData != null){
+                            return responseManager.onSuccess('Organizer event updated successfully!', {_id : eventData._id, name: eventData.name, event_type: eventData.event_type, event_category : eventData.event_category, other: eventData.other, status : eventData.status}, res);
+                        }else{
+                            return responseManager.badrequest({ message: 'Invalid event id get event data, please try again' }, res);
+                        }
                     } else {
                         if(other && other != ''){
                             let obj = {
@@ -44,7 +48,11 @@ exports.createevent = async (req, res) => {
                                 model: primary.model(constants.MODELS.eventcategories, categoryModel),
                                 select: '-createdAt -updatedAt -__v -createdBy -updatedBy -status'
                             }).lean();
-                            return responseManager.onSuccess('Organizer event updated successfully!', {_id : eventData._id, name: eventData.name, event_type: eventData.event_type, event_category : eventData.event_category, other: eventData.other, status : eventData.status}, res);    
+                            if(eventData && eventData != null){
+                                return responseManager.onSuccess('Organizer event updated successfully!', {_id : eventData._id, name: eventData.name, event_type: eventData.event_type, event_category : eventData.event_category, other: eventData.other, status : eventData.status}, res);    
+                            }else{
+                                return responseManager.badrequest({ message: 'Invalid event id get event data, please try again' }, res);
+                            }
                         }else{
                             return responseManager.badrequest({ message: 'Invalid event category or other value to update event, please try again' }, res);
                         }
@@ -71,7 +79,11 @@ exports.createevent = async (req, res) => {
                             model: primary.model(constants.MODELS.eventcategories, categoryModel),
                             select: '-createdAt -updatedAt -__v -createdBy -updatedBy -status'
                         }).lean();
-                        return responseManager.onSuccess('Organizer event created successfully!', eventData, res);
+                        if(eventData && eventData != null){
+                            return responseManager.onSuccess('Organizer event created successfully!', eventData, res);
+                        }else{
+                            return responseManager.badrequest({ message: 'Invalid event id get event data, please try again' }, res);
+                        }
                     } else {
                         if(other && other != ''){
                             let obj = {
@@ -90,7 +102,11 @@ exports.createevent = async (req, res) => {
                                 model: primary.model(constants.MODELS.eventcategories, categoryModel),
                                 select: '-createdAt -updatedAt -__v -createdBy -updatedBy -status'
                             }).lean();
-                            return responseManager.onSuccess('Organizer event created successfully!', eventData, res);
+                            if(eventData && eventData != null){
+                                return responseManager.onSuccess('Organizer event created successfully!', eventData, res);
+                            }else{
+                                return responseManager.badrequest({ message: 'Invalid event id get event data, please try again' }, res);
+                            }
                         }else{
                             return responseManager.badrequest({ message: 'Invalid event category or other to create event, please try again' }, res);
                         }
