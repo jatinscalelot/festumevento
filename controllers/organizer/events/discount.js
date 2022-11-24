@@ -4,6 +4,7 @@ const responseManager = require('../../../utilities/response.manager');
 const mongoConnection = require('../../../utilities/connections');
 const constants = require('../../../utilities/constants');
 const mongoose = require('mongoose');
+let async = require('async');
 exports.discount = async (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
