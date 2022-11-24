@@ -21,6 +21,7 @@ const personaldetailCtrl = require('../../controllers/organizer/events/personald
 const tandcCtrl = require('../../controllers/organizer/events/tandc');
 const discountCtrl = require('../../controllers/organizer/events/discount');
 const eventRemoveCtrl = require('../../controllers/organizer/events/remove');
+const eventListCtrl = require('../../controllers/organizer/events/list');
 // post apis
 router.post('/save', helper.authenticateToken, createCtrl.createevent);
 router.post('/about', helper.authenticateToken, aboutCtrl.aboutevent);
@@ -33,6 +34,7 @@ router.post('/personaldetail', helper.authenticateToken, personaldetailCtrl.pers
 router.post('/tandc', helper.authenticateToken, tandcCtrl.tandc);
 router.post('/discount', helper.authenticateToken, discountCtrl.discount);
 router.post('/remove', helper.authenticateToken, eventRemoveCtrl.removeevent);
+router.post('/list', helper.authenticateToken, eventListCtrl.list);
 // get apis
 router.get('/', helper.authenticateToken, createCtrl.getevent);
 router.get('/about', helper.authenticateToken, aboutCtrl.getaboutevent);
