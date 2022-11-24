@@ -23,8 +23,12 @@ exports.createevent = async (req, res) => {
                             updatedBy: mongoose.Types.ObjectId(req.token.organizerid),
                         };
                         await primary.model(constants.MODELS.events, eventModel).findByIdAndUpdate(eventid, obj);
-                        let eventData = await primary.model(constants.MODELS.events, eventModel).findById(eventid);
-                        return responseManager.onSuccess('Organizer event updated successfully!', eventData, res);
+                        let eventData = await primary.model(constants.MODELS.events, eventModel).findById(eventid).populate({
+                            path: "event_category",
+                            model: primary.model(constants.MODELS.categories, categoryModel),
+                            select: '-createdAt -updatedAt -__v -createdBy -updatedBy -status'
+                        }).lean();
+                        return responseManager.onSuccess('Organizer event updated successfully!', {_id : eventData._id, name: eventData.name, event_type: eventData.event_type, event_category : eventData.event_category, other: eventData.other, status : eventData.status}, res);
                     } else {
                         return responseManager.badrequest({ message: 'Invalid event category to update event, please try again' }, res);
                     }
@@ -45,7 +49,12 @@ exports.createevent = async (req, res) => {
                             status: false
                         };
                         let createdEvent = await primary.model(constants.MODELS.events, eventModel).create(obj);
-                        return responseManager.onSuccess('Organizer event created successfully!', createdEvent, res);
+                        let eventData = await primary.model(constants.MODELS.events, eventModel).findById(createdEvent._id).populate({
+                            path: "event_category",
+                            model: primary.model(constants.MODELS.categories, categoryModel),
+                            select: '-createdAt -updatedAt -__v -createdBy -updatedBy -status'
+                        }).lean();
+                        return responseManager.onSuccess('Organizer event created successfully!', eventData, res);
                     } else {
                         return responseManager.badrequest({ message: 'Invalid event category to create event, please try again' }, res);
                     }
