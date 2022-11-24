@@ -11,12 +11,33 @@ exports.discount = async (req, res) => {
         let organizerData = await primary.model(constants.MODELS.organizers, organizerModel).findById(req.token.organizerid).select('-password').lean();
         if (organizerData && organizerData.status == true && organizerData.mobileverified == true) {
             const { eventid, discounts } = req.body;
-            if (eventid && eventid != '' && mongoose.Types.ObjectId.isValid(eventid)) {
-                await primary.model(constants.MODELS.events, eventModel).findByIdAndUpdate(eventid, { updatedBy: mongoose.Types.ObjectId(req.token.organizerid), discounts: discounts });
-                let eventData = await primary.model(constants.MODELS.events, eventModel).findById(eventid).lean();
-                return responseManager.onSuccess('Organizer event discounts data updated successfully!', { _id: eventData._id, discounts: eventData.discounts }, res);
-            } else {
-                return responseManager.badrequest({ message: 'Invalid event id to add event discounts data, please try again' }, res);
+            if(discounts && discounts.length > 0){
+                let finalDiscount = [];
+                async.forEachSeries(discounts, (discount, next_discount) => {
+                    if(discount.items && discount.items.length > 0){
+                        let itemArray = [];
+                        discount.items.forEach(element => {
+                            itemArray.push(mongoose.Types.ObjectId(element));
+                        });
+                        discount.items = itemArray;
+                        finalDiscount.push(discount);
+                    }else{
+                        finalDiscount.push(discount);
+                    }
+                    next_discount();
+                }, () => {
+                    ( async () => {
+                        if (eventid && eventid != '' && mongoose.Types.ObjectId.isValid(eventid)) {
+                            await primary.model(constants.MODELS.events, eventModel).findByIdAndUpdate(eventid, { updatedBy: mongoose.Types.ObjectId(req.token.organizerid), discounts: discounts });
+                            let eventData = await primary.model(constants.MODELS.events, eventModel).findById(eventid).lean();
+                            return responseManager.onSuccess('Organizer event discounts data updated successfully!', { _id: eventData._id, discounts: eventData.discounts }, res);
+                        } else {
+                            return responseManager.badrequest({ message: 'Invalid event id to add event discounts data, please try again' }, res);
+                        }
+                    })().catch((error) => {
+                        return responseManager.onError(error, res);
+                    });
+                });
             }
         } else {
             return responseManager.badrequest({ message: 'Invalid organizerid to update event, please try again' }, res);
