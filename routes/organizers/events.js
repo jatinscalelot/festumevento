@@ -22,6 +22,7 @@ const tandcCtrl = require('../../controllers/organizer/events/tandc');
 const discountCtrl = require('../../controllers/organizer/events/discount');
 const eventRemoveCtrl = require('../../controllers/organizer/events/remove');
 const eventListCtrl = require('../../controllers/organizer/events/list');
+const getoneCtrl = require('../../controllers/organizer/events/getone');
 // post apis
 router.post('/save', helper.authenticateToken, createCtrl.createevent);
 router.post('/about', helper.authenticateToken, aboutCtrl.aboutevent);
@@ -46,6 +47,7 @@ router.get('/companydetail', helper.authenticateToken, companydetailCtrl.getcomp
 router.get('/personaldetail', helper.authenticateToken, personaldetailCtrl.getpersonaldetail);
 router.get('/tandc', helper.authenticateToken, tandcCtrl.gettandc);
 router.get('/discount', helper.authenticateToken, discountCtrl.getdiscount);
+router.get('/getone', helper.authenticateToken, getoneCtrl.getone);
 router.post('/image', helper.authenticateToken, fileHelper.memoryUpload.single('file'), async (req, res) => {
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);

@@ -30,7 +30,7 @@ exports.list = async (req, res) => {
                 return responseManager.onSuccess('Events list!', events, res);
             }).catch((error) => {
                 return responseManager.onError(error, res);
-            })
+            });
         } else {
             return responseManager.badrequest({ message: 'Invalid organizerid to get event list, please try again' }, res);
         }
