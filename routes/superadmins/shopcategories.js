@@ -9,7 +9,7 @@ const superadminModel = require('../../models/superadmins.model');
 const { default: mongoose } = require("mongoose");
 router.post('/', helper.authenticateToken, async (req, res) => {
     if (req.token.superadminid && mongoose.Types.ObjectId.isValid(req.token.superadminid)) {
-        const { page, limit, search, sortfield, sortoption } = req.body;
+        const { page, limit, search } = req.body;
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
         let superadmin = await primary.model(constants.MODELS.superadmins, superadminModel).findById(req.token.superadminid).lean();
         if (superadmin) {
@@ -21,7 +21,7 @@ router.post('/', helper.authenticateToken, async (req, res) => {
             }, {
                 page,
                 limit: parseInt(limit),
-                sort: { [sortfield]: [sortoption] },
+                sort: { _id : -1 },
                 lean: true
             }).then((categories) => {
                 return responseManager.onSuccess('Shop Categories list!', categories, res);
