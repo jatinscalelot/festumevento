@@ -20,7 +20,7 @@ exports.getone = async (req, res) => {
                     {path: "arrangements.seating_item", model: primary.model(constants.MODELS.items, itemModel), select: '-createdAt -updatedAt -__v -createdBy -updatedBy -status'}
                 ]).lean();
                 console.log('eventData', eventData);
-                if(eventData && eventData != null && eventData.createdBy == mongoose.Types.ObjectId(req.token.organizerid)){
+                if(eventData && eventData != null && (eventData.createdBy.toString() == req.token.organizerid.toString())){
                     return responseManager.onSuccess('Organizer event data!', eventData, res);
                 }else{
                     return responseManager.badrequest({ message: 'Invalid event id to get event data, please try again' }, res);
