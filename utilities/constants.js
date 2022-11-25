@@ -11,7 +11,11 @@ let constants = {
         offers: 'offers',
         items: 'items',
         eventcategories : 'eventcategories',
-        discounts : 'discounts'
+        shopcategories : 'shopcategories',
+        discounts : 'discounts',
+        shops : 'shops',
+        onlineoffers : 'onlineoffers',
+        offlineoffers : 'offlineoffers'
     }
 };
 module.exports = constants;
