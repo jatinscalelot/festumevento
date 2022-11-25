@@ -19,6 +19,7 @@ exports.getone = async (req, res) => {
                     {path: "discounts.items", model: primary.model(constants.MODELS.items, itemModel), select: '-createdAt -updatedAt -__v -createdBy -updatedBy -status'},
                     {path: "arrangements.seating_item", model: primary.model(constants.MODELS.items, itemModel), select: '-createdAt -updatedAt -__v -createdBy -updatedBy -status'}
                 ]).lean();
+                console.log('eventData', eventData);
                 if(eventData && eventData != null && eventData.createdBy == mongoose.Types.ObjectId(req.token.organizerid)){
                     return responseManager.onSuccess('Organizer event data!', eventData, res);
                 }else{
