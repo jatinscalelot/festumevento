@@ -1,6 +1,19 @@
 let mongoose = require("mongoose");
 let mongoosePaginate = require("mongoose-paginate-v2");
 let schema = new mongoose.Schema({
+	shop_category : {
+		type: mongoose.Types.ObjectId,
+		default: null
+	},
+	location: {
+		type: {
+			type: String,
+			enum: ['Point']
+		},
+		coordinates: {
+			type: [Number]
+		}
+	},
 	createdBy: {
 		type: mongoose.Types.ObjectId,
 		default: null
@@ -11,4 +24,5 @@ let schema = new mongoose.Schema({
 	}
 }, { timestamps: true, strict: false, autoIndex: true });
 schema.plugin(mongoosePaginate);
+schema.index({ "location" : "2dsphere" });
 module.exports = schema;
