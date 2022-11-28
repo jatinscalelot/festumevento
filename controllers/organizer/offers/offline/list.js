@@ -1,9 +1,9 @@
-const mongoConnection = require('../../utilities/connections');
-const responseManager = require('../../utilities/response.manager');
-const constants = require('../../utilities/constants');
-const organizerModel = require('../../models/organizers.model');
+const mongoConnection = require('../../../../utilities/connections');
+const responseManager = require('../../../../utilities/response.manager');
+const constants = require('../../../../utilities/constants');
+const organizerModel = require('../../../../models/organizers.model');
+const offlineofferModel = require('../../../../models/offlineoffers.model');
 const mongoose = require('mongoose');
-const offlineofferModel = require('../../models/offlineoffers.model');
 exports.list = async (req, res) => {
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
