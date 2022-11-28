@@ -6,6 +6,9 @@ const constants = require('../../utilities/constants');
 const helper = require('../../utilities/helper');
 const organizerModel = require('../../models/organizers.model');
 const onlineofferModel = require('../../models/onlineoffers.model');
+let fileHelper = require('../../utilities/multer.functions');
+const AwsCloud = require('../../utilities/aws');
+const allowedContentTypes = require("../../utilities/content-types");
 const mongoose = require('mongoose');
 router.post('/', helper.authenticateToken, async (req, res) => {
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
