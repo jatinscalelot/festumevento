@@ -160,6 +160,25 @@ router.post('/companydetails', helper.authenticateToken, async (req, res) => {
         return responseManager.unauthorisedRequest(res);
     }
 });
+router.post('/getone', helper.authenticateToken, async (req, res) => {
+    if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
+        let primary = mongoConnection.useDb(constants.DEFAULT_DB);
+        let organizerData = await primary.model(constants.MODELS.organizers, organizerModel).findById(req.token.organizerid).select('-password').lean();
+        if (organizerData && organizerData.status == true && organizerData.mobileverified == true) {
+            const { shopid } = req.body;
+            if(shopid && shopid != '' && mongoose.Types.ObjectId.isValid(shopid)){
+                let shopData = await primary.model(constants.MODELS.shops, shopModel).findById(shopid).lean();
+                return responseManager.onSuccess('Shop data!', shopData, res);
+            }else{
+                return responseManager.badrequest({ message: 'Invalid shop id to get Shop data, please try again' }, res);
+            }
+        }else {
+            return responseManager.badrequest({ message: 'Invalid organizerid to get Shop data, please try again' }, res);
+        }
+    } else {
+        return responseManager.unauthorisedRequest(res);
+    }
+});
 router.post('/banner', helper.authenticateToken, fileHelper.memoryUpload.single('file'), async (req, res) => {
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
