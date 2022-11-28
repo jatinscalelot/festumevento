@@ -5,126 +5,16 @@ const responseManager = require('../../utilities/response.manager');
 const constants = require('../../utilities/constants');
 const helper = require('../../utilities/helper');
 const organizerModel = require('../../models/organizers.model');
-const onlineofferModel = require('../../models/onlineoffers.model');
 let fileHelper = require('../../utilities/multer.functions');
 const AwsCloud = require('../../utilities/aws');
 const allowedContentTypes = require("../../utilities/content-types");
 const mongoose = require('mongoose');
-router.post('/', helper.authenticateToken, async (req, res) => {
-    if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
-        let primary = mongoConnection.useDb(constants.DEFAULT_DB);
-        let organizerData = await primary.model(constants.MODELS.organizers, organizerModel).findById(req.token.organizerid).select('-password').lean();
-        if (organizerData && organizerData.status == true && organizerData.mobileverified == true) {
-            const { page, limit, search } = req.body;
-            primary.model(constants.MODELS.onlineoffers, onlineofferModel).paginate({
-                $or: [
-                    { offer_title: { '$regex': new RegExp(search, "i") } },
-                    { description: { '$regex': new RegExp(search, "i") } }
-                ],
-                createdBy: mongoose.Types.ObjectId(req.token.organizerid)
-            }, {
-                page,
-                limit: parseInt(limit),
-                sort: { _id: -1 },
-                lean: true
-            }).then((onlineoffers) => {
-                return responseManager.onSuccess('Online Offers list!', onlineoffers, res);
-            }).catch((error) => {
-                return responseManager.onError(error, res);
-            });
-        } else {
-            return responseManager.badrequest({ message: 'Invalid organizer id to get online offer list, please try again' }, res);
-        }
-    } else {
-        return responseManager.unauthorisedRequest(res);
-    }
-});
-router.post('/save', helper.authenticateToken, async (req, res) => {
-    if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
-        let primary = mongoConnection.useDb(constants.DEFAULT_DB);
-        let organizerData = await primary.model(constants.MODELS.organizers, organizerModel).findById(req.token.organizerid).select('-password').lean();
-        if (organizerData && organizerData.status == true && organizerData.mobileverified == true) {
-            const { offerid, shop_name, offer_amount, offer_type, start_date, end_date, product_name, poster, images, description, status, product_links, company_name, company_gst, company_contact_no, company_email, about_company, tandc } = req.body;
-            if (offerid && offerid && mongoose.Types.ObjectId.isValid(offerid)) {
-                var obj = {
-                    shop_name: shop_name,
-                    offer_amount: offer_amount,
-                    offer_type: offer_type,
-                    start_date: start_date,
-                    end_date: end_date,
-                    product_name: product_name,
-                    poster: poster,
-                    images: images,
-                    description: description,
-                    status: status,
-                    product_links: product_links,
-                    company_name: company_name,
-                    company_gst: company_gst,
-                    company_contact_no : company_contact_no,
-                    company_email : company_email,
-                    about_company : about_company,
-                    tandc: tandc,
-                    updatedBy: mongoose.Types.ObjectId(req.token.organizerid)
-                };
-                await primary.model(constants.MODELS.onlineoffers, onlineofferModel).findByIdAndUpdate(offerid, obj);
-                let onlineOffer = await primary.model(constants.MODELS.onlineoffers, onlineofferModel).findById(offerid).lean();
-                return responseManager.onSuccess('Online offer updated successfully!', onlineOffer, res);
-            } else {
-                var obj = {
-                    shop_name: shop_name,
-                    offer_amount: offer_amount,
-                    offer_type: offer_type,
-                    start_date: start_date,
-                    end_date: end_date,
-                    product_name: product_name,
-                    poster: poster,
-                    images: images,
-                    description: description,
-                    status: status,
-                    product_links: product_links,
-                    company_name: company_name,
-                    company_gst: company_gst,
-                    company_contact_no : company_contact_no,
-                    company_email : company_email,
-                    about_company : about_company,
-                    tandc: tandc,
-                    createdBy: mongoose.Types.ObjectId(req.token.organizerid),
-                    updatedBy: mongoose.Types.ObjectId(req.token.organizerid)
-                };
-                let createdOnlineOffer = await primary.model(constants.MODELS.onlineoffers, onlineofferModel).create(obj);
-                let onlineOffer = await primary.model(constants.MODELS.onlineoffers, onlineofferModel).findById(createdOnlineOffer._id).lean();
-                return responseManager.onSuccess('Online offer created successfully!', onlineOffer, res);
-            }
-        } else {
-            return responseManager.badrequest({ message: 'Invalid organizer id to save online offer data, please try again' }, res);
-        }
-    } else {
-        return responseManager.unauthorisedRequest(res);
-    }
-});
-router.post('/getone', helper.authenticateToken, async (req, res) => {
-    if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
-        let primary = mongoConnection.useDb(constants.DEFAULT_DB);
-        let organizerData = await primary.model(constants.MODELS.organizers, organizerModel).findById(req.token.organizerid).select('-password').lean();
-        if (organizerData && organizerData.status == true && organizerData.mobileverified == true) {
-            const { onlineofferid } = req.body;
-            if (onlineofferid && onlineofferid != '' && mongoose.Types.ObjectId.isValid(onlineofferid)) {
-                let onlineOfferData = await primary.model(constants.MODELS.onlineoffers, onlineofferModel).findById(onlineofferid).lean();
-                if (onlineOfferData && onlineOfferData.createdBy.toString() == req.token.organizerid.toString()) {
-                    return responseManager.onSuccess('Online offer data!', onlineOfferData, res);
-                } else {
-                    return responseManager.badrequest({ message: 'Invalid offer id to get online offer data, please try again' }, res);
-                }
-            } else {
-                return responseManager.badrequest({ message: 'Invalid offer id to get online offer data, please try again' }, res);
-            }
-        } else {
-            return responseManager.badrequest({ message: 'Invalid organizerid to get online offer data, please try again' }, res);
-        }
-    } else {
-        return responseManager.unauthorisedRequest(res);
-    }
-});
+const listOnlineOfferCtrl = require('../../controllers/organizer/offers/online/list');
+const saveOnlineOfferCtrl = require('../../controllers/organizer/offers/online/save');
+const getOneOnlineOfferCtrl = require('../../controllers/organizer/offers/online/getone');
+router.post('/', helper.authenticateToken, listOnlineOfferCtrl.list);
+router.post('/save', helper.authenticateToken, saveOnlineOfferCtrl.save);
+router.post('/getone', helper.authenticateToken, getOneOnlineOfferCtrl.getone);
 router.post('/video', helper.authenticateToken, fileHelper.memoryUpload.single('file'), async (req, res) => {
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
