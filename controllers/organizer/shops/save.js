@@ -32,17 +32,17 @@ exports.save = async (req, res) => {
                             city: city,
                             state: state,
                             pincode: pincode,
-                            location : { type: "Point", coordinates: [longitude, latitude] },
-                            updatedBy : mongoose.Types.ObjectId(req.token.organizerid)
+                            location: { type: "Point", coordinates: [longitude, latitude] },
+                            updatedBy: mongoose.Types.ObjectId(req.token.organizerid)
                         };
                         await primary.model(constants.MODELS.shops, shopModel).findByIdAndUpdate(shopid, obj);
-                        let shopData = await primary.model(constants.MODELS.shops, shopModel).findById(shopid).populate({path: 'shop_category', model: primary.model(constants.MODELS.shopcategories, shopcategoryModel), select: "categoryname description"}).lean();
-                        if(shopData && shopData != null){
+                        let shopData = await primary.model(constants.MODELS.shops, shopModel).findById(shopid).populate({ path: 'shop_category', model: primary.model(constants.MODELS.shopcategories, shopcategoryModel), select: "categoryname description" }).lean();
+                        if (shopData && shopData != null) {
                             return responseManager.onSuccess('Shop updated successfully!', shopData, res);
-                        }else{
+                        } else {
                             return responseManager.badrequest({ message: 'Invalid shop id to update Shop, please try again' }, res);
                         }
-                    }else{
+                    } else {
                         return responseManager.badrequest({ message: 'Invalid Lat-Long to update Shop, please try again' }, res);
                     }
                 } else {
@@ -61,18 +61,18 @@ exports.save = async (req, res) => {
                             city: city,
                             state: state,
                             pincode: pincode,
-                            location : { type: "Point", coordinates: [longitude, latitude] },
-                            createdBy : mongoose.Types.ObjectId(req.token.organizerid),
-                            updatedBy : mongoose.Types.ObjectId(req.token.organizerid)
+                            location: { type: "Point", coordinates: [longitude, latitude] },
+                            createdBy: mongoose.Types.ObjectId(req.token.organizerid),
+                            updatedBy: mongoose.Types.ObjectId(req.token.organizerid)
                         };
                         let createdShop = await primary.model(constants.MODELS.shops, shopModel).create(obj);
-                        let shopData = await primary.model(constants.MODELS.shops, shopModel).findById(createdShop._id).populate({path: 'shop_category', model: primary.model(constants.MODELS.shopcategories, shopcategoryModel), select: "categoryname description"}).lean();
-                        if(shopData && shopData != null){
+                        let shopData = await primary.model(constants.MODELS.shops, shopModel).findById(createdShop._id).populate({ path: 'shop_category', model: primary.model(constants.MODELS.shopcategories, shopcategoryModel), select: "categoryname description" }).lean();
+                        if (shopData && shopData != null) {
                             return responseManager.onSuccess('Shop created successfully!', shopData, res);
-                        }else{
+                        } else {
                             return responseManager.badrequest({ message: 'Invalid shop data to create Shop, please try again' }, res);
                         }
-                    }else{
+                    } else {
                         return responseManager.badrequest({ message: 'Invalid Lat-Long to create Shop, please try again' }, res);
                     }
                 }

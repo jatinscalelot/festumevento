@@ -11,13 +11,13 @@ exports.getone = async (req, res) => {
         let organizerData = await primary.model(constants.MODELS.organizers, organizerModel).findById(req.token.organizerid).select('-password').lean();
         if (organizerData && organizerData.status == true && organizerData.mobileverified == true) {
             const { shopid } = req.body;
-            if(shopid && shopid != '' && mongoose.Types.ObjectId.isValid(shopid)){
-                let shopData = await primary.model(constants.MODELS.shops, shopModel).findById(shopid).populate({ path: 'shop_category', model: primary.model(constants.MODELS.shopcategories, shopcategoryModel), select: "categoryname description"}).lean();
+            if (shopid && shopid != '' && mongoose.Types.ObjectId.isValid(shopid)) {
+                let shopData = await primary.model(constants.MODELS.shops, shopModel).findById(shopid).populate({ path: 'shop_category', model: primary.model(constants.MODELS.shopcategories, shopcategoryModel), select: "categoryname description" }).lean();
                 return responseManager.onSuccess('Shop data!', shopData, res);
-            }else{
+            } else {
                 return responseManager.badrequest({ message: 'Invalid shop id to get Shop data, please try again' }, res);
             }
-        }else {
+        } else {
             return responseManager.badrequest({ message: 'Invalid organizerid to get Shop data, please try again' }, res);
         }
     } else {

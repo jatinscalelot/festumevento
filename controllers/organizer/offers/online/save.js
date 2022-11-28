@@ -25,9 +25,9 @@ exports.save = async (req, res) => {
                     product_links: product_links,
                     company_name: company_name,
                     company_gst: company_gst,
-                    company_contact_no : company_contact_no,
-                    company_email : company_email,
-                    about_company : about_company,
+                    company_contact_no: company_contact_no,
+                    company_email: company_email,
+                    about_company: about_company,
                     tandc: tandc,
                     updatedBy: mongoose.Types.ObjectId(req.token.organizerid)
                 };
@@ -49,9 +49,9 @@ exports.save = async (req, res) => {
                     product_links: product_links,
                     company_name: company_name,
                     company_gst: company_gst,
-                    company_contact_no : company_contact_no,
-                    company_email : company_email,
-                    about_company : about_company,
+                    company_contact_no: company_contact_no,
+                    company_email: company_email,
+                    about_company: about_company,
                     tandc: tandc,
                     createdBy: mongoose.Types.ObjectId(req.token.organizerid),
                     updatedBy: mongoose.Types.ObjectId(req.token.organizerid)

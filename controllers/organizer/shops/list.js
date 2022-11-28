@@ -13,21 +13,21 @@ exports.list = async (req, res) => {
             const { page, limit, search } = req.body;
             primary.model(constants.MODELS.shops, shopModel).paginate({
                 $or: [
-                    { shop_name : { '$regex' : new RegExp(search, "i") } },
-                    { about_shop : { '$regex' : new RegExp(search, "i") } },
-                    { flat_no : { '$regex' : new RegExp(search, "i") } },
-                    { street_name : { '$regex' : new RegExp(search, "i") } },
-                    { area_name : { '$regex' : new RegExp(search, "i") } },
-                    { city : { '$regex' : new RegExp(search, "i") } },
-                    { state : { '$regex' : new RegExp(search, "i") } },
-                    { pincode : { '$regex' : new RegExp(search, "i") } }
+                    { shop_name: { '$regex': new RegExp(search, "i") } },
+                    { about_shop: { '$regex': new RegExp(search, "i") } },
+                    { flat_no: { '$regex': new RegExp(search, "i") } },
+                    { street_name: { '$regex': new RegExp(search, "i") } },
+                    { area_name: { '$regex': new RegExp(search, "i") } },
+                    { city: { '$regex': new RegExp(search, "i") } },
+                    { state: { '$regex': new RegExp(search, "i") } },
+                    { pincode: { '$regex': new RegExp(search, "i") } }
                 ],
-                createdBy : mongoose.Types.ObjectId(req.token.organizerid)
-            },{
+                createdBy: mongoose.Types.ObjectId(req.token.organizerid)
+            }, {
                 page,
                 limit: parseInt(limit),
-                sort: { _id : -1 },
-                populate:  { path: 'shop_category', model: primary.model(constants.MODELS.shopcategories, shopcategoryModel), select: "categoryname description"},
+                sort: { _id: -1 },
+                populate: { path: 'shop_category', model: primary.model(constants.MODELS.shopcategories, shopcategoryModel), select: "categoryname description" },
                 lean: true
             }).then((shops) => {
                 return responseManager.onSuccess('Shops list!', shops, res);
