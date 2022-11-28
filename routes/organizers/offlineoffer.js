@@ -5,8 +5,6 @@ const responseManager = require('../../utilities/response.manager');
 const constants = require('../../utilities/constants');
 const helper = require('../../utilities/helper');
 const organizerModel = require('../../models/organizers.model');
-const shopModel = require('../../models/shops.model');
-const shopcategoryModel = require('../../models/shopcategories.model');
 const mongoose = require('mongoose');
 const offlineofferModel = require('../../models/offlineoffers.model');
 let fileHelper = require('../../utilities/multer.functions');
@@ -17,9 +15,25 @@ router.post('/', helper.authenticateToken, async (req, res) => {
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
         let organizerData = await primary.model(constants.MODELS.organizers, organizerModel).findById(req.token.organizerid).select('-password').lean();
         if (organizerData && organizerData.status == true && organizerData.mobileverified == true) {
-            const { shopid } = req.body;
+            const { shopid, page, limit, search } = req.body;
             if(shopid && shopid != '' && mongoose.Types.ObjectId.isValid(shopid)){
-                
+                primary.model(constants.MODELS.offlineoffers, offlineofferModel).paginate({
+                    $or: [
+                        { offer_title : { '$regex' : new RegExp(search, "i") } },
+                        { description : { '$regex' : new RegExp(search, "i") } }
+                    ],
+                    createdBy : mongoose.Types.ObjectId(req.token.organizerid),
+                    shopid :  mongoose.Types.ObjectId(shopid)
+                },{
+                    page,
+                    limit: parseInt(limit),
+                    sort: { _id : -1 },
+                    lean: true
+                }).then((offlineoffers) => {
+                    return responseManager.onSuccess('Offline Offers list!', offlineoffers, res);
+                }).catch((error) => {
+                    return responseManager.onError(error, res);
+                });
             }else{
                 return responseManager.badrequest({ message: 'Invalid shop id to get offline offer list, please try again' }, res);
             }
@@ -35,7 +49,7 @@ router.post('/save', helper.authenticateToken, async (req, res) => {
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
         let organizerData = await primary.model(constants.MODELS.organizers, organizerModel).findById(req.token.organizerid).select('-password').lean();
         if (organizerData && organizerData.status == true && organizerData.mobileverified == true) {
-            const { shopid, offerid, offer_title, start_date, end_date, poster, video, description, offer_on_all_products, all_product_images, all_product_conditions, offer_type, offer_type_conditions, tandc } = req.body;
+            const { shopid, offerid, offer_title, start_date, end_date, poster, video, description, status, offer_on_all_products, all_product_images, all_product_conditions, offer_type, offer_type_conditions, tandc } = req.body;
             if(shopid && shopid != '' && mongoose.Types.ObjectId.isValid(shopid)){
                 if(offer_on_all_products && offer_on_all_products == true){
                     if(all_product_images && all_product_images.length > 0 && all_product_conditions && all_product_conditions.length > 0){
@@ -52,6 +66,7 @@ router.post('/save', helper.authenticateToken, async (req, res) => {
                                 all_product_conditions : all_product_conditions,
                                 offer_type : '',
                                 offer_type_conditions : [],
+                                status : status,
                                 tandc : tandc,
                                 updatedBy : mongoose.Types.ObjectId(req.token.organizerid)
                             };
@@ -72,6 +87,7 @@ router.post('/save', helper.authenticateToken, async (req, res) => {
                                 offer_type : '',
                                 offer_type_conditions : [],
                                 tandc : tandc,
+                                status : status,
                                 shopid : mongoose.Types.ObjectId(shopid),
                                 createdBy : mongoose.Types.ObjectId(req.token.organizerid),
                                 updatedBy : mongoose.Types.ObjectId(req.token.organizerid)
@@ -98,6 +114,7 @@ router.post('/save', helper.authenticateToken, async (req, res) => {
                                 all_product_conditions : [],
                                 offer_type : offer_type,
                                 offer_type_conditions : offer_type_conditions,
+                                status : status,
                                 tandc : tandc,
                                 updatedBy : mongoose.Types.ObjectId(req.token.organizerid)
                             };
@@ -118,6 +135,7 @@ router.post('/save', helper.authenticateToken, async (req, res) => {
                                 offer_type : offer_type,
                                 offer_type_conditions : offer_type_conditions,
                                 tandc : tandc,
+                                status : status,
                                 shopid : mongoose.Types.ObjectId(shopid),
                                 createdBy : mongoose.Types.ObjectId(req.token.organizerid),
                                 updatedBy : mongoose.Types.ObjectId(req.token.organizerid)
@@ -131,10 +149,10 @@ router.post('/save', helper.authenticateToken, async (req, res) => {
                     }
                 }   
             }else{
-                return responseManager.badrequest({ message: 'Invalid shop id to get offline offer list, please try again' }, res);
+                return responseManager.badrequest({ message: 'Invalid shop id to save offline offer data, please try again' }, res);
             }
         } else {
-            return responseManager.badrequest({ message: 'Invalid organizer id to get offline offer list, please try again' }, res);
+            return responseManager.badrequest({ message: 'Invalid organizer id to save offline offer data, please try again' }, res);
         }
     } else {
         return responseManager.unauthorisedRequest(res);
@@ -151,13 +169,13 @@ router.post('/getone', helper.authenticateToken, async (req, res) => {
                 if(offlineOfferData && offlineOfferData.shopid.toString() == shopid.toString()){
                     return responseManager.onSuccess('Offline offer data!', offlineOfferData, res);
                 }else{
-                    return responseManager.badrequest({ message: 'Invalid shop id to get Shop data, please try again' }, res);
+                    return responseManager.badrequest({ message: 'Invalid shop id to get offline offer data, please try again' }, res);
                 }
             }else{
-                return responseManager.badrequest({ message: 'Invalid shop id to get Shop data, please try again' }, res);
+                return responseManager.badrequest({ message: 'Invalid shop id to get offline offer data, please try again' }, res);
             }
         }else {
-            return responseManager.badrequest({ message: 'Invalid organizerid to get Shop data, please try again' }, res);
+            return responseManager.badrequest({ message: 'Invalid organizerid to get offline offer data, please try again' }, res);
         }
     } else {
         return responseManager.unauthorisedRequest(res);
