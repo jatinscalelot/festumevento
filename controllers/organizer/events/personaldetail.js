@@ -12,7 +12,7 @@ exports.personaldetail = async (req, res) => {
         if (organizerData && organizerData.status == true && organizerData.mobileverified == true) {
             const { eventid } = req.body;
             if(eventid && eventid != '' && mongoose.Types.ObjectId.isValid(eventid)){
-                if(req.body.full_name && req.body.full_name.trim() != '' && req.body.mobile_no && req.body.mobile_no.trim() != '' && req.body.mobile_no.trim().length == 10 && req.body.email && req.body.email.trim() != '' && req.body.city && req.body.city.trim() != '' && req.body.state && req.body.state.trim() != '' && req.body.pincode && req.body.pincode.trim() != ''){
+                if(req.body.full_name && req.body.full_name.trim() != '' && req.body.mobile_no && req.body.mobile_no.trim() != '' &&  req.body.mobile_no.trim().length >= 10 && req.body.email && req.body.email.trim() != '' && req.body.city && req.body.city.trim() != '' && req.body.state && req.body.state.trim() != '' && req.body.pincode && req.body.pincode.trim() != ''){
                     if((/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(req.body.email))){
                         let obj = {
                             full_name : (req.body.full_name) ? req.body.full_name : '', 

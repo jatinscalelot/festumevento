@@ -15,7 +15,8 @@ let constants = {
         discounts : 'discounts',
         shops : 'shops',
         onlineoffers : 'onlineoffers',
-        offlineoffers : 'offlineoffers'
+        offlineoffers : 'offlineoffers',
+        notifications : 'notifications'
     }
 };
 module.exports = constants;
