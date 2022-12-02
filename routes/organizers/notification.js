@@ -260,7 +260,26 @@ router.post('/setschedule', helper.authenticateToken, async (req, res) => {
     }
 });
 router.post('/import', helper.authenticateToken, fileHelper.memoryUpload.single('file'), async (req, res) => {
-
+    if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
+        let primary = mongoConnection.useDb(constants.DEFAULT_DB);
+        let organizerData = await primary.model(constants.MODELS.organizers, organizerModel).findById(req.token.organizerid).select('-password').lean();
+        if (organizerData && organizerData.status == true && organizerData.mobileverified == true) {
+            const { notificationid } = req.body;
+            if(req.file && notificationid && notificationid != '' && mongoose.Types.ObjectId.isValid(notificationid)){
+                let notificationData = await primary.model(constants.MODELS.notifications, notificationModel).findById(notificationid).lean();
+                if(notificationData && notificationData != null){
+                    console.log('req.file', req.file);
+                    console.log('notificationid', notificationid);
+                }else{
+                    return responseManager.badrequest({ message: 'Invalid notificationid to import users, please try again' }, res);
+                }
+            }
+        }else {
+            return responseManager.badrequest({ message: 'Invalid organizerid to set notification schedule, please try again' }, res);
+        }
+    } else {
+        return responseManager.unauthorisedRequest(res);
+    }
 });
 router.post('/usertype', helper.authenticateToken, async (req, res) => {
 
