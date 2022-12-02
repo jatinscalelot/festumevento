@@ -299,7 +299,7 @@ router.post('/import', helper.authenticateToken, fileHelper.memoryUpload.single(
                         console.log('finalbatchArray', finalbatchArray);
                         async.forEachSeries(finalbatchArray, (batchArray, next_batchArray) => {
                             console.log('batchArray', batchArray);
-                            async.applyEachSeries(batchArray.list, (customer, next_customer) => {
+                            async.forEachSeries(batchArray.list, (customer, next_customer) => {
                                 ( async () => {
                                     console.log('customer', customer);
                                     if((/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(customer["EmailId"]))){
