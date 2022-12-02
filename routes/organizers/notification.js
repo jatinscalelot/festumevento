@@ -301,7 +301,7 @@ router.post('/import', helper.authenticateToken, fileHelper.memoryUpload.single(
                             console.log('batchArray', batchArray);
                             async.forEachSeries(batchArray.list, (customer, next_customer) => {
                                 ( async () => {
-                                    console.log('customer', customer);
+                                    console.log('customer', customer["MobileNumber"]);
                                     if((/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(customer["EmailId"]))){
                                         if(!isNaN(customer["MobileNumber"]) && customer["MobileNumber"].lenght > 10 && !checkForSpecialChar(customer["MobileNumber"])){
                                             customer.notificationid = notificationid;
