@@ -303,12 +303,18 @@ router.post('/import', helper.authenticateToken, fileHelper.memoryUpload.single(
                                 ( async () => {
                                     console.log('customer', customer["MobileNumber"]);
                                     if((/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(customer["EmailId"]))){
-                                        if(!isNaN(customer["MobileNumber"]) && customer["MobileNumber"].lenght > 10 && !checkForSpecialChar(customer["MobileNumber"])){
-                                            customer.notificationid = notificationid;
-                                            customer.selected = false;
-                                            await primary.model(constants.MODELS.customerimports, customerimportModel).create(customer);
-                                            importCount++;
-                                            next_customer();
+                                        if(!isNaN(customer["MobileNumber"]) && customer["MobileNumber"].lenght > 10){
+                                            if(checkForSpecialChar(customer["MobileNumber"])){
+                                                rejectedCount++;
+                                                rejectedRecords.push({message : 'Invalid Customer Mobile Number Special Chars not allowed', customer : customer});
+                                                next_customer();
+                                            }else{
+                                                customer.notificationid = notificationid;
+                                                customer.selected = false;
+                                                await primary.model(constants.MODELS.customerimports, customerimportModel).create(customer);
+                                                importCount++;
+                                                next_customer();
+                                            }
                                         }else{
                                             rejectedCount++;
                                             rejectedRecords.push({message : 'Invalid Customer Mobile Number', customer : customer});
