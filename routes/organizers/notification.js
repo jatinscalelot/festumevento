@@ -303,7 +303,7 @@ router.post('/import', helper.authenticateToken, fileHelper.memoryUpload.single(
                                 ( async () => {
                                     console.log('customer', customer);
                                     if((/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(customer["EmailId"]))){
-                                        if(!isNaN(customer["Mobile Number"]) && customer["Mobile Number"].lenght > 10 && !checkForSpecialChar(customer["Mobile Number"])){
+                                        if(!isNaN(customer["MobileNumber"]) && customer["MobileNumber"].lenght > 10 && !checkForSpecialChar(customer["MobileNumber"])){
                                             customer.notificationid = notificationid;
                                             customer.selected = false;
                                             await primary.model(constants.MODELS.customerimports, customerimportModel).create(customer);
