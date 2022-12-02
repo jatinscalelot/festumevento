@@ -311,6 +311,7 @@ router.post('/import', helper.authenticateToken, fileHelper.memoryUpload.single(
                                             }else{
                                                 customer.notificationid = notificationid;
                                                 customer.selected = false;
+                                                customer.createdBy = mongoose.Types.ObjectId(req.token.organizerid);
                                                 await primary.model(constants.MODELS.customerimports, customerimportModel).create(customer);
                                                 importCount++;
                                                 next_customer();
