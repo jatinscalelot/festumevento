@@ -296,9 +296,11 @@ router.post('/import', helper.authenticateToken, fileHelper.memoryUpload.single(
                         let importCount = 0;
                         let rejectedCount = 0;
                         let rejectedRecords = [];
+                        console.log('finalbatchArray', finalbatchArray);
                         async.forEachSeries(finalbatchArray, (batchArray, next_batchArray) => {
                             async.applyEachSeries(batchArray.list, (customer, next_customer) => {
                                 ( async () => {
+                                    console.log('customer', customer);
                                     if((/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(customer["EmailId"]))){
                                         if(!isNaN(customer["Mobile Number"]) && customer["Mobile Number"].lenght > 10 && !checkForSpecialChar(customer["Mobile Number"])){
                                             customer.notificationid = notificationid;
@@ -323,6 +325,7 @@ router.post('/import', helper.authenticateToken, fileHelper.memoryUpload.single(
                                 next_batchArray();
                             });
                         }, () => {
+                            console.log('done');
                             return responseManager.onSuccess('File uploaded successfully!', {importCount : importCount, rejectedCount : rejectedCount, rejectedRecords : rejectedRecords}, res);
                         });
                     }else{
