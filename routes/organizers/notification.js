@@ -9,8 +9,18 @@ const fileHelper = require('../../utilities/multer.functions');
 const AwsCloud = require('../../utilities/aws');
 const allowedContentTypes = require("../../utilities/content-types");
 const notificationModel = require("../../models/notifications.model");
+const customerimportModel = require("../../models/customerimports.model");
 const csv = require("csvtojson");
 const mongoose = require('mongoose');
+const specialChars = "<>@!#$%^&*()_+[]{}?:;|'\"\\,./~`-=";
+const checkForSpecialChar = function (string) {
+    for (i = 0; i < specialChars.length; i++) {
+        if (string.indexOf(specialChars[i]) > -1) {
+            return true
+        }
+    }
+    return false;
+}
 router.post('/', helper.authenticateToken, async (req, res) => {
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
@@ -282,9 +292,38 @@ router.post('/import', helper.authenticateToken, fileHelper.memoryUpload.single(
                                 });
                             }
                         }
-
-                        console.log('finalbatchArray', finalbatchArray);
-                        console.log('notificationid', notificationid);
+                        let importCount = 0;
+                        let rejectedCount = 0;
+                        let rejectedRecords = [];
+                        async.forEachSeries(finalbatchArray, (batchArray, next_batchArray) => {
+                            async.applyEachSeries(batchArray.list, (customer, next_customer) => {
+                                ( async () => {
+                                    if((/^\w+([\.-]?\w+)*@\w+([\.-]?\w+)*(\.\w{2,3})+$/.test(customer["EmailId"]))){
+                                        if(!isNaN(customer["Mobile Number"]) && customer["Mobile Number"].lenght > 10 && !checkForSpecialChar(customer["Mobile Number"])){
+                                            customer.notificationid = notificationid;
+                                            customer.selected = false;
+                                            await primary.model(constants.MODELS.customerimports, customerimportModel).create(customer);
+                                            importCount++;
+                                            next_customer();
+                                        }else{
+                                            rejectedCount++;
+                                            rejectedRecords.push({message : 'Invalid Customer Mobile Number', customer : customer});
+                                            next_customer();
+                                        }
+                                    }else{
+                                        rejectedCount++;
+                                        rejectedRecords.push({message : 'Invalid Customer Email ID', customer : customer});
+                                        next_customer();
+                                    }
+                                })().catch((error) => {
+                                    next_customer();
+                                });
+                            }, () => {
+                                next_batchArray();
+                            });
+                        }, () => {
+                            return responseManager.onSuccess('File uploaded successfully!', {importCount : importCount, rejectedCount : rejectedCount, rejectedRecords : rejectedRecords}, res);
+                        });
                     }else{
                         return responseManager.badrequest({ message: 'Invalid file type to import users only CSV file allowed, please try again' }, res);
                     }
