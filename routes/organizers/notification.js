@@ -182,7 +182,7 @@ router.post('/selectusers', helper.authenticateToken, async (req, res) => {
                             }
                         }
                     } else if (notificationData.usertype && notificationData.usertype == 'existingusers') {
-                        if (is_selected_all == true) { 
+                        if (is_selected_all == true) {
                             await primary.model(constants.MODELS.notifications, notificationModel).findByIdAndUpdate(notificationid, { is_selected_all: is_selected_all });
                             let updatednotificationData = await primary.model(constants.MODELS.notifications, notificationModel).findById(notificationid).lean();
                             return responseManager.onSuccess('Promotion user all user set successfully', updatednotificationData, res);
@@ -217,33 +217,37 @@ router.post('/setschedule', helper.authenticateToken, async (req, res) => {
         let organizerData = await primary.model(constants.MODELS.organizers, organizerModel).findById(req.token.organizerid).select('-password').lean();
         if (organizerData && organizerData.status == true && organizerData.mobileverified == true) {
             const { notificationid, notification_date, notification_time, is_notification, is_email, is_sms } = req.body;
-            let notificationData = await primary.model(constants.MODELS.notifications, notificationModel).findById(notificationid).lean();
-            if (notificationData && notificationData.createdBy.toString() == req.token.organizerid.toString()) {
-                if(notificationData.payment == false){
-                    let newdate = notification_date + ' ' + notification_time;
-                    const finalDate = new Date(newdate);
-                    let notification_timestamp = finalDate.getTime();
-                    await primary.model(constants.MODELS.notifications, notificationModel).findByIdAndUpdate(notificationid, { 
-                        notification_date : notification_date,
-                        notification_time : notification_time,
-                        notification_timestamp : notification_timestamp,
-                        is_notification : is_notification,
-                        is_email : is_email,
-                        is_sms : is_sms 
-                    });
-                    let updatednotificationData = await primary.model(constants.MODELS.notifications, notificationModel).findById(notificationid).lean();
-                    return responseManager.onSuccess('Promotion schedule set successfully', updatednotificationData, res);
-                }else{
-                    let newdate = notification_date + ' ' + notification_time;
-                    const finalDate = new Date(newdate);
-                    let notification_timestamp = finalDate.getTime();
-                    await primary.model(constants.MODELS.notifications, notificationModel).findByIdAndUpdate(notificationid, { 
-                        notification_date : notification_date,
-                        notification_time : notification_time,
-                        notification_timestamp : notification_timestamp
-                    });
-                    let updatednotificationData = await primary.model(constants.MODELS.notifications, notificationModel).findById(notificationid).lean();
-                    return responseManager.onSuccess('Promotion schedule set successfully', updatednotificationData, res);
+            if (notificationid && notificationid != '' && mongoose.Types.ObjectId.isValid(notificationid)) {
+                let notificationData = await primary.model(constants.MODELS.notifications, notificationModel).findById(notificationid).lean();
+                if (notificationData && notificationData.createdBy.toString() == req.token.organizerid.toString()) {
+                    if (notificationData.payment == false) {
+                        let newdate = notification_date + ' ' + notification_time;
+                        const finalDate = new Date(newdate);
+                        let notification_timestamp = finalDate.getTime();
+                        await primary.model(constants.MODELS.notifications, notificationModel).findByIdAndUpdate(notificationid, {
+                            notification_date: notification_date,
+                            notification_time: notification_time,
+                            notification_timestamp: notification_timestamp,
+                            is_notification: is_notification,
+                            is_email: is_email,
+                            is_sms: is_sms
+                        });
+                        let updatednotificationData = await primary.model(constants.MODELS.notifications, notificationModel).findById(notificationid).lean();
+                        return responseManager.onSuccess('Promotion schedule set successfully', updatednotificationData, res);
+                    } else {
+                        let newdate = notification_date + ' ' + notification_time;
+                        const finalDate = new Date(newdate);
+                        let notification_timestamp = finalDate.getTime();
+                        await primary.model(constants.MODELS.notifications, notificationModel).findByIdAndUpdate(notificationid, {
+                            notification_date: notification_date,
+                            notification_time: notification_time,
+                            notification_timestamp: notification_timestamp
+                        });
+                        let updatednotificationData = await primary.model(constants.MODELS.notifications, notificationModel).findById(notificationid).lean();
+                        return responseManager.onSuccess('Promotion schedule set successfully', updatednotificationData, res);
+                    }
+                } else {
+                    return responseManager.badrequest({ message: 'Invalid notification id to set notification schedule, please try again' }, res);
                 }
             } else {
                 return responseManager.badrequest({ message: 'Invalid notification id to set notification schedule, please try again' }, res);
