@@ -268,8 +268,13 @@ router.post('/import', helper.authenticateToken, fileHelper.memoryUpload.single(
             if(req.file && notificationid && notificationid != '' && mongoose.Types.ObjectId.isValid(notificationid)){
                 let notificationData = await primary.model(constants.MODELS.notifications, notificationModel).findById(notificationid).lean();
                 if(notificationData && notificationData != null){
-                    console.log('req.file', req.file);
-                    console.log('notificationid', notificationid);
+                    if(req.file.mimetype == 'text/csv'){
+                        let list = await csv().fromString(req.file.buffer.toString());
+                        console.log('list', list);
+                        console.log('notificationid', notificationid);
+                    }else{
+                        return responseManager.badrequest({ message: 'Invalid file type to import users only CSV file allowed, please try again' }, res);
+                    }
                 }else{
                     return responseManager.badrequest({ message: 'Invalid notificationid to import users, please try again' }, res);
                 }
