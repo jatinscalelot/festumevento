@@ -38,7 +38,7 @@ router.post('/', helper.authenticateToken, async (req, res) => {
 router.post('/save', helper.authenticateToken, async (req, res) => {
     if (req.token.superadminid && mongoose.Types.ObjectId.isValid(req.token.superadminid)) {
         const { planid, planname, description, notification_amount, sms_amount, email_amount, combo_amount, total_users, status } = req.body;
-        if(planname && planname != '' && notification_amount && !NaN(notification_amount) && sms_amount && !NaN(sms_amount) && email_amount && !NaN(email_amount) && combo_amount && !NaN(combo_amount) && total_users && !NaN(total_users)){
+        if(planname && planname != '' && notification_amount && !isNaN(notification_amount) && sms_amount && !isNaN(sms_amount) && email_amount && !isNaN(email_amount) && combo_amount && !isNaN(combo_amount) && total_users && !isNaN(total_users)){
             let primary = mongoConnection.useDb(constants.DEFAULT_DB);
             let superadmin = await primary.model(constants.MODELS.superadmins, superadminModel).findById(req.token.superadminid).lean();
             if(superadmin){
