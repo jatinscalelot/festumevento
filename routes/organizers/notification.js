@@ -12,6 +12,7 @@ const notificationModel = require("../../models/notifications.model");
 const customerimportModel = require("../../models/customerimports.model");
 const csv = require("csvtojson");
 const mongoose = require('mongoose');
+const async = require('async');
 const specialChars = "<>@!#$%^&*()_+[]{}?:;|'\"\\,./~`-=";
 const checkForSpecialChar = function (string) {
     for (i = 0; i < specialChars.length; i++) {
