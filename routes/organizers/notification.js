@@ -309,7 +309,7 @@ router.post('/import', helper.authenticateToken, fileHelper.memoryUpload.single(
                                                 rejectedRecords.push({message : 'Invalid Customer Mobile Number Special Chars not allowed', customer : customer});
                                                 next_customer();
                                             }else{
-                                                customer.notificationid = notificationid;
+                                                customer.notificationid = mongoose.Types.ObjectId(notificationid);
                                                 customer.selected = false;
                                                 customer.createdBy = mongoose.Types.ObjectId(req.token.organizerid);
                                                 await primary.model(constants.MODELS.customerimports, customerimportModel).create(customer);
