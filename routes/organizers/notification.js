@@ -182,7 +182,7 @@ router.post('/selectusers', helper.authenticateToken, async (req, res) => {
                             }
                         }
                     } else if (notificationData.usertype && notificationData.usertype == 'existingusers') {
-                        if (is_selected_all == true) {
+                        if (is_selected_all == true) { 
                             await primary.model(constants.MODELS.notifications, notificationModel).findByIdAndUpdate(notificationid, { is_selected_all: is_selected_all });
                             let updatednotificationData = await primary.model(constants.MODELS.notifications, notificationModel).findById(notificationid).lean();
                             return responseManager.onSuccess('Promotion user all user set successfully', updatednotificationData, res);
