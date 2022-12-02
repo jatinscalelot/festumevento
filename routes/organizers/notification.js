@@ -270,7 +270,20 @@ router.post('/import', helper.authenticateToken, fileHelper.memoryUpload.single(
                 if(notificationData && notificationData != null){
                     if(req.file.mimetype == 'text/csv'){
                         let list = await csv().fromString(req.file.buffer.toString());
-                        console.log('list', list);
+                        let lengthOfList = parseInt(list.length);
+                        let numberOfImports = parseInt(Math.ceil(lengthOfList / process.env.IMPORT_PARTITION_LIMIT));
+                        let finalbatchArray = [];
+                        for (var i = 0; i < numberOfImports; i++) {
+                            let partition = list.slice((i == 0) ? i : i * process.env.IMPORT_PARTITION_LIMIT, (i == 0) ? process.env.IMPORT_PARTITION_LIMIT : (i + 1) * process.env.IMPORT_PARTITION_LIMIT);
+                            if (partition.length > 0) {
+                                finalbatchArray.push({
+                                    batchno: i + 1,
+                                    list: partition
+                                });
+                            }
+                        }
+
+                        console.log('finalbatchArray', finalbatchArray);
                         console.log('notificationid', notificationid);
                     }else{
                         return responseManager.badrequest({ message: 'Invalid file type to import users only CSV file allowed, please try again' }, res);
@@ -286,9 +299,7 @@ router.post('/import', helper.authenticateToken, fileHelper.memoryUpload.single(
         return responseManager.unauthorisedRequest(res);
     }
 });
-router.post('/usertype', helper.authenticateToken, async (req, res) => {
-
-});
+router.post('/usertype', helper.authenticateToken, async (req, res) => {});
 router.post('/banner', helper.authenticateToken, fileHelper.memoryUpload.single('file'), async (req, res) => {
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
