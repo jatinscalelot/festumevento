@@ -68,7 +68,7 @@ const superadminpaths = [
   { pathUrl: '/executive', routeFile: 'executive' },
   { pathUrl: '/shopcategories', routeFile: 'shopcategories'},
   { pathUrl: '/media', routeFile: 'media'},
-  { pathUrl: '/promotionalplans', routeFile: 'promotionalplans'},
+  { pathUrl: '/promotionplans', routeFile: 'promotionplans'},
 ];
 const userpaths = [
   { pathUrl: '/', routeFile: 'index'}
