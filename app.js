@@ -52,7 +52,7 @@ const organizerpaths = [
   { pathUrl: '/shops', routeFile: 'shops'},
   { pathUrl: '/onlineoffer', routeFile: 'onlineoffer'},
   { pathUrl: '/offlineoffer', routeFile: 'offlineoffer'},
-  { pathUrl: '/promotionplans', routeFile: 'promotionplans'},
+  { pathUrl: '/promotionplan', routeFile: 'promotionplan'},
   { pathUrl: '/notification', routeFile: 'notification'},
 ];
 const subadminpaths = [
