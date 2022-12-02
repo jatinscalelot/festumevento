@@ -15,7 +15,7 @@ router.post('/', helper.authenticateToken, async (req, res) => {
         if(superadmin){
             primary.model(constants.MODELS.items, itemModel).paginate({
                 $or: [
-                    { name : { '$regex' : new RegExp(search, "i") } },
+                    { itemname : { '$regex' : new RegExp(search, "i") } },
                     { description : { '$regex' : new RegExp(search, "i") } },
                 ]
             },{
