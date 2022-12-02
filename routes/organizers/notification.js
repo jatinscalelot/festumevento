@@ -298,6 +298,7 @@ router.post('/import', helper.authenticateToken, fileHelper.memoryUpload.single(
                         let rejectedRecords = [];
                         console.log('finalbatchArray', finalbatchArray);
                         async.forEachSeries(finalbatchArray, (batchArray, next_batchArray) => {
+                            console.log('batchArray', batchArray);
                             async.applyEachSeries(batchArray.list, (customer, next_customer) => {
                                 ( async () => {
                                     console.log('customer', customer);
