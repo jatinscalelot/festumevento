@@ -17,6 +17,8 @@ const selectusersCtrl = require("../../controllers/organizer/notifications/selec
 const setscheduleCtrl = require("../../controllers/organizer/notifications/setschedule");
 const importCtrl = require("../../controllers/organizer/notifications/import");
 const userlistCtrl = require("../../controllers/organizer/notifications/userlist");
+const checkalluserCtrl = require("../../controllers/organizer/notifications/checkallusers");
+const checkuserCtrl = require("../../controllers/organizer/notifications/checkuser");
 router.post('/', helper.authenticateToken, listCtrl.list);
 router.post('/save', helper.authenticateToken, saveCtrl.save);
 router.post('/getone', helper.authenticateToken, getOneCtrl.getone);
@@ -25,6 +27,8 @@ router.post('/selectusers', helper.authenticateToken, selectusersCtrl.selectuser
 router.post('/setschedule', helper.authenticateToken, setscheduleCtrl.setschedule);
 router.post('/import', helper.authenticateToken, fileHelper.memoryUpload.single('file'), importCtrl.import);
 router.post('/userlist', helper.authenticateToken, userlistCtrl.userlist);
+router.post('/checkalluser', helper.authenticateToken, checkalluserCtrl.checkalluser);
+router.post('/checkuser', helper.authenticateToken, checkuserCtrl.checkuser);
 router.post('/banner', helper.authenticateToken, fileHelper.memoryUpload.single('file'), async (req, res) => {
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);

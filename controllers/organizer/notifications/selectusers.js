@@ -2,6 +2,7 @@ const mongoConnection = require('../../../utilities/connections');
 const responseManager = require('../../../utilities/response.manager');
 const constants = require('../../../utilities/constants');
 const notificationModel = require("../../../models/notifications.model");
+const customerimportModel = require("../../../models/customerimports.model");
 const organizerModel = require('../../../models/organizers.model');
 const mongoose = require('mongoose');
 exports.selectusers = async (req, res) => {
@@ -9,7 +10,7 @@ exports.selectusers = async (req, res) => {
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
         let organizerData = await primary.model(constants.MODELS.organizers, organizerModel).findById(req.token.organizerid).select('-password').lean();
         if (organizerData && organizerData.status == true && organizerData.mobileverified == true) {
-            const { notificationid, numberofusers, published_location, selected_plan, is_selected_all, selected_users } = req.body;
+            const { notificationid, numberofusers, published_location, selected_plan, is_selected_all } = req.body;
             if (notificationid && notificationid != '' && mongoose.Types.ObjectId.isValid(notificationid)) {
                 let notificationData = await primary.model(constants.MODELS.notifications, notificationModel).findById(notificationid).lean();
                 if (notificationData && notificationData.payment == false && notificationData.createdBy.toString() == req.token.organizerid.toString()) {
@@ -43,12 +44,13 @@ exports.selectusers = async (req, res) => {
                             let updatednotificationData = await primary.model(constants.MODELS.notifications, notificationModel).findById(notificationid).lean();
                             return responseManager.onSuccess('Promotion user all user set successfully', updatednotificationData, res);
                         } else {
-                            if (selected_users && selected_users.length > 0) {
-                                await primary.model(constants.MODELS.notifications, notificationModel).findByIdAndUpdate(notificationid, { is_selected_all: false, selected_users: selected_users });
+                            let allSelectedUsers = await primary.model(constants.MODELS.customerimports, customerimportModel).find({ notificationid: mongoose.Types.ObjectId(notificationid), selected: true }).lean();
+                            if (allSelectedUsers && allSelectedUsers.length > 0) {
+                                await primary.model(constants.MODELS.notifications, notificationModel).findByIdAndUpdate(notificationid, { is_selected_all: false });
                                 let updatednotificationData = await primary.model(constants.MODELS.notifications, notificationModel).findById(notificationid).lean();
                                 return responseManager.onSuccess('Promotion user all ids set successfully', updatednotificationData, res);
                             } else {
-                                return responseManager.badrequest({ message: 'Invalid selected to set notification user data please select atleast one user to send notification, please try again' }, res);
+                                return responseManager.badrequest({ message: 'Please select at least one user to send notification, please try again' }, res);
                             }
                         }
                     } else {
