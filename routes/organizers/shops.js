@@ -11,11 +11,9 @@ const allowedContentTypes = require("../../utilities/content-types");
 const mongoose = require('mongoose');
 const listShopCtrl = require('../../controllers/organizer/shops/list');
 const saveShopCtrl = require('../../controllers/organizer/shops/save');
-const companydetailsCtrl = require('../../controllers/organizer/shops/companydetails');
 const getOneShopCtrl = require('../../controllers/organizer/shops/getone');
 router.post('/', helper.authenticateToken, listShopCtrl.list);
 router.post('/save', helper.authenticateToken, saveShopCtrl.save);
-router.post('/companydetails', helper.authenticateToken, companydetailsCtrl.companydetails);
 router.post('/getone', helper.authenticateToken, getOneShopCtrl.getone);
 router.post('/banner', helper.authenticateToken, fileHelper.memoryUpload.single('file'), async (req, res) => {
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {

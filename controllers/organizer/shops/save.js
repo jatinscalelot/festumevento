@@ -14,7 +14,7 @@ exports.save = async (req, res) => {
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
         let organizerData = await primary.model(constants.MODELS.organizers, organizerModel).findById(req.token.organizerid).select('-password').lean();
         if (organizerData && organizerData.status == true && organizerData.mobileverified == true) {
-            const { shopid, banner, shop_name, shop_category, shop_days, start_date, end_date, about_shop, flat_no, street_name, area_name, city, state, pincode, longitude, latitude } = req.body;
+            const { shopid, banner, shop_name, shop_category, shop_days, start_date, end_date, about_shop, flat_no, street_name, area_name, city, state, pincode, longitude, latitude, company_name, gst_file, contact_number, emailid, about, social_media_links } = req.body;
             if (banner && shop_name && shop_category && shop_days && start_date && end_date && about_shop && flat_no && street_name && area_name && city && state && pincode && longitude && latitude) {
                 if (shopid && shopid != '' && mongoose.Types.ObjectId.isValid(shopid)) {
                     if (latitude && latitude != '' && longitude && longitude != '' && validateLatLng(parseFloat(latitude), parseFloat(longitude))) {
@@ -32,6 +32,14 @@ exports.save = async (req, res) => {
                             city: city,
                             state: state,
                             pincode: pincode,
+                            companydetails : {
+                                company_name: company_name,
+                                gst_file: gst_file,
+                                contact_number: contact_number,
+                                emailid: emailid,
+                                about: about,
+                                social_media_links: social_media_links
+                            },
                             location: { type: "Point", coordinates: [longitude, latitude] },
                             updatedBy: mongoose.Types.ObjectId(req.token.organizerid)
                         };
@@ -61,6 +69,14 @@ exports.save = async (req, res) => {
                             city: city,
                             state: state,
                             pincode: pincode,
+                            companydetails : {
+                                company_name: company_name,
+                                gst_file: gst_file,
+                                contact_number: contact_number,
+                                emailid: emailid,
+                                about: about,
+                                social_media_links: social_media_links
+                            },
                             location: { type: "Point", coordinates: [longitude, latitude] },
                             createdBy: mongoose.Types.ObjectId(req.token.organizerid),
                             updatedBy: mongoose.Types.ObjectId(req.token.organizerid)
