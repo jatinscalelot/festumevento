@@ -3,6 +3,7 @@ const responseManager = require('../../../utilities/response.manager');
 const constants = require('../../../utilities/constants');
 const notificationModel = require("../../../models/notifications.model");
 const organizerModel = require('../../../models/organizers.model');
+const settingModel = require('../../../models/settings.model');
 const mongoose = require('mongoose');
 exports.setschedule = async (req, res) => {
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
@@ -26,7 +27,12 @@ exports.setschedule = async (req, res) => {
                             is_sms: is_sms
                         });
                         let updatednotificationData = await primary.model(constants.MODELS.notifications, notificationModel).findById(notificationid).lean();
-                        return responseManager.onSuccess('Promotion schedule set successfully', updatednotificationData, res);
+                        let defaultSetting = await primary.model(constants.MODELS.settings, settingModel).find({}).lean();
+                        if(defaultSetting && defaultSetting.length > 0){
+                            return responseManager.onSuccess('Promotion schedule set successfully', { notification : updatednotificationData, setting : defaultSetting}, res);
+                        }else{
+                            return responseManager.badrequest({ message: 'Something went wrong, please try again' }, res);
+                        }                      
                     } else {
                         let newdate = notification_date + ' ' + notification_time;
                         const finalDate = new Date(newdate);

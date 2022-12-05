@@ -42,13 +42,13 @@ exports.selectusers = async (req, res) => {
                         if (is_selected_all == true) {
                             await primary.model(constants.MODELS.notifications, notificationModel).findByIdAndUpdate(notificationid, { is_selected_all: is_selected_all });
                             let updatednotificationData = await primary.model(constants.MODELS.notifications, notificationModel).findById(notificationid).lean();
-                            return responseManager.onSuccess('Promotion user all user set successfully', updatednotificationData, res);
+                            return responseManager.onSuccess('Promotion all user set successfully', updatednotificationData, res);
                         } else {
                             let allSelectedUsers = await primary.model(constants.MODELS.customerimports, customerimportModel).find({ notificationid: mongoose.Types.ObjectId(notificationid), selected: true }).lean();
                             if (allSelectedUsers && allSelectedUsers.length > 0) {
                                 await primary.model(constants.MODELS.notifications, notificationModel).findByIdAndUpdate(notificationid, { is_selected_all: false });
                                 let updatednotificationData = await primary.model(constants.MODELS.notifications, notificationModel).findById(notificationid).lean();
-                                return responseManager.onSuccess('Promotion user all ids set successfully', updatednotificationData, res);
+                                return responseManager.onSuccess('Promotion all ids set successfully', updatednotificationData, res);
                             } else {
                                 return responseManager.badrequest({ message: 'Please select at least one user to send notification, please try again' }, res);
                             }
