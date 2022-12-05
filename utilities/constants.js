@@ -19,7 +19,8 @@ let constants = {
         notifications : 'notifications',
         promotionplans : 'promotionplans',
         customerimports : 'customerimports',
-        settings : 'settings'
+        settings : 'settings',
+        notificationcoupons : 'notificationcoupons'
     }
 };
 module.exports = constants;
