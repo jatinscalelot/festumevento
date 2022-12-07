@@ -69,7 +69,7 @@ router.post('/banner', helper.authenticateToken, fileHelper.memoryUpload.single(
             if (req.file) {
                 if (allowedContentTypes.imagearray.includes(req.file.mimetype)) {
                     let filesizeinMb = parseFloat(parseFloat(req.file.size) / 1000000);
-                    if (filesizeinMb <= 10) {
+                    if (filesizeinMb <= 25) {
                         AwsCloud.saveToS3(req.file.buffer, req.token.organizerid.toString(), req.file.mimetype, 'offlineoffer').then((result) => {
                             let obj = {
                                 s3_url: process.env.AWS_BUCKET_URI,

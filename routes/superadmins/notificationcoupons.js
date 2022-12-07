@@ -27,7 +27,7 @@ router.post('/', helper.authenticateToken, async (req, res) => {
                 return responseManager.onSuccess('Notification coupons list!', notificationcoupons, res);
             }).catch((error) => {
                 return responseManager.onError(error, res);
-            })
+            });
         }else{
             return responseManager.unauthorisedRequest(res);
         }
@@ -41,7 +41,7 @@ router.post('/save', helper.authenticateToken, async (req, res) => {
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
         let superadmin = await primary.model(constants.MODELS.superadmins, superadminModel).findById(req.token.superadminid).lean();
         if(superadmin){
-            if(code && code.length > 6){
+            if(code && code != '' && code.trim() != '' && code.trim().length > 6){
                 if((amount && !isNaN(amount)) || (percentage && !isNaN(percentage))){
                     if((limit && !isNaN(limit)) || (expiry_date && expiry_time)){
                         if(notificationcouponid && notificationcouponid != '' && mongoose.Types.ObjectId.isValid(notificationcouponid)){
@@ -51,7 +51,7 @@ router.post('/save', helper.authenticateToken, async (req, res) => {
                                 const finalDate = new Date(newdate);
                                 let timestamp = (expiry_date && expiry_date != '' && expiry_time && expiry_time != '') ? finalDate.getTime() : 0;
                                 let obj = {
-                                    code : code,
+                                    code : code.trim().replace(/\s/g, '').toUpperCase(),
                                     description : description,
                                     amount : amount,
                                     percentage : percentage,
@@ -74,7 +74,7 @@ router.post('/save', helper.authenticateToken, async (req, res) => {
                                 const finalDate = new Date(newdate);
                                 let timestamp = (expiry_date && expiry_date != '' && expiry_time && expiry_time != '') ? finalDate.getTime() : 0;
                                 let obj = {
-                                    code : code,
+                                    code : code.trim().replace(/\s/g, '').toUpperCase(),
                                     description : description,
                                     amount : parseFloat(amount),
                                     percentage : parseFloat(percentage),
@@ -109,7 +109,7 @@ router.post('/save', helper.authenticateToken, async (req, res) => {
         return responseManager.badrequest({ message: 'Invalid token save Notification coupon code data, please try again' }, res);
     }
 });
-router.post('/remove', helper.authenticateToken, async (req, res) => {
+router.post('/remove', helper.authenticateToken, async (req, res) => { 
     if (req.token.superadminid && mongoose.Types.ObjectId.isValid(req.token.superadminid)) {
         const { notificationcouponid } = req.body;
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
