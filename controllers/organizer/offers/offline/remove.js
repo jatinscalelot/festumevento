@@ -11,7 +11,7 @@ exports.remove = async (req, res) => {
         if (organizerData && organizerData.status == true && organizerData.mobileverified == true) {
             const { shopid, offlineofferid } = req.body;
             if (shopid && shopid != '' && mongoose.Types.ObjectId.isValid(shopid) && offlineofferid && offlineofferid != '' && mongoose.Types.ObjectId.isValid(offlineofferid)) {
-                let offlineOfferData = await primary.model(constants.MODELS.offlineoffers, offlineofferModel).findByIdAndRemove(offlineofferid).lean();
+                await primary.model(constants.MODELS.offlineoffers, offlineofferModel).findByIdAndRemove(offlineofferid).lean();
                 return responseManager.onSuccess('Offline offer data removed successfully!', 1, res);
             } else {
                 return responseManager.badrequest({ message: 'Invalid shop id to remove offline offer data, please try again' }, res);
