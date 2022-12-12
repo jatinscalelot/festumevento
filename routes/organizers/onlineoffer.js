@@ -12,9 +12,11 @@ const mongoose = require('mongoose');
 const listOnlineOfferCtrl = require('../../controllers/organizer/offers/online/list');
 const saveOnlineOfferCtrl = require('../../controllers/organizer/offers/online/save');
 const getOneOnlineOfferCtrl = require('../../controllers/organizer/offers/online/getone');
+const removeOnlineOfferCtrl = require('../../controllers/organizer/offers/online/remove');
 router.post('/', helper.authenticateToken, listOnlineOfferCtrl.list);
 router.post('/save', helper.authenticateToken, saveOnlineOfferCtrl.save);
 router.post('/getone', helper.authenticateToken, getOneOnlineOfferCtrl.getone);
+router.post('/remove', helper.authenticateToken, removeOnlineOfferCtrl.remove);
 router.post('/video', helper.authenticateToken, fileHelper.memoryUpload.single('file'), async (req, res) => {
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);

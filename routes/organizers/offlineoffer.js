@@ -12,9 +12,11 @@ const allowedContentTypes = require("../../utilities/content-types");
 const listofflineOfferCtrl = require('../../controllers/organizer/offers/offline/list');
 const saveofflineOfferCtrl = require('../../controllers/organizer/offers/offline/save');
 const getOneofflineOfferCtrl = require('../../controllers/organizer/offers/offline/getone');
+const removeofflineOfferCtrl = require('../../controllers/organizer/offers/offline/remove');
 router.post('/', helper.authenticateToken, listofflineOfferCtrl.list);
 router.post('/save', helper.authenticateToken, saveofflineOfferCtrl.save);
 router.post('/getone', helper.authenticateToken, getOneofflineOfferCtrl.getone);
+router.post('/remove', helper.authenticateToken, removeofflineOfferCtrl.remove);
 router.post('/video', helper.authenticateToken, fileHelper.memoryUpload.single('file'), async (req, res) => {
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);

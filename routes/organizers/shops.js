@@ -12,9 +12,11 @@ const mongoose = require('mongoose');
 const listShopCtrl = require('../../controllers/organizer/shops/list');
 const saveShopCtrl = require('../../controllers/organizer/shops/save');
 const getOneShopCtrl = require('../../controllers/organizer/shops/getone');
+const deleteShopCtrl = require('../../controllers/organizer/shops/remove');
 router.post('/', helper.authenticateToken, listShopCtrl.list);
 router.post('/save', helper.authenticateToken, saveShopCtrl.save);
 router.post('/getone', helper.authenticateToken, getOneShopCtrl.getone);
+router.post('/remove', helper.authenticateToken, deleteShopCtrl.remove);
 router.post('/banner', helper.authenticateToken, fileHelper.memoryUpload.single('file'), async (req, res) => {
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
