@@ -77,7 +77,9 @@ const superadminpaths = [
   { pathUrl: '/platform', routeFile: 'platform'}
 ];
 const userpaths = [
-  { pathUrl: '/', routeFile: 'index'}
+  { pathUrl: '/', routeFile: 'index'},
+  { pathUrl: '/login', routeFile: 'login'},
+  { pathUrl: '/register', routeFile: 'register'}
 ];
 adminpaths.forEach((path) => {
 	app.use('/admin'+path.pathUrl, require('./routes/admins/' + path.routeFile));
