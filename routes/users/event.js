@@ -82,7 +82,9 @@ router.post('/getone', helper.authenticateToken, async (req, res) => {
                         let allreview = await primary.model(constants.MODELS.eventreviews, eventreviewModel).find({evenid : mongoose.Types.ObjectId(eventid)}).populate({path : 'userid', model : primary.model(constants.MODELS.users, userModel), select : "name mobile profilepic"}).lean();
                         result.reviews = allreview;
                         return responseManager.onSuccess("event data", result, res);
-                    })().catch((error) => {});
+                    })().catch((error) => {
+                        return responseManager.onError(error, res);
+                    });
                 }).catch((error) => {
                     return responseManager.onError(error, res);
                 });
