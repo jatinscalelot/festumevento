@@ -80,6 +80,7 @@ const userpaths = [
   { pathUrl: '/', routeFile: 'index'},
   { pathUrl: '/login', routeFile: 'login'},
   { pathUrl: '/register', routeFile: 'register'},
+  { pathUrl: '/profile', routeFile: 'profile'},
   { pathUrl: '/event', routeFile: 'event'}
 ];
 adminpaths.forEach((path) => {

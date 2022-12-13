@@ -32,6 +32,8 @@ router.post('/', async (req, res) => {
                 fcm_token : (fcm_token) ? fcm_token : '',
                 status : true,
                 f_coin : 0,
+                about : '',
+                profilepic : '',
                 mobileverified : false
             };
             const url = process.env.FACTOR_URL + mobile + "/AUTOGEN";
