@@ -100,6 +100,7 @@ router.post('/rate', helper.authenticateToken, async (req, res) => {
             const { eventid, ratings, title, review } = req.body;
             if (eventid && eventid != '' && mongoose.Types.ObjectId.isValid(eventid)) {
                 let existingreview = primary.model(constants.MODELS.eventreviews, eventreviewModel).findOne({eventid : mongoose.Types.ObjectId(eventid), userid : mongoose.Types.ObjectId(req.token.userid)}).lean();
+                console.log('existingreview', existingreview);
                 if(existingreview == null){
                     if(!isNaN(ratings) && title && title.trim() != '' && review && review.trim() != ''){
                         let obj = {
