@@ -15,7 +15,7 @@ router.get('/list', helper.authenticateToken, async (req, res) => {
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
         let organizerData = await primary.model(constants.MODELS.organizers, organizerModel).findById(req.token.organizerid).select('-password').lean();
         if (organizerData && organizerData.status == true && organizerData.mobileverified == true) {
-            primary.model(constants.MODELS.platforms, platformModel).find({ status: true, createdBy : mongoose.Types.ObjectId(req.token.organizerid), owner:'superadmin' }).lean().then((platforms) => {
+            primary.model(constants.MODELS.platforms, platformModel).find({ status: true, $or : [{createdBy : mongoose.Types.ObjectId(req.token.organizerid)}, {owner:'superadmin'}] }).lean().then((platforms) => {
                 return responseManager.onSuccess('Platforms list!', platforms, res);
             }).catch((error) => {
                 return responseManager.onError(error, res);
