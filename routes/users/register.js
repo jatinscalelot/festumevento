@@ -68,7 +68,6 @@ router.post('/verifyotp', async (req, res) => {
                     return responseManager.badrequest({message : 'Invalid OTP, please try again'}, res);
                 }
             })().catch((error) => {
-                console.log('error', error);
                 return responseManager.badrequest({message : 'Invalid OTP, please try again'}, res);
             });
         }else{
