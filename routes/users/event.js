@@ -13,8 +13,6 @@ function validateLatLng(lat, lng) {
     return pattern.test(lat) && pattern.test(lng);
 };
 router.post('/findevents', helper.authenticateToken, async (req, res) => {
-    console.log('req', req.token);
-    console.log('req', req.token.userid);
     if (req.token.userid && mongoose.Types.ObjectId.isValid(req.token.userid)) {
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
         let userdata = await primary.model(constants.MODELS.users, userModel).findById(req.token.userid).lean();
@@ -66,6 +64,31 @@ router.post('/findevents', helper.authenticateToken, async (req, res) => {
         }
     }else{
         return responseManager.badrequest({ message: 'Invalid token to find events near by you, please try again' }, res);
+    }
+});
+router.post('/getone', helper.authenticateToken, async (req, res) => {
+    if (req.token.userid && mongoose.Types.ObjectId.isValid(req.token.userid)) {
+        let primary = mongoConnection.useDb(constants.DEFAULT_DB);
+        let userdata = await primary.model(constants.MODELS.users, userModel).findById(req.token.userid).lean();
+        if (userdata && userdata.status == true && userdata.mobileverified == true) {
+            const { eventid } = req.body;
+            if (eventid && eventid != '' && mongoose.Types.ObjectId.isValid(eventid)) {
+                primary.model(constants.MODELS.events, eventModel).findById(eventid).populate({
+                    path : 'createdBy',
+                    model : primary.model(constants.MODELS.organizers, organizerModel)
+                }).lean().then((result) => {
+                    return responseManager.onSuccess("event data", result, res);
+                }).catch((error) => {
+                    return responseManager.onError(error, res);
+                });
+            }else{
+                return responseManager.badrequest({ message: 'Invalid event id to get event data, please try again' }, res);
+            }
+        }else{
+            return responseManager.badrequest({ message: 'Invalid user id to find event data, please try again' }, res);
+        }
+    }else{
+        return responseManager.badrequest({ message: 'Invalid token to get event data, please try again' }, res);
     }
 });
 module.exports = router;
