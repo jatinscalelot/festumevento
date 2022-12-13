@@ -27,10 +27,11 @@ router.post('/', async (req, res) => {
                 mobile : mobile,
                 country_code : country_code,
                 password : ecnPassword,
-                refer_code : refer_code,
+                refer_code : (refer_code) ? refer_code : '',
                 my_refer_code : my_referCode,
-                fcm_token : fcm_token,
+                fcm_token : (fcm_token) ? fcm_token : '',
                 status : true,
+                f_coin : 0,
                 mobileverified : false
             };
             const url = process.env.FACTOR_URL + mobile + "/AUTOGEN";
