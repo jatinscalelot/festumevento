@@ -7,6 +7,7 @@ const helper = require('../../utilities/helper');
 const userModel = require('../../models/users.model');
 const organizerModel = require('../../models/organizers.model');
 const eventModel = require('../../models/events.model');
+const eventreviewModel = require('../../models/eventreviews.model');
 const mongoose = require('mongoose');
 function validateLatLng(lat, lng) {
     let pattern = new RegExp('^-?([1-8]?[1-9]|[1-9]0)\\.{1}\\d{1,6}');
@@ -89,6 +90,42 @@ router.post('/getone', helper.authenticateToken, async (req, res) => {
         }
     }else{
         return responseManager.badrequest({ message: 'Invalid token to get event data, please try again' }, res);
+    }
+});
+router.post('/rate', helper.authenticateToken, async (req, res) => {
+    if (req.token.userid && mongoose.Types.ObjectId.isValid(req.token.userid)) {
+        let primary = mongoConnection.useDb(constants.DEFAULT_DB);
+        let userdata = await primary.model(constants.MODELS.users, userModel).findById(req.token.userid).lean();
+        if (userdata && userdata.status == true && userdata.mobileverified == true) {
+            const { eventid, ratings, title, review } = req.body;
+            if (eventid && eventid != '' && mongoose.Types.ObjectId.isValid(eventid)) {
+                let existingreview = primary.model(constants.MODELS.eventreviews, eventreviewModel).findOne({eventid : mongoose.Types.ObjectId(eventid), userid : mongoose.Types.ObjectId(req.token.userid)}).lean();
+                if(existingreview == null){
+                    if(!isNaN(ratings) && title && title.trim() != '' && review && review.trim() != ''){
+                        let obj = {
+                            eventid : mongoose.Types.ObjectId(eventid),
+                            userid : mongoose.Types.ObjectId(req.token.userid),
+                            ratings : parseFloat(ratings),
+                            title : title,
+                            review : review,
+                            timestamp : Date.now()
+                        };
+                        await primary.model(constants.MODELS.eventreviews, eventreviewModel).create(obj);
+                        return responseManager.onSuccess("Event review placed successfully!", 1, res);
+                    }else{
+                        return responseManager.badrequest({ message: 'Invalid data to place review for the event, please try again' }, res);
+                    }
+                }else{
+                    return responseManager.badrequest({ message: 'Review already register for the event, please try again with other event' }, res);
+                }
+            }else{
+                return responseManager.badrequest({ message: 'Invalid event id to rate event data, please try again' }, res);
+            }
+        }else{
+            return responseManager.badrequest({ message: 'Invalid user id to rate event data, please try again' }, res);
+        }
+    }else{
+        return responseManager.badrequest({ message: 'Invalid token to rate event data, please try again' }, res);
     }
 });
 module.exports = router;
