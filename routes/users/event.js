@@ -59,9 +59,13 @@ router.post('/findevents', helper.authenticateToken, async (req, res) => {
                     return responseManager.onError(error, res);
                 });
             }else{
-                return responseManager.badrequest({ message: 'Invalid token to find friends list, please try again' }, res);
+                return responseManager.badrequest({ message: 'Invalid latitude and logitude to find events near by you, please try again' }, res);
             }
+        }else{
+            return responseManager.badrequest({ message: 'Invalid user request to find events near by you, please try again' }, res);
         }
+    }else{
+        return responseManager.badrequest({ message: 'Invalid token to find events near by you, please try again' }, res);
     }
 });
 module.exports = router;
