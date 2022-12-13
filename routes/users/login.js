@@ -22,7 +22,7 @@ router.post('/', async (req, res) => {
             let decPassword = await helper.passwordDecryptor(userData.password);
             if(decPassword == password){
                 let accessToken = await helper.generateAccessToken({ userid : userData._id.toString() });
-                await primary.model(constants.MODELS.users, userModel).findByIdAndUpdate(userData._id, {fcm_token : (fcm_token) ? fcm_token : ''});
+                await primary.model(constants.MODELS.users, userModel).findByIdAndUpdate(userData._id, {fcm_token : (fcm_token) ? fcm_token : '', lastloginAt : Date.now()});
                 return responseManager.onSuccess('User login successfully!', {token : accessToken}, res);
             }else{
                 return responseManager.badrequest({message : 'Invalid password, please try again'}, res);
