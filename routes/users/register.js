@@ -59,13 +59,18 @@ router.post('/verifyotp', async (req, res) => {
         let userData = await primary.model(constants.MODELS.users, userModel).findOne({mobile : mobile, otpVerifyKey : key}).lean();
         if(userData){
             const url = process.env.FACTOR_URL + "VERIFY/" + key + "/" + otp;
-            let verifiedOTP = await axios.get(url ,config);
-            if(verifiedOTP.data.Status == 'Success'){
-                await primary.model(constants.MODELS.users, userModel).findByIdAndUpdate(userData._id, {mobileverified : true});
-                return responseManager.onSuccess('User mobile number verified successfully!', 1, res);
-            }else{
+            ( async () => {
+                let verifiedOTP = await axios.get(url ,config);
+                if(verifiedOTP.data.Status == 'Success'){
+                    await primary.model(constants.MODELS.users, userModel).findByIdAndUpdate(userData._id, {mobileverified : true});
+                    return responseManager.onSuccess('User mobile number verified successfully!', 1, res);
+                }else{
+                    return responseManager.badrequest({message : 'Invalid OTP, please try again'}, res);
+                }
+            })().catch((error) => {
+                console.log('error', error);
                 return responseManager.badrequest({message : 'Invalid OTP, please try again'}, res);
-            }
+            });
         }else{
             return responseManager.badrequest({message : 'Invalid data to verify user mobile number, please try again'}, res);
         } 
