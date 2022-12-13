@@ -13,6 +13,7 @@ function validateLatLng(lat, lng) {
     return pattern.test(lat) && pattern.test(lng);
 };
 router.post('/findevents', helper.authenticateToken, async (req, res) => {
+    console.log('req', req.token);
     console.log('req', req.token.userid);
     if (req.token.userid && mongoose.Types.ObjectId.isValid(req.token.userid)) {
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
