@@ -14,7 +14,7 @@ const config = {
 router.post('/', async (req, res) => {
     res.setHeader('Access-Control-Allow-Headers','Content-Type,Authorization');
     res.setHeader('Access-Control-Allow-Origin', '*');
-    const { mobile, password } = req.body;
+    const { mobile, password, fcm_token } = req.body;
     if(mobile && password && mobile.length == 10 && password.length >= 6){
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
         let userData = await primary.model(constants.MODELS.users, userModel).findOne({mobile: mobile, status: true}).lean();
@@ -22,6 +22,7 @@ router.post('/', async (req, res) => {
             let decPassword = await helper.passwordDecryptor(userData.password);
             if(decPassword == password){
                 let accessToken = await helper.generateAccessToken({ userid : userData._id.toString() });
+                await primary.model(constants.MODELS.users, userModel).findByIdAndUpdate(userData._id, {fcm_token : (fcm_token) ? fcm_token : ''});
                 return responseManager.onSuccess('User login successfully!', {token : accessToken}, res);
             }else{
                 return responseManager.badrequest({message : 'Invalid password, please try again'}, res);
