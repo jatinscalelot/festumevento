@@ -67,7 +67,8 @@ router.post('/save', helper.authenticateToken, async (req, res) => {
                         updatedBy : mongoose.Types.ObjectId(req.token.organizerid)
                     };
                     await primary.model(constants.MODELS.platforms, platformModel).findByIdAndUpdate(platformid, obj);
-                    return responseManager.onSuccess('Platform updated sucecssfully!', 1, res);
+                    let platformData = await primary.model(constants.MODELS.platforms, platformModel).findById(platformid).lean();
+                    return responseManager.onSuccess('Platform updated sucecssfully!', platformData, res);
                 }else{
                     return responseManager.badrequest({ message: 'Platform name can not be identical, please try again' }, res);
                 }
@@ -83,8 +84,9 @@ router.post('/save', helper.authenticateToken, async (req, res) => {
                         createdBy : mongoose.Types.ObjectId(req.token.organizerid),
                         updatedBy : mongoose.Types.ObjectId(req.token.organizerid)
                     };
-                    await primary.model(constants.MODELS.platforms, platformModel).create(obj);
-                    return responseManager.onSuccess('Platform created sucecssfully!', 1, res);
+                    let lastAdded = await primary.model(constants.MODELS.platforms, platformModel).create(obj);
+                    let platformData = await primary.model(constants.MODELS.platforms, platformModel).findById(lastAdded._id).lean();
+                    return responseManager.onSuccess('Platform created sucecssfully!', platformData, res);
                 }else{
                     return responseManager.badrequest({ message: 'Platform name can not be identical, please try again' }, res);
                 }
