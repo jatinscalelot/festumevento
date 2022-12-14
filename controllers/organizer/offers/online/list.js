@@ -3,6 +3,7 @@ const responseManager = require('../../../../utilities/response.manager');
 const constants = require('../../../../utilities/constants');
 const organizerModel = require('../../../../models/organizers.model');
 const onlineofferModel = require('../../../../models/onlineoffers.model');
+const platformModel = require('../../../../models/platforms.model');
 const mongoose = require('mongoose');
 exports.list = async (req, res) => {
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
@@ -20,6 +21,11 @@ exports.list = async (req, res) => {
                 page,
                 limit: parseInt(limit),
                 sort: { _id: -1 },
+                populate: {
+                    path : 'product_links.platform',
+                    model : primary.model(constants.MODELS.platforms, platformModel),
+                    select : 'name platformimage'
+                },
                 lean: true
             }).then((onlineoffers) => {
                 return responseManager.onSuccess('Online Offers list!', onlineoffers, res);
