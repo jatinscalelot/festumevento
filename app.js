@@ -57,6 +57,7 @@ const organizerpaths = [
   { pathUrl: '/notificationcoupons', routeFile: 'notificationcoupons'},
   { pathUrl: '/platform', routeFile: 'platform'},
   { pathUrl: '/livestream', routeFile: 'livestream'},
+  { pathUrl: '/subscriptions', routeFile: 'subscriptions'},
 ];
 const subadminpaths = [
   { pathUrl: '/', routeFile: 'index'}
@@ -75,7 +76,8 @@ const superadminpaths = [
   { pathUrl: '/media', routeFile: 'media'},
   { pathUrl: '/promotionplans', routeFile: 'promotionplans'},
   { pathUrl: '/notificationcoupons', routeFile: 'notificationcoupons'},
-  { pathUrl: '/platform', routeFile: 'platform'}
+  { pathUrl: '/platform', routeFile: 'platform'},
+  { pathUrl: '/subscriptions', routeFile: 'subscriptions'},
 ];
 const userpaths = [
   { pathUrl: '/', routeFile: 'index'},

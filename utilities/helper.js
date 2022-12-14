@@ -16,7 +16,7 @@ exports.getFileType = (mimeType) => {
         return element.mimeType == mimeType;
     });
     return filteredData.length > 0 ? filteredData[0].fName : "";
-}
+};
 exports.generateAccessToken = async (userData) => {
     return jwt.sign(userData, process.env.APP_LOGIN_AUTH_TOKEN, {});
 };
@@ -36,7 +36,7 @@ exports.authenticateToken = async (req, res, next) => {
     } else {
         return response.unauthorisedRequest(res);
     }
-}
+};
 exports.passwordDecryptor = async (passwordKeyDecrypt) => {
     try {
         var decLayer1 = CryptoJS.TripleDES.decrypt(passwordKeyDecrypt, process.env.PASSWORD_ENCRYPTION_SECRET);
@@ -49,7 +49,7 @@ exports.passwordDecryptor = async (passwordKeyDecrypt) => {
     } catch (err) {
         throw err;
     }
-}
+};
 exports.passwordEncryptor = async (passwordKeyEncrypt) => {
     try {
         var encLayer1 = CryptoJS.AES.encrypt(passwordKeyEncrypt, process.env.PASSWORD_ENCRYPTION_SECRET).toString();
@@ -59,4 +59,4 @@ exports.passwordEncryptor = async (passwordKeyEncrypt) => {
     } catch (err) {
         throw err;
     }
-}
+};

@@ -23,7 +23,8 @@ let constants = {
         settings: 'settings',
         notificationcoupons: 'notificationcoupons',
         platforms: 'platforms',
-        livestreams : 'livestreams'
+        livestreams : 'livestreams',
+        subscriptions : 'subscriptions'
     }
 };
 module.exports = constants;
