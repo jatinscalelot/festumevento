@@ -15,8 +15,10 @@ exports.save = async (req, res) => {
             if(product_links && product_links.length > 0){
                 let finalproduct_links = [];
                 async.forEachSeries(product_links, (product_link, next_product_link) => {
-                    product_link.platform = mongoose.Types.ObjectId(product_link.platform);
-                    finalproduct_links.push(product_link);
+                    if(product_link.platform && product_link.platform != '' && mongoose.Types.ObjectId.isValid(product_link.platform)){
+                        product_link.platform = mongoose.Types.ObjectId(product_link.platform);
+                        finalproduct_links.push(product_link);
+                    }
                     next_product_link();
                 }, () => {
                     ( async () => {
