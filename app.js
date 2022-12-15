@@ -84,7 +84,15 @@ const userpaths = [
   { pathUrl: '/login', routeFile: 'login'},
   { pathUrl: '/register', routeFile: 'register'},
   { pathUrl: '/profile', routeFile: 'profile'},
-  { pathUrl: '/event', routeFile: 'event'}
+  { pathUrl: '/event', routeFile: 'event'},
+  { pathUrl: '/shopoffer', routeFile: 'shopoffer'},
+  { pathUrl: '/onlineoffer', routeFile: 'onlineoffer'},
+  { pathUrl: '/livestreaming', routeFile: 'livestreaming'},
+  { pathUrl: '/eventwishlist', routeFile: 'eventwishlist'},
+  { pathUrl: '/shopofferwishlist', routeFile: 'shopofferwishlist'},
+  { pathUrl: '/onlineofferwishlist', routeFile: 'onlineofferwishlist'},
+  { pathUrl: '/livestreamingwishlist', routeFile: 'livestreamingwishlist'},
+  { pathUrl: '/search', routeFile: 'search'},
 ];
 adminpaths.forEach((path) => {
 	app.use('/admin'+path.pathUrl, require('./routes/admins/' + path.routeFile));

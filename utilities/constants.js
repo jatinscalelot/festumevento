@@ -24,7 +24,9 @@ let constants = {
         notificationcoupons: 'notificationcoupons',
         platforms: 'platforms',
         livestreams : 'livestreams',
-        subscriptions : 'subscriptions'
+        subscriptions : 'subscriptions',
+        eventwishlists : 'eventwishlists',
+        shopreviews : 'shopreviews'
     }
 };
 module.exports = constants;

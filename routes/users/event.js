@@ -53,7 +53,25 @@ router.post('/findevents', helper.authenticateToken, async (req, res) => {
                     path : 'createdBy',
                     model : primary.model(constants.MODELS.organizers, organizerModel)
                 }).lean().then((result) => {
-                    return responseManager.onSuccess("event List", result, res);
+                    let allEvents = [];
+                    async.forEachSeries(result, (event, next_event) => {
+                        ( async () => {
+                            let noofreview = parseInt(await primary.model(constants.MODELS.eventreviews, eventreviewModel).countDocuments({eventid : mongoose.Types.ObjectId(event._id)}));
+                            if(noofreview > 0){
+                                let totalReviewsCountObj = await primary.model(constants.MODELS.eventreviews, eventreviewModel).aggregate([{ $match: {eventid : mongoose.Types.ObjectId(event._id)} },{ $group: { _id : null, sum : { $sum: "$ratings" } } }]);
+                                if(totalReviewsCountObj && totalReviewsCountObj.length > 0 && totalReviewsCountObj[0].sum){
+                                    event.ratings = parseFloat(parseFloat(totalReviewsCountObj[0].sum) / noofreview).toFixed(1);
+                                    allEvents.push(event);
+                                }
+                            }else{
+                                event.ratings = '0.0';
+                                allEvents.push(event);
+                            }
+                            next_event();
+                        })().catch((error) => {})
+                    }, () => {
+                        return responseManager.onSuccess("event List", allEvents, res);
+                    });
                 }).catch((error) => {
                     return responseManager.onError(error, res);
                 });
