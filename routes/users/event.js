@@ -9,6 +9,7 @@ const organizerModel = require('../../models/organizers.model');
 const eventModel = require('../../models/events.model');
 const eventreviewModel = require('../../models/eventreviews.model');
 const mongoose = require('mongoose');
+const async = require('async');
 function validateLatLng(lat, lng) {
     let pattern = new RegExp('^-?([1-8]?[1-9]|[1-9]0)\\.{1}\\d{1,6}');
     return pattern.test(lat) && pattern.test(lng);
