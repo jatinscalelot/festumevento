@@ -8,6 +8,7 @@ const userModel = require('../../models/users.model');
 const organizerModel = require('../../models/organizers.model');
 const eventModel = require('../../models/events.model');
 const eventreviewModel = require('../../models/eventreviews.model');
+const eventwishlistModel = require('../../models/eventwishlists.model');
 const mongoose = require('mongoose');
 const async = require('async');
 function validateLatLng(lat, lng) {
@@ -57,6 +58,8 @@ router.post('/findevents', helper.authenticateToken, async (req, res) => {
                     let allEvents = [];
                     async.forEachSeries(result, (event, next_event) => {
                         ( async () => {
+                            let wishlist = await primary.model(constants.MODELS.eventwishlists, eventwishlistModel).findOne({eventid : mongoose.Types.ObjectId(event._id), userid : mongoose.Types.ObjectId(req.token.userid)}).lean();
+                            event.wishlist_status = (wishlist == null) ? false : true; 
                             let noofreview = parseInt(await primary.model(constants.MODELS.eventreviews, eventreviewModel).countDocuments({eventid : mongoose.Types.ObjectId(event._id)}));
                             if(noofreview > 0){
                                 let totalReviewsCountObj = await primary.model(constants.MODELS.eventreviews, eventreviewModel).aggregate([{ $match: {eventid : mongoose.Types.ObjectId(event._id)} },{ $group: { _id : null, sum : { $sum: "$ratings" } } }]);
@@ -98,6 +101,17 @@ router.post('/getone', helper.authenticateToken, async (req, res) => {
                     model : primary.model(constants.MODELS.organizers, organizerModel)
                 }).lean().then((result) => {
                     ( async () => {
+                        let wishlist = await primary.model(constants.MODELS.eventwishlists, eventwishlistModel).findOne({eventid : mongoose.Types.ObjectId(eventid), userid : mongoose.Types.ObjectId(req.token.userid)}).lean();
+                        result.wishlist_status = (wishlist == null) ? false : true;
+                        let noofreview = parseInt(await primary.model(constants.MODELS.eventreviews, eventreviewModel).countDocuments({eventid : mongoose.Types.ObjectId(eventid)}));
+                        if(noofreview > 0){
+                            let totalReviewsCountObj = await primary.model(constants.MODELS.eventreviews, eventreviewModel).aggregate([{ $match: {eventid : mongoose.Types.ObjectId(eventid)} },{ $group: { _id : null, sum : { $sum: "$ratings" } } }]);
+                            if(totalReviewsCountObj && totalReviewsCountObj.length > 0 && totalReviewsCountObj[0].sum){
+                                result.ratings = parseFloat(parseFloat(totalReviewsCountObj[0].sum) / noofreview).toFixed(1);
+                            }
+                        }else{
+                            result.ratings = '0.0';
+                        }
                         let allreview = await primary.model(constants.MODELS.eventreviews, eventreviewModel).find({eventid : mongoose.Types.ObjectId(eventid)}).populate({path : 'userid', model : primary.model(constants.MODELS.users, userModel), select : "name mobile profilepic"}).lean();
                         result.reviews = allreview;
                         return responseManager.onSuccess("event data", result, res);

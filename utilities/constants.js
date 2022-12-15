@@ -26,7 +26,8 @@ let constants = {
         livestreams : 'livestreams',
         subscriptions : 'subscriptions',
         eventwishlists : 'eventwishlists',
-        shopreviews : 'shopreviews'
+        shopreviews : 'shopreviews',
+        offlineofferwishlists : 'offlineofferwishlists'
     }
 };
 module.exports = constants;
