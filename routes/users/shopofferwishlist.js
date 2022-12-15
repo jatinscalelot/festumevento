@@ -10,7 +10,6 @@ const organizerModel = require('../../models/organizers.model');
 const shopModel = require('../../models/shops.model');
 const offlineofferModel = require('../../models/offlineoffers.model');
 const shopreviewModel = require('../../models/shopreviews.model');
-const helper = require('../../utilities/helper');
 const mongoose = require('mongoose');
 const async = require('async');
 router.post('/', helper.authenticateToken, async (req, res) => {
