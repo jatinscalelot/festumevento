@@ -15,9 +15,7 @@ exports.list = async (req, res) => {
             let query = {};
             if(platform && platform != '' && mongoose.Types.ObjectId.isValid(platform)){
                 query = {
-                    product_links : {
-                        platform : mongoose.Types.ObjectId(platform)
-                    }
+                    "product_links.platform" : mongoose.Types.ObjectId(platform)
                 };
             }
             console.log('query', query);
