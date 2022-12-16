@@ -56,7 +56,7 @@ router.post('/list', helper.authenticateToken, async (req, res) => {
                 }
                 next_wishlist();
             }, () => {
-                primary.model(constants.MODELS.events, eventModel).find({ _id : { $in : allEventsId }}).populate(
+                primary.model(constants.MODELS.events, eventModel).find({ _id : { $in : allEventsId }, status : true}).populate(
                     [{
                         path : 'createdBy',
                         model : primary.model(constants.MODELS.organizers, organizerModel),
@@ -71,7 +71,36 @@ router.post('/list', helper.authenticateToken, async (req, res) => {
                         select: '-createdAt -updatedAt -__v -createdBy -updatedBy -status'
                     }
                 ]).select("name event_type event_category other about event_location banner seating_arrangements").lean().then((result) => {
-                    return responseManager.onSuccess("Wishlist List", result, res);
+                    let allEvents = [];
+                    let currentTime = Date.now() + 19800000;
+                    async.forEachSeries(result, (event, next_event) => {
+                        ( async () => {
+                            let wishlist = await primary.model(constants.MODELS.eventwishlists, eventwishlistModel).findOne({eventid : mongoose.Types.ObjectId(event._id), userid : mongoose.Types.ObjectId(req.token.userid)}).lean();
+                            event.wishlist_status = (wishlist == null) ? false : true; 
+                            let noofreview = parseInt(await primary.model(constants.MODELS.eventreviews, eventreviewModel).countDocuments({eventid : mongoose.Types.ObjectId(event._id)}));
+                            if(noofreview > 0){
+                                let totalReviewsCountObj = await primary.model(constants.MODELS.eventreviews, eventreviewModel).aggregate([{ $match: {eventid : mongoose.Types.ObjectId(event._id)} },{ $group: { _id : null, sum : { $sum: "$ratings" } } }]);
+                                if(totalReviewsCountObj && totalReviewsCountObj.length > 0 && totalReviewsCountObj[0].sum){
+                                    event.ratings = parseFloat(parseFloat(totalReviewsCountObj[0].sum) / noofreview).toFixed(1);
+                                    if(event.about && event.about.start_timestamp && event.about.end_timestamp && (event.about.start_timestamp <= currentTime && event.about.end_timestamp >= currentTime)){
+                                        allEvents.push(event);
+                                    }else if(event.about && event.about.start_timestamp && event.about.end_timestamp && (event.about.start_timestamp > currentTime && event.about.end_timestamp > currentTime)){
+                                        allEvents.push(event);
+                                    }
+                                }
+                            }else{
+                                event.ratings = '0.0';
+                                if(event.about && event.about.start_timestamp && event.about.end_timestamp && (event.about.start_timestamp <= currentTime && event.about.end_timestamp >= currentTime)){
+                                    allEvents.push(event);
+                                }else if(event.about && event.about.start_timestamp && event.about.end_timestamp && (event.about.start_timestamp > currentTime && event.about.end_timestamp > currentTime)){
+                                    allEvents.push(event);
+                                }
+                            }
+                            next_event();
+                        })().catch((error) => {console.log('error', error);})
+                    }, () => {
+                        return responseManager.onSuccess("Wishlist List", allEvents, res);
+                    });
                 }).catch((error) => {
                     return responseManager.onError(error, res);
                 });
