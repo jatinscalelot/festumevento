@@ -68,7 +68,7 @@ router.post('/findevents', helper.authenticateToken, async (req, res) => {
                 }]).select("name event_type event_category other about event_location banner seating_arrangements").lean().then((result) => {
                     let allEvents = [];
                     let upcomingEvents = [];
-                    let currentTime = Date.now();
+                    let currentTime = Date.now() + 19800000;
                     console.log('currentTime', currentTime);
                     async.forEachSeries(result, (event, next_event) => {
                         ( async () => {
