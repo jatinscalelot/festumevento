@@ -16,12 +16,18 @@ exports.aboutevent = async (req, res) => {
                     if (start_time && start_time != '' && end_time && end_time != '') {
                         if (about_event && about_event != '') {
                             let primary = mongoConnection.useDb(constants.DEFAULT_DB);
+                            let xstart_date = start_date.split("-");
+                            let startTimestamp = new Date(xstart_date[1]+'-'+xstart_date[2]+'-'+xstart_date[0]+' '+start_time).getTime();
+                            let yend_date = end_date.split("-");
+                            let endTimestamp = new Date(yend_date[1]+'-'+yend_date[2]+'-'+yend_date[0]+' '+end_time).getTime();
                             let obj = {
                                 start_date: start_date,
                                 end_date: end_date,
                                 start_time: start_time,
                                 end_time: end_time,
-                                about_event: about_event
+                                about_event: about_event,
+                                start_timestamp : startTimestamp,
+                                end_timestamp : endTimestamp,
                             };
                             await primary.model(constants.MODELS.events, eventModel).findByIdAndUpdate(eventid, { updatedBy: mongoose.Types.ObjectId(req.token.organizerid), about: obj });
                             let eventData = await primary.model(constants.MODELS.events, eventModel).findById(eventid).lean();
