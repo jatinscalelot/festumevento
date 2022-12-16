@@ -56,7 +56,8 @@ router.post('/image', helper.authenticateToken, fileHelper.memoryUpload.single('
             if (req.file) {
                 if (allowedContentTypes.imagearray.includes(req.file.mimetype)) {
                     let filesizeinMb = parseFloat(parseFloat(req.file.size) / 1000000);
-                    if (filesizeinMb <= 3) {
+                    console.log('event image size', filesizeinMb);
+                    if (filesizeinMb <= 10) {
                         AwsCloud.saveToS3(req.file.buffer, req.token.organizerid.toString(), req.file.mimetype, 'event').then((result) => {
                             let obj = {
                                 s3_url: process.env.AWS_BUCKET_URI,
@@ -67,7 +68,7 @@ router.post('/image', helper.authenticateToken, fileHelper.memoryUpload.single('
                             return responseManager.onError(error, res);
                         });
                     }else{
-                        return responseManager.badrequest({ message: 'Image file must be <= 3 MB, please try again' }, res);
+                        return responseManager.badrequest({ message: 'Image file must be <= 10 MB, please try again' }, res);
                     }
                 }else{
                     return responseManager.badrequest({ message: 'Invalid file type only image files allowed, please try again' }, res);
@@ -136,8 +137,8 @@ router.post('/banner', helper.authenticateToken, fileHelper.memoryUpload.single(
             if (req.file) {
                 if (allowedContentTypes.imagearray.includes(req.file.mimetype)) {
                     let filesizeinMb = parseFloat(parseFloat(req.file.size) / 1000000);
-                    console.log('filesizeinMb', filesizeinMb);
-                    if (filesizeinMb <= 10) {
+                    console.log('event banner filesizeinMb', filesizeinMb);
+                    if (filesizeinMb <= 25) {
                         AwsCloud.saveToS3(req.file.buffer, req.token.organizerid.toString(), req.file.mimetype, 'event').then((result) => {
                             let obj = {
                                 s3_url: process.env.AWS_BUCKET_URI,
@@ -148,7 +149,7 @@ router.post('/banner', helper.authenticateToken, fileHelper.memoryUpload.single(
                             return responseManager.onError(error, res);
                         });
                     }else{
-                        return responseManager.badrequest({ message: 'Banner file must be <= 10 MB, please try again' }, res);
+                        return responseManager.badrequest({ message: 'Banner file must be <= 25 MB, please try again' }, res);
                     }
                 }else{
                     return responseManager.badrequest({ message: 'Invalid file type only image files allowed, please try again' }, res);
