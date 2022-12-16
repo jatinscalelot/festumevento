@@ -10,6 +10,7 @@ const eventModel = require('../../models/events.model');
 const eventcategoriesModel = require('../../models/eventcategories.model');
 const eventreviewModel = require('../../models/eventreviews.model');
 const eventwishlistModel = require('../../models/eventwishlists.model');
+const itemModel = require('../../models/items.model');
 const mongoose = require('mongoose');
 const async = require('async');
 function validateLatLng(lat, lng) {
@@ -60,6 +61,10 @@ router.post('/findevents', helper.authenticateToken, async (req, res) => {
                     path : 'event_category',
                     model : primary.model(constants.MODELS.eventcategories, eventcategoriesModel),
                     select : 'categoryname description'
+                },{
+                    path: "arrangements.seating_item", 
+                    model: primary.model(constants.MODELS.items, itemModel), 
+                    select: '-createdAt -updatedAt -__v -createdBy -updatedBy -status'
                 }]).select("name event_type event_category other about event_location banner arrangements").lean().then((result) => {
                     let allEvents = [];
                     let upcomingEvents = [];
