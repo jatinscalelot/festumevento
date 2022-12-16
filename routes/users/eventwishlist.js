@@ -5,8 +5,10 @@ const responseManager = require('../../utilities/response.manager');
 const constants = require('../../utilities/constants');
 const userModel = require('../../models/users.model');
 const eventModel = require('../../models/events.model');
-const categoryModel = require('../../models/eventcategories.model');
+const eventcategoriesModel = require('../../models/eventcategories.model');
+const organizerModel = require('../../models/organizers.model');
 const eventwishlistModel = require('../../models/eventwishlists.model');
+const itemModel = require('../../models/items.model');
 const helper = require('../../utilities/helper');
 const mongoose = require('mongoose');
 const async = require('async');
@@ -54,7 +56,21 @@ router.post('/list', helper.authenticateToken, async (req, res) => {
                 }
                 next_wishlist();
             }, () => {
-                primary.model(constants.MODELS.events, eventModel).find({ _id : { $in : allEventsId }}).populate({ path: 'event_category', model: primary.model(constants.MODELS.eventcategories, categoryModel), select: "categoryname description event_type" }).lean().then((result) => {
+                primary.model(constants.MODELS.events, eventModel).find({ _id : { $in : allEventsId }}).populate(
+                    [{
+                        path : 'createdBy',
+                        model : primary.model(constants.MODELS.organizers, organizerModel),
+                        select : 'name email mobile profile_pic'
+                    },{
+                        path : 'event_category',
+                        model : primary.model(constants.MODELS.eventcategories, eventcategoriesModel),
+                        select : 'categoryname description event_type'
+                    },{
+                        path: "seating_arrangements.seating_item", 
+                        model: primary.model(constants.MODELS.items, itemModel), 
+                        select: '-createdAt -updatedAt -__v -createdBy -updatedBy -status'
+                    }
+                ]).select("name event_type event_category other about event_location banner seating_arrangements").lean().then((result) => {
                     return responseManager.onSuccess("Wishlist List", result, res);
                 }).catch((error) => {
                     return responseManager.onError(error, res);

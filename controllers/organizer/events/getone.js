@@ -17,7 +17,7 @@ exports.getone = async (req, res) => {
                 let eventData = await primary.model(constants.MODELS.events, eventModel).findById(eventid).populate([
                     {path: 'event_category', model: primary.model(constants.MODELS.eventcategories, categoryModel), select: "categoryname description event_type"},
                     {path: "discounts.items", model: primary.model(constants.MODELS.items, itemModel), select: '-createdAt -updatedAt -__v -createdBy -updatedBy -status'},
-                    {path: "arrangements.seating_item", model: primary.model(constants.MODELS.items, itemModel), select: '-createdAt -updatedAt -__v -createdBy -updatedBy -status'}
+                    {path: "seating_arrangements.seating_item", model: primary.model(constants.MODELS.items, itemModel), select: '-createdAt -updatedAt -__v -createdBy -updatedBy -status'}
                 ]).lean();
                 if(eventData && eventData != null && (eventData.createdBy.toString() == req.token.organizerid.toString())){
                     return responseManager.onSuccess('Organizer event data!', eventData, res);
