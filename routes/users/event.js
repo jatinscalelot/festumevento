@@ -62,7 +62,8 @@ router.post('/findevents', helper.authenticateToken, async (req, res) => {
                     select : 'categoryname description'
                 }]).select("name event_type event_category other about event_location banner arrangements").lean().then((result) => {
                     let allEvents = [];
-                    let upcomingEvents = []
+                    let upcomingEvents = [];
+                    let currentTime = Date.now();
                     async.forEachSeries(result, (event, next_event) => {
                         ( async () => {
                             let wishlist = await primary.model(constants.MODELS.eventwishlists, eventwishlistModel).findOne({eventid : mongoose.Types.ObjectId(event._id), userid : mongoose.Types.ObjectId(req.token.userid)}).lean();
@@ -72,7 +73,6 @@ router.post('/findevents', helper.authenticateToken, async (req, res) => {
                                 let totalReviewsCountObj = await primary.model(constants.MODELS.eventreviews, eventreviewModel).aggregate([{ $match: {eventid : mongoose.Types.ObjectId(event._id)} },{ $group: { _id : null, sum : { $sum: "$ratings" } } }]);
                                 if(totalReviewsCountObj && totalReviewsCountObj.length > 0 && totalReviewsCountObj[0].sum){
                                     event.ratings = parseFloat(parseFloat(totalReviewsCountObj[0].sum) / noofreview).toFixed(1);
-                                    let currentTime = Date.now();
                                     if(event.about && event.about.start_timestamp && event.about.end_timestamp && (event.about.start_timestamp <= currentTime && event.about.end_timestamp >= currentTime)){
                                         allEvents.push(event);
                                     }else if(event.about && event.about.start_timestamp && event.about.end_timestamp && (event.about.start_timestamp > currentTime && event.about.end_timestamp > currentTime)){
