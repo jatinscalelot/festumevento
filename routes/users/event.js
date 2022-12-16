@@ -7,6 +7,7 @@ const helper = require('../../utilities/helper');
 const userModel = require('../../models/users.model');
 const organizerModel = require('../../models/organizers.model');
 const eventModel = require('../../models/events.model');
+const eventcategoriesModel = require('../../models/eventcategories.model');
 const eventreviewModel = require('../../models/eventreviews.model');
 const eventwishlistModel = require('../../models/eventwishlists.model');
 const mongoose = require('mongoose');
@@ -51,10 +52,15 @@ router.post('/findevents', helper.authenticateToken, async (req, res) => {
                         { "event_location.pincode": { '$regex': new RegExp(search, "i") } }
                     ],
                     ...query
-                }).populate({
+                }).populate([{
                     path : 'createdBy',
-                    model : primary.model(constants.MODELS.organizers, organizerModel)
-                }).lean().then((result) => {
+                    model : primary.model(constants.MODELS.organizers, organizerModel),
+                    select : 'name email mobile profile_pic'
+                },{
+                    path : 'event_category',
+                    model : primary.model(constants.MODELS.eventcategories, eventcategoriesModel),
+                    select : 'categoryname description'
+                }]).select("name event_type event_category other about event_location banner arrangements").lean().then((result) => {
                     let allEvents = [];
                     async.forEachSeries(result, (event, next_event) => {
                         ( async () => {
