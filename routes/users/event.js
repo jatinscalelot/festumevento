@@ -64,6 +64,7 @@ router.post('/findevents', helper.authenticateToken, async (req, res) => {
                     let allEvents = [];
                     let upcomingEvents = [];
                     let currentTime = Date.now();
+                    console.log('currentTime', currentTime);
                     async.forEachSeries(result, (event, next_event) => {
                         ( async () => {
                             let wishlist = await primary.model(constants.MODELS.eventwishlists, eventwishlistModel).findOne({eventid : mongoose.Types.ObjectId(event._id), userid : mongoose.Types.ObjectId(req.token.userid)}).lean();
