@@ -62,10 +62,10 @@ router.post('/findevents', helper.authenticateToken, async (req, res) => {
                     model : primary.model(constants.MODELS.eventcategories, eventcategoriesModel),
                     select : 'categoryname description'
                 },{
-                    path: "arrangements.seating_item", 
+                    path: "seating_arrangements.seating_item", 
                     model: primary.model(constants.MODELS.items, itemModel), 
                     select: '-createdAt -updatedAt -__v -createdBy -updatedBy -status'
-                }]).select("name event_type event_category other about event_location banner arrangements").lean().then((result) => {
+                }]).select("name event_type event_category other about event_location banner seating_arrangements").lean().then((result) => {
                     let allEvents = [];
                     let upcomingEvents = [];
                     let currentTime = Date.now();
@@ -127,7 +127,7 @@ router.post('/getone', helper.authenticateToken, async (req, res) => {
                     model : primary.model(constants.MODELS.eventcategories, eventcategoriesModel),
                     select : 'categoryname description'
                 },{
-                    path: "arrangements.seating_item", 
+                    path: "seating_arrangements.seating_item", 
                     model: primary.model(constants.MODELS.items, itemModel), 
                     select: '-createdAt -updatedAt -__v -createdBy -updatedBy -status'
                 }]).lean().then((result) => {
