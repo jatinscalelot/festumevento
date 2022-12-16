@@ -96,7 +96,7 @@ let schema = new mongoose.Schema({
         }
     },
     discounts : [discountSchema],
-    arrangements : [arrangementSchema],
+    seating_arrangements : [arrangementSchema],
 	createdBy: {
 		type: mongoose.Types.ObjectId,
 		default: null
