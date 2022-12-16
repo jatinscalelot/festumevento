@@ -23,12 +23,18 @@ exports.save = async (req, res) => {
                 }, () => {
                     ( async () => {
                         if (offerid && offerid && mongoose.Types.ObjectId.isValid(offerid)) {
+                            let xstart_date = start_date.split("-");
+                            let startTimestamp = new Date(xstart_date[1]+'-'+xstart_date[2]+'-'+xstart_date[0]+' 00:00:00').getTime();
+                            let yend_date = end_date.split("-");
+                            let endTimestamp = new Date(yend_date[1]+'-'+yend_date[2]+'-'+yend_date[0]+' 00:00:00').getTime();
                             var obj = {
                                 shop_name: shop_name,
                                 offer_amount: offer_amount,
                                 offer_type: offer_type,
                                 start_date: start_date,
+                                start_timestamp : startTimestamp,
                                 end_date: end_date,
+                                end_timestamp : endTimestamp,
                                 product_name: product_name,
                                 poster: poster,
                                 images: images,
@@ -51,12 +57,18 @@ exports.save = async (req, res) => {
                             }).lean();
                             return responseManager.onSuccess('Online offer updated successfully!', onlineOffer, res);
                         } else {
+                            let xstart_date = start_date.split("-");
+                            let startTimestamp = new Date(xstart_date[1]+'-'+xstart_date[2]+'-'+xstart_date[0]+' 00:00:00').getTime();
+                            let yend_date = end_date.split("-");
+                            let endTimestamp = new Date(yend_date[1]+'-'+yend_date[2]+'-'+yend_date[0]+' 00:00:00').getTime();
                             var obj = {
                                 shop_name: shop_name,
                                 offer_amount: offer_amount,
                                 offer_type: offer_type,
                                 start_date: start_date,
+                                start_timestamp : startTimestamp,
                                 end_date: end_date,
+                                end_timestamp : endTimestamp,
                                 product_name: product_name,
                                 poster: poster,
                                 images: images,

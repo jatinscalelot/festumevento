@@ -14,10 +14,16 @@ exports.save = async (req, res) => {
                 if (offer_on_all_products && offer_on_all_products == true) {
                     if (all_product_images && all_product_images.length > 0 && all_product_conditions && all_product_conditions.length > 0) {
                         if (offerid && offerid && mongoose.Types.ObjectId.isValid(offerid)) {
+                            let xstart_date = start_date.split("-");
+                            let startTimestamp = new Date(xstart_date[1]+'-'+xstart_date[2]+'-'+xstart_date[0]+' 00:00:00').getTime();
+                            let yend_date = end_date.split("-");
+                            let endTimestamp = new Date(yend_date[1]+'-'+yend_date[2]+'-'+yend_date[0]+' 00:00:00').getTime();
                             var obj = {
                                 offer_title: offer_title,
                                 start_date: start_date,
+                                start_timestamp : startTimestamp,
                                 end_date: end_date,
+                                end_timestamp : endTimestamp,
                                 poster: poster,
                                 video: video,
                                 description: description,
@@ -34,10 +40,16 @@ exports.save = async (req, res) => {
                             let offlineOffer = await primary.model(constants.MODELS.offlineoffers, offlineofferModel).findById(offerid).lean();
                             return responseManager.onSuccess('Offline offer updated successfully!', offlineOffer, res);
                         } else {
+                            let xstart_date = start_date.split("-");
+                            let startTimestamp = new Date(xstart_date[1]+'-'+xstart_date[2]+'-'+xstart_date[0]+' 00:00:00').getTime();
+                            let yend_date = end_date.split("-");
+                            let endTimestamp = new Date(yend_date[1]+'-'+yend_date[2]+'-'+yend_date[0]+' 00:00:00').getTime();
                             var obj = {
                                 offer_title: offer_title,
                                 start_date: start_date,
+                                start_timestamp : startTimestamp,
                                 end_date: end_date,
+                                end_timestamp : endTimestamp,
                                 poster: poster,
                                 video: video,
                                 description: description,
@@ -62,10 +74,16 @@ exports.save = async (req, res) => {
                 } else {
                     if (offer_type && (offer_type == 'limited_person' || offer_type == 'unlimited_person') && offer_type_conditions && offer_type_conditions.length > 0) {
                         if (offerid && offerid && mongoose.Types.ObjectId.isValid(offerid)) {
+                            let xstart_date = start_date.split("-");
+                            let startTimestamp = new Date(xstart_date[1]+'-'+xstart_date[2]+'-'+xstart_date[0]+' 00:00:00').getTime();
+                            let yend_date = end_date.split("-");
+                            let endTimestamp = new Date(yend_date[1]+'-'+yend_date[2]+'-'+yend_date[0]+' 00:00:00').getTime();
                             var obj = {
                                 offer_title: offer_title,
                                 start_date: start_date,
+                                start_timestamp : startTimestamp,
                                 end_date: end_date,
+                                end_timestamp : endTimestamp,
                                 poster: poster,
                                 video: video,
                                 description: description,
@@ -82,9 +100,16 @@ exports.save = async (req, res) => {
                             let offlineOffer = await primary.model(constants.MODELS.offlineoffers, offlineofferModel).findById(offerid).lean();
                             return responseManager.onSuccess('Offline offer updated successfully!', offlineOffer, res);
                         } else {
+                            let xstart_date = start_date.split("-");
+                            let startTimestamp = new Date(xstart_date[1]+'-'+xstart_date[2]+'-'+xstart_date[0]+' 00:00:00').getTime();
+                            let yend_date = end_date.split("-");
+                            let endTimestamp = new Date(yend_date[1]+'-'+yend_date[2]+'-'+yend_date[0]+' 00:00:00').getTime();
                             var obj = {
                                 offer_title: offer_title,
                                 start_date: start_date,
+                                start_timestamp : startTimestamp,
+                                end_date: end_date,
+                                end_timestamp : endTimestamp,
                                 end_date: end_date,
                                 poster: poster,
                                 video: video,
