@@ -88,7 +88,7 @@ router.post('/findevents', helper.authenticateToken, async (req, res) => {
                                 }
                             }
                             next_event();
-                        })().catch((error) => {})
+                        })().catch((error) => {console.log('error', error);})
                     }, () => {
                         return responseManager.onSuccess("event List", {events : allEvents, upcomingEvents : upcomingEvents}, res);
                     });
