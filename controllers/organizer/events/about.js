@@ -17,9 +17,9 @@ exports.aboutevent = async (req, res) => {
                         if (about_event && about_event != '') {
                             let primary = mongoConnection.useDb(constants.DEFAULT_DB);
                             let xstart_date = start_date.split("-");
-                            let startTimestamp = new Date(xstart_date[1]+'-'+xstart_date[2]+'-'+xstart_date[0]+' '+start_time).getTime() + (19800 * 1000);
+                            let startTimestamp = new Date(xstart_date[1]+'-'+xstart_date[2]+'-'+xstart_date[0]+' '+start_time).getTime();
                             let yend_date = end_date.split("-");
-                            let endTimestamp = new Date(yend_date[1]+'-'+yend_date[2]+'-'+yend_date[0]+' '+end_time).getTime() + (19800 * 1000);
+                            let endTimestamp = new Date(yend_date[1]+'-'+yend_date[2]+'-'+yend_date[0]+' '+end_time).getTime();
                             let obj = {
                                 start_date: start_date,
                                 end_date: end_date,
