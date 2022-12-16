@@ -118,10 +118,19 @@ router.post('/getone', helper.authenticateToken, async (req, res) => {
         if (userdata && userdata.status == true && userdata.mobileverified == true) {
             const { eventid } = req.body;
             if (eventid && eventid != '' && mongoose.Types.ObjectId.isValid(eventid)) {
-                primary.model(constants.MODELS.events, eventModel).findById(eventid).populate({
+                primary.model(constants.MODELS.events, eventModel).findById(eventid).populate([{
                     path : 'createdBy',
-                    model : primary.model(constants.MODELS.organizers, organizerModel)
-                }).lean().then((result) => {
+                    model : primary.model(constants.MODELS.organizers, organizerModel),
+                    select : 'name email mobile profile_pic'
+                },{
+                    path : 'event_category',
+                    model : primary.model(constants.MODELS.eventcategories, eventcategoriesModel),
+                    select : 'categoryname description'
+                },{
+                    path: "arrangements.seating_item", 
+                    model: primary.model(constants.MODELS.items, itemModel), 
+                    select: '-createdAt -updatedAt -__v -createdBy -updatedBy -status'
+                }]).lean().then((result) => {
                     ( async () => {
                         let wishlist = await primary.model(constants.MODELS.eventwishlists, eventwishlistModel).findOne({eventid : mongoose.Types.ObjectId(eventid), userid : mongoose.Types.ObjectId(req.token.userid)}).lean();
                         result.wishlist_status = (wishlist == null) ? false : true;
