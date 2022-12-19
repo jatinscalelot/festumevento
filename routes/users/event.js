@@ -87,6 +87,7 @@ router.post('/findevents', helper.authenticateToken, async (req, res) => {
                         }, () => {
                             ( async () => {
                                 event.startingat = parseFloat(event.startingat).toFixed(2);
+                                delete event.seating_arrangements;
                                 let wishlist = await primary.model(constants.MODELS.eventwishlists, eventwishlistModel).findOne({eventid : mongoose.Types.ObjectId(event._id), userid : mongoose.Types.ObjectId(req.token.userid)}).lean();
                                 event.wishlist_status = (wishlist == null) ? false : true; 
                                 let noofreview = parseInt(await primary.model(constants.MODELS.eventreviews, eventreviewModel).countDocuments({eventid : mongoose.Types.ObjectId(event._id)}));
