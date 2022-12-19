@@ -27,7 +27,9 @@ let constants = {
         subscriptions : 'subscriptions',
         eventwishlists : 'eventwishlists',
         shopreviews : 'shopreviews',
-        offlineofferwishlists : 'offlineofferwishlists'
+        offlineofferwishlists : 'offlineofferwishlists',
+        onlineofferreviews : 'onlineofferreviews',
+        onlineofferwishlists : 'onlineofferwishlists'
     }
 };
 module.exports = constants;
