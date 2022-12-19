@@ -7,9 +7,9 @@ const helper = require('../../utilities/helper');
 const userModel = require('../../models/users.model');
 const onlineofferwishlistModel = require('../../models/onlineofferwishlists.model');
 const organizerModel = require('../../models/organizers.model');
-const shopModel = require('../../models/shops.model');
 const onlineofferModel = require('../../models/onlineoffers.model');
 const onlineofferreviewModel = require('../../models/onlineofferreviews.model');
+const platformModel = require('../../models/platforms.model');
 const mongoose = require('mongoose');
 const async = require('async');
 router.post('/', helper.authenticateToken, async (req, res) => {
@@ -48,7 +48,7 @@ router.post('/list', helper.authenticateToken, async (req, res) => {
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
         let userdata = await primary.model(constants.MODELS.users, userModel).findById(req.token.userid).lean();
         if (userdata && userdata.status == true && userdata.mobileverified == true) {
-            let mywishlist = await primary.model(constants.MODELS.offlineofferwishlists, offlineofferwishlistModel).find({userid : mongoose.Types.ObjectId(req.token.userid)}).lean();
+            let mywishlist = await primary.model(constants.MODELS.onlineofferwishlists, onlineofferwishlistModel).find({userid : mongoose.Types.ObjectId(req.token.userid)}).lean();
             let allOffersId = [];
             async.forEachSeries(mywishlist, (wishlist, next_wishlist) => {
                 if(wishlist.offerid && wishlist.offerid != '' && mongoose.Types.ObjectId.isValid(wishlist.offerid)){
@@ -56,40 +56,40 @@ router.post('/list', helper.authenticateToken, async (req, res) => {
                 }
                 next_wishlist();
             }, () => {
-              primary.model(constants.MODELS.offlineoffers, offlineofferModel).find({
+              primary.model(constants.MODELS.onlineoffers, onlineofferModel).find({
                 _id: { $in: allOffersId }, status: true,
               }).populate([
                 { path: 'createdBy', model: primary.model(constants.MODELS.organizers, organizerModel) },
-                { path: 'shopid', model: primary.model(constants.MODELS.shops, shopModel) }
-              ]).lean().then((shopOffers) => {
+                { path : 'product_links.platform', model : primary.model(constants.MODELS.platforms, platformModel)}
+              ]).lean().then((onlineOffers) => {
                 let alloffers = [];
-                async.forEachSeries(shopOffers, (offer, next_offer) => {
+                async.forEachSeries(onlineOffers, (offer, next_offer) => {
                   (async () => {
-                    let noofreview = parseInt(await primary.model(constants.MODELS.shopreviews, shopreviewModel).countDocuments({ shopid: mongoose.Types.ObjectId(offer.shopid._id) }));
+                    let noofreview = parseInt(await primary.model(constants.MODELS.onlineofferreviews, onlineofferreviewModel).countDocuments({ offerid: mongoose.Types.ObjectId(offer._id) }));
                     if (noofreview > 0) {
-                      let totalReviewsCountObj = await primary.model(constants.MODELS.shopreviews, shopreviewModel).aggregate([{ $match: { shopid: mongoose.Types.ObjectId(offer.shopid._id) } }, { $group: { _id: null, sum: { $sum: "$ratings" } } }]);
+                      let totalReviewsCountObj = await primary.model(constants.MODELS.onlineofferreviews, onlineofferreviewModel).aggregate([{ $match: { offerid: mongoose.Types.ObjectId(offer._id) } }, { $group: { _id: null, sum: { $sum: "$ratings" } } }]);
                       if (totalReviewsCountObj && totalReviewsCountObj.length > 0 && totalReviewsCountObj[0].sum) {
-                        offer.shopid.ratings = parseFloat(parseFloat(totalReviewsCountObj[0].sum) / noofreview).toFixed(1);
+                        offer.ratings = parseFloat(parseFloat(totalReviewsCountObj[0].sum) / noofreview).toFixed(1);
                         alloffers.push(offer);
                       }
                     } else {
-                      offer.shopid.ratings = '0.0';
+                      offer.ratings = '0.0';
                       alloffers.push(offer);
                     }
                     next_offer();
                   })().catch((error) => { });
                 }, () => {
-                  return responseManager.onSuccess("Wishlist List", alloffers, res);
+                  return responseManager.onSuccess("Online offer wishlist list", alloffers, res);
                 });
               }).catch((error) => {
                 return responseManager.onError(error, res);
               });
             });            
         } else {
-            return responseManager.badrequest({ message: 'Invalid userid to get offer wishlist list, please try again' }, res);
+            return responseManager.badrequest({ message: 'Invalid userid to get online offer wishlist list, please try again' }, res);
         }
     } else {
-        return responseManager.badrequest({ message: 'Invalid token to get offer wishlist list, please try again' }, res);
+        return responseManager.badrequest({ message: 'Invalid token to get online offer wishlist list, please try again' }, res);
     }
 });
 module.exports = router;
