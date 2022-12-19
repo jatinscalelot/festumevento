@@ -71,7 +71,7 @@ router.post('/findevents', helper.authenticateToken, async (req, res) => {
                     let currentTime = Date.now() + 19800000;
                     async.forEachSeries(result, (event, next_event) => {
                         event.startingat = 0.00;
-                        async.forEachSeries(seating_arrangements, (seating_arrangement, next_seating_arrangement) => {
+                        async.forEachSeries(event.seating_arrangements, (seating_arrangement, next_seating_arrangement) => {
                             async.forEachSeries(seating_arrangement.arrangements, (arrangement, next_arrangement) => {
                                 if(event.startingat != 0.00){
                                     if(event.startingat > arrangement.per_person_price){
