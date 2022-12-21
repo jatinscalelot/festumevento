@@ -75,7 +75,8 @@ router.post('/getone', helper.authenticateToken, async (req, res) => {
       if (offerid && offerid != '' && mongoose.Types.ObjectId.isValid(offerid)) {
         primary.model(constants.MODELS.onlineoffers, onlineofferModel).findById(offerid).populate([{
           path: 'createdBy',
-          model: primary.model(constants.MODELS.organizers, organizerModel)
+          model: primary.model(constants.MODELS.organizers, organizerModel),
+          select: 'name email mobile profile_pic'
         }, {
           path : 'product_links.platform', 
           model : primary.model(constants.MODELS.platforms, platformModel)
