@@ -16,6 +16,7 @@ const companydetailslivestreamCtrl = require('../../controllers/organizer/livest
 const personaldetailslivestreamCtrl = require('../../controllers/organizer/livestream/personaldetails');
 const tandclivestreamCtrl = require('../../controllers/organizer/livestream/tandc');
 const getonelivestreamCtrl = require('../../controllers/organizer/livestream/getone');
+const removelivestreamCtrl = require('../../controllers/organizer/livestream/remove');
 router.post('/', helper.authenticateToken, listlivestreamCtrl.list);
 router.post('/save', helper.authenticateToken, savelivestreamCtrl.save);
 router.post('/media', helper.authenticateToken, medialivestreamCtrl.media);
@@ -23,6 +24,7 @@ router.post('/companydetails', helper.authenticateToken, companydetailslivestrea
 router.post('/personaldetails', helper.authenticateToken, personaldetailslivestreamCtrl.personaldetails);
 router.post('/tandc', helper.authenticateToken, tandclivestreamCtrl.tandc);
 router.post('/getone', helper.authenticateToken, getonelivestreamCtrl.getone);
+router.post('/remove', helper.authenticateToken, removelivestreamCtrl.remove);
 router.get('/getlivestream', helper.authenticateToken, savelivestreamCtrl.getlivestream);
 router.get('/getmedia', helper.authenticateToken, medialivestreamCtrl.getmedia);
 router.get('/getcompanydetails', helper.authenticateToken, companydetailslivestreamCtrl.getcompanydetails);
