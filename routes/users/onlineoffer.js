@@ -32,7 +32,7 @@ router.post('/findoffer', helper.authenticateToken, async (req, res) => {
           { about_company : { '$regex': new RegExp(search, "i") } }
         ]
       }).populate([
-        { path: 'createdBy', model: primary.model(constants.MODELS.organizers, organizerModel) },
+        { path: 'createdBy', model: primary.model(constants.MODELS.organizers, organizerModel), select: 'name email mobile profile_pic' },
         { path : 'product_links.platform', model : primary.model(constants.MODELS.platforms, platformModel)}
       ]).lean().then((onlineOffers) => {
         let alloffers = [];
