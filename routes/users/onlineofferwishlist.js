@@ -59,7 +59,7 @@ router.post('/list', helper.authenticateToken, async (req, res) => {
               primary.model(constants.MODELS.onlineoffers, onlineofferModel).find({
                 _id: { $in: allOffersId }, status: true,
               }).populate([
-                { path: 'createdBy', model: primary.model(constants.MODELS.organizers, organizerModel) },
+                { path: 'createdBy', model: primary.model(constants.MODELS.organizers, organizerModel), select: 'name email mobile profile_pic' },
                 { path : 'product_links.platform', model : primary.model(constants.MODELS.platforms, platformModel)}
               ]).lean().then((onlineOffers) => {
                 let alloffers = [];
