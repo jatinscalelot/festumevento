@@ -79,7 +79,7 @@ const superadminpaths = [
   { pathUrl: '/platform', routeFile: 'platform'},
   { pathUrl: '/subscriptions', routeFile: 'subscriptions'},
 ];
-const userpaths = [
+const userpaths = [ 
   { pathUrl: '/', routeFile: 'index'},
   { pathUrl: '/login', routeFile: 'login'},
   { pathUrl: '/register', routeFile: 'register'},
