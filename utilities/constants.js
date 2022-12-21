@@ -24,6 +24,8 @@ let constants = {
         notificationcoupons: 'notificationcoupons',
         platforms: 'platforms',
         livestreams : 'livestreams',
+        livestreamreviews : 'livestreamreviews',
+        livestreamwishlists : 'livestreamwishlists',
         subscriptions : 'subscriptions',
         eventwishlists : 'eventwishlists',
         shopreviews : 'shopreviews',

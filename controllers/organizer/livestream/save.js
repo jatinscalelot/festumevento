@@ -19,8 +19,8 @@ exports.save = async (req, res) => {
                             if(event_type && (event_type == 'free' || event_type == 'paid')){
                                 if(!isNaN(price_per_user) && (price_per_user >= 0)){
                                     let x = event_date.split("/");
-                                    let startTimestamp = new Date(x[1]+'-'+x[0]+'-'+x[2]+' '+event_start_time).getTime();
-                                    let endTimestamp = new Date(x[1]+'-'+x[0]+'-'+x[2]+' '+event_end_time).getTime();
+                                    let startTimestamp = new Date(x[1]+'-'+x[2]+'-'+x[0]+' '+event_start_time).getTime();
+                                    let endTimestamp = new Date(x[1]+'-'+x[2]+'-'+x[0]+' '+event_end_time).getTime();
                                     let obj = {
                                         event_name: event_name,
                                         event_category: mongoose.Types.ObjectId(event_category),
@@ -80,8 +80,8 @@ exports.save = async (req, res) => {
                             if(event_type && (event_type == 'free' || event_type == 'paid')){
                                 if(!isNaN(price_per_user) && (price_per_user >= 0)){
                                     let x = event_date.split("/");
-                                    let startTimestamp = new Date(x[1]+'-'+x[0]+'-'+x[2]+' '+event_start_time).getTime();
-                                    let endTimestamp = new Date(x[1]+'-'+x[0]+'-'+x[2]+' '+event_end_time).getTime();
+                                    let startTimestamp = new Date(x[1]+'-'+x[2]+'-'+x[0]+' '+event_start_time).getTime();
+                                    let endTimestamp = new Date(x[1]+'-'+x[2]+'-'+x[0]+' '+event_end_time).getTime();
                                     let obj = {
                                         event_name: event_name,
                                         event_category: mongoose.Types.ObjectId(event_category),
