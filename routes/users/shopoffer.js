@@ -106,7 +106,8 @@ router.post('/getone', helper.authenticateToken, async (req, res) => {
       if (offerid && offerid != '' && mongoose.Types.ObjectId.isValid(offerid)) {
         primary.model(constants.MODELS.offlineoffers, offlineofferModel).findById(offerid).populate([{
           path: 'createdBy',
-          model: primary.model(constants.MODELS.organizers, organizerModel)
+          model: primary.model(constants.MODELS.organizers, organizerModel),
+          select: 'name email mobile profile_pic'
         }, {
           path: 'shopid',
           model: primary.model(constants.MODELS.shops, shopModel)
