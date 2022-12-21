@@ -53,7 +53,7 @@ router.post('/findoffer', helper.authenticateToken, async (req, res) => {
                   { description: { '$regex': new RegExp(search, "i") } }
                 ]
               }).populate([
-                { path: 'createdBy', model: primary.model(constants.MODELS.organizers, organizerModel) },
+                { path: 'createdBy', model: primary.model(constants.MODELS.organizers, organizerModel), select: 'name email mobile profile_pic' },
                 { path: 'shopid', model: primary.model(constants.MODELS.shops, shopModel) }
               ]).lean().then((shopOffers) => {
                 let alloffers = [];
