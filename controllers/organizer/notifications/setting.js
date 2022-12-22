@@ -9,6 +9,7 @@ exports.getsettings = async (req, res) => {
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
         const { notificationid } = req.query;
+        console.log('notificationid', notificationid);
         let organizerData = await primary.model(constants.MODELS.organizers, organizerModel).findById(req.token.organizerid).select('-password').lean();
         if (organizerData && organizerData.status == true && organizerData.mobileverified == true && organizerData.is_approved == true) {
             if (notificationid && notificationid != '' && mongoose.Types.ObjectId.isValid(notificationid)) {
@@ -53,6 +54,8 @@ exports.getsettings = async (req, res) => {
                     } else {
                         return responseManager.badrequest({ message: 'Invalid notification data to set notification user data, please try again' }, res);
                     }
+                }else{
+                    console.log('notificationData', notificationData);
                 }
             } else {
                 let defaultSetting = await primary.model(constants.MODELS.settings, settingModel).find({}).lean();
