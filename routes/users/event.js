@@ -37,6 +37,8 @@ router.post('/findevents', helper.authenticateToken, async (req, res) => {
                     }
                 };
                 primary.model(constants.MODELS.events, eventModel).find({
+                    is_approved: true,
+                    is_live: true,
                     status: true,
                     $or: [
                         { name: { '$regex': new RegExp(search, "i") } },
@@ -148,41 +150,45 @@ router.post('/getone', helper.authenticateToken, async (req, res) => {
                     model: primary.model(constants.MODELS.items, itemModel),
                     select: '-createdAt -updatedAt -__v -createdBy -updatedBy -status'
                 }]).lean().then((result) => {
-                    result.startingat = 0.00;
-                    async.forEachSeries(result.seating_arrangements, (seating_arrangement, next_seating_arrangement) => {
-                        async.forEachSeries(seating_arrangement.arrangements, (arrangement, next_arrangement) => {
-                            if (result.startingat != 0.00) {
-                                if (result.startingat > arrangement.per_person_price) {
+                    if (result.is_live == true && result.is_approved == true && result.status == true) {
+                        result.startingat = 0.00;
+                        async.forEachSeries(result.seating_arrangements, (seating_arrangement, next_seating_arrangement) => {
+                            async.forEachSeries(seating_arrangement.arrangements, (arrangement, next_arrangement) => {
+                                if (result.startingat != 0.00) {
+                                    if (result.startingat > arrangement.per_person_price) {
+                                        result.startingat = arrangement.per_person_price;
+                                    }
+                                } else {
                                     result.startingat = arrangement.per_person_price;
                                 }
-                            } else {
-                                result.startingat = arrangement.per_person_price;
-                            }
-                            next_arrangement();
+                                next_arrangement();
+                            }, () => {
+                                next_seating_arrangement();
+                            });
                         }, () => {
-                            next_seating_arrangement();
-                        });
-                    }, () => {
-                        (async () => {
-                            result.startingat = parseFloat(result.startingat).toFixed(2);
-                            let wishlist = await primary.model(constants.MODELS.eventwishlists, eventwishlistModel).findOne({ eventid: mongoose.Types.ObjectId(eventid), userid: mongoose.Types.ObjectId(req.token.userid) }).lean();
-                            result.wishlist_status = (wishlist == null) ? false : true;
-                            let noofreview = parseInt(await primary.model(constants.MODELS.eventreviews, eventreviewModel).countDocuments({ eventid: mongoose.Types.ObjectId(eventid) }));
-                            if (noofreview > 0) {
-                                let totalReviewsCountObj = await primary.model(constants.MODELS.eventreviews, eventreviewModel).aggregate([{ $match: { eventid: mongoose.Types.ObjectId(eventid) } }, { $group: { _id: null, sum: { $sum: "$ratings" } } }]);
-                                if (totalReviewsCountObj && totalReviewsCountObj.length > 0 && totalReviewsCountObj[0].sum) {
-                                    result.ratings = parseFloat(parseFloat(totalReviewsCountObj[0].sum) / noofreview).toFixed(1);
+                            (async () => {
+                                result.startingat = parseFloat(result.startingat).toFixed(2);
+                                let wishlist = await primary.model(constants.MODELS.eventwishlists, eventwishlistModel).findOne({ eventid: mongoose.Types.ObjectId(eventid), userid: mongoose.Types.ObjectId(req.token.userid) }).lean();
+                                result.wishlist_status = (wishlist == null) ? false : true;
+                                let noofreview = parseInt(await primary.model(constants.MODELS.eventreviews, eventreviewModel).countDocuments({ eventid: mongoose.Types.ObjectId(eventid) }));
+                                if (noofreview > 0) {
+                                    let totalReviewsCountObj = await primary.model(constants.MODELS.eventreviews, eventreviewModel).aggregate([{ $match: { eventid: mongoose.Types.ObjectId(eventid) } }, { $group: { _id: null, sum: { $sum: "$ratings" } } }]);
+                                    if (totalReviewsCountObj && totalReviewsCountObj.length > 0 && totalReviewsCountObj[0].sum) {
+                                        result.ratings = parseFloat(parseFloat(totalReviewsCountObj[0].sum) / noofreview).toFixed(1);
+                                    }
+                                } else {
+                                    result.ratings = '0.0';
                                 }
-                            } else {
-                                result.ratings = '0.0';
-                            }
-                            let allreview = await primary.model(constants.MODELS.eventreviews, eventreviewModel).find({ eventid: mongoose.Types.ObjectId(eventid) }).populate({ path: 'userid', model: primary.model(constants.MODELS.users, userModel), select: "name mobile profilepic" }).lean();
-                            result.reviews = allreview;
-                            return responseManager.onSuccess("event data", result, res);
-                        })().catch((error) => {
-                            return responseManager.onError(error, res);
+                                let allreview = await primary.model(constants.MODELS.eventreviews, eventreviewModel).find({ eventid: mongoose.Types.ObjectId(eventid) }).populate({ path: 'userid', model: primary.model(constants.MODELS.users, userModel), select: "name mobile profilepic" }).lean();
+                                result.reviews = allreview;
+                                return responseManager.onSuccess("event data", result, res);
+                            })().catch((error) => {
+                                return responseManager.onError(error, res);
+                            });
                         });
-                    });
+                    }else{
+                        return responseManager.badrequest({ message: 'Invalid event id to get event data, please try again' }, res);
+                    }
                 }).catch((error) => {
                     return responseManager.onError(error, res);
                 });
@@ -204,7 +210,6 @@ router.post('/rate', helper.authenticateToken, async (req, res) => {
             const { eventid, ratings, title, review } = req.body;
             if (eventid && eventid != '' && mongoose.Types.ObjectId.isValid(eventid)) {
                 let existingreview = await primary.model(constants.MODELS.eventreviews, eventreviewModel).findOne({ eventid: mongoose.Types.ObjectId(eventid), userid: mongoose.Types.ObjectId(req.token.userid) }).lean();
-                console.log('existingreview', existingreview);
                 if (existingreview == null) {
                     if (!isNaN(ratings) && title && title.trim() != '' && review && review.trim() != '') {
                         let obj = {

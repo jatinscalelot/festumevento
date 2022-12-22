@@ -56,7 +56,7 @@ router.post('/list', helper.authenticateToken, async (req, res) => {
                 }
                 next_wishlist();
             }, () => {
-                primary.model(constants.MODELS.events, eventModel).find({ _id : { $in : allEventsId }, status : true}).populate(
+                primary.model(constants.MODELS.events, eventModel).find({ _id : { $in : allEventsId }, status : true, is_approved: true, is_live: true}).populate(
                     [{
                         path : 'createdBy',
                         model : primary.model(constants.MODELS.organizers, organizerModel),
