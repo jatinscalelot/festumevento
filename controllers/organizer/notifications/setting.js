@@ -29,7 +29,7 @@ exports.getsettings = async (req, res) => {
                             return responseManager.badrequest({ message: 'Something went wrong, please try again' }, res);
                         }
                     } else if (notificationData.usertype && notificationData.usertype == 'allusers') {
-                        console.log('777777');
+                        console.log('777777', notificationData);
                         if (notificationData.selected_plan && notificationData.selected_plan != '' && mongoose.Types.ObjectId.isValid(notificationData.selected_plan)) {
                             console.log('888888');
                             let defaultSetting = await primary.model(constants.MODELS.settings, settingModel).find({}).lean();
