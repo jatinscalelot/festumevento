@@ -52,6 +52,13 @@ exports.getsettings = async (req, res) => {
                                 console.log('CCCCC');
                                 return responseManager.badrequest({ message: 'Something went wrong, please try again' }, res);
                             }
+                        }else{
+                            let defaultSetting = await primary.model(constants.MODELS.settings, settingModel).find({}).lean();
+                            if (defaultSetting && defaultSetting.length > 0) {
+                                 return responseManager.onSuccess('settings data', {settings : defaultSetting}, res);
+                            } else {
+                                return responseManager.badrequest({ message: 'Something went wrong, please try again' }, res);
+                            }
                         }
                     } else if (notificationData.usertype && notificationData.usertype == 'existingusers') {
                         console.log('DDDDD');
