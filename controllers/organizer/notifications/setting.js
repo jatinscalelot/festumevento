@@ -35,7 +35,6 @@ exports.getsettings = async (req, res) => {
                             let defaultSetting = await primary.model(constants.MODELS.settings, settingModel).find({}).lean();
                             let planData = await primary.model(constants.MODELS.promotionplans, promotionplanModel).findById(notificationData.selected_plan).lean();
                             if (defaultSetting && defaultSetting.length > 0) {
-                               
                                 console.log('999999',{settings : defaultSetting, planData : planData});
                                 return responseManager.onSuccess('settings data', {settings : defaultSetting, planData : planData}, res);
                             } else {
