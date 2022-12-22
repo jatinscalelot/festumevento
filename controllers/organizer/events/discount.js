@@ -16,6 +16,7 @@ exports.discount = async (req, res) => {
             if(discounts && discounts.length > 0){
                 let finalDiscount = [];
                 async.forEachSeries(discounts, (discount, next_discount) => {
+                    discount.discount = parseFloat(discount.discount);
                     if(discount.items && discount.items.length > 0){
                         let itemArray = [];
                         discount.items.forEach(element => {
