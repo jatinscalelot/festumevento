@@ -16,7 +16,7 @@ router.get('/', helper.authenticateToken, async (req, res) => {
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
         let organizerData = await primary.model(constants.MODELS.organizers, organizerModel).findById(req.token.organizerid).select('-password').lean();
-        if(organizerData && organizerData.status == true && organizerData.mobileverified == true){
+        if(organizerData && organizerData.status == true && organizerData.mobileverified == true && organizerData.is_approved == true){
             let finalArray = [];
             let allEvents = await primary.model(constants.MODELS.events, eventModel).find({createdBy : mongoose.Types.ObjectId(req.token.organizerid)}).select('photos videos name event_category event_type other').populate({path : 'event_category', model : primary.model(constants.MODELS.eventcategories, eventcategoryModel), select : 'categoryname'}).sort({_id : -1}).lean();
             let allOfflineOffers = await primary.model(constants.MODELS.offlineoffers, offlineofferModel).find({ createdBy : mongoose.Types.ObjectId(req.token.organizerid)}).select('offer_title poster video').sort({_id : -1}).lean();

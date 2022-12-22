@@ -8,7 +8,7 @@ exports.getsettings = async (req, res) => {
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
         let organizerData = await primary.model(constants.MODELS.organizers, organizerModel).findById(req.token.organizerid).select('-password').lean();
-        if (organizerData && organizerData.status == true && organizerData.mobileverified == true) {
+        if (organizerData && organizerData.status == true && organizerData.mobileverified == true && organizerData.is_approved == true) {
             let defaultSetting = await primary.model(constants.MODELS.settings, settingModel).find({}).lean();
             if (defaultSetting && defaultSetting.length > 0) {
                 return responseManager.onSuccess('Promotion schedule set successfully', defaultSetting, res);

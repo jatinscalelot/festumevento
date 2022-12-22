@@ -15,7 +15,7 @@ router.get('/', helper.authenticateToken, async (req, res, next) => {
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
         let organizerData = await primary.model(constants.MODELS.organizers, organizerModel).findById(req.token.organizerid).select('-password').lean();
-        if(organizerData && organizerData.status == true && organizerData.mobileverified == true){
+        if(organizerData && organizerData.status == true && organizerData.mobileverified == true && organizerData.is_approved == true){
             organizerData.s3Url = process.env.AWS_BUCKET_URI;
             return responseManager.onSuccess('Organizer profile!', organizerData, res);
         }else{
@@ -32,7 +32,7 @@ router.post('/', helper.authenticateToken, async (req, res, next) => {
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
         let organizerData = await primary.model(constants.MODELS.organizers, organizerModel).findById(req.token.organizerid).select('-password').lean();
-        if(organizerData && organizerData.status == true && organizerData.mobileverified == true){
+        if(organizerData && organizerData.status == true && organizerData.mobileverified == true && organizerData.is_approved == true){
             let obj = {
                 name : name,
                 dob : dob,
@@ -60,7 +60,7 @@ router.post('/profilepic', helper.authenticateToken, fileHelper.memoryUpload.sin
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
         let organizerData = await primary.model(constants.MODELS.organizers, organizerModel).findById(req.token.organizerid).select('-password').lean();
-        if(organizerData && organizerData.status == true && organizerData.mobileverified == true){
+        if(organizerData && organizerData.status == true && organizerData.mobileverified == true && organizerData.is_approved == true){
             if (req.file) {
                 if (allowedContentTypes.imagearray.includes(req.file.mimetype)) {
                     let filesizeinMb = parseFloat(parseFloat(req.file.size) / 1000000);
@@ -104,7 +104,7 @@ router.post('/businessprofile', helper.authenticateToken, async (req, res, next)
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
         let organizerData = await primary.model(constants.MODELS.organizers, organizerModel).findById(req.token.organizerid).select('-password').lean();
-        if(organizerData && organizerData.status == true && organizerData.mobileverified == true){
+        if(organizerData && organizerData.status == true && organizerData.mobileverified == true && organizerData.is_approved == true){
             let obj = {
                 profile_pic : (organizerData.businessProfile && organizerData.businessProfile.profile_pic &&  organizerData.businessProfile.profile_pic != '') ? organizerData.businessProfile.profile_pic : '',
                 name : name,
@@ -133,7 +133,7 @@ router.post('/businessprofilepic', helper.authenticateToken, fileHelper.memoryUp
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
         let organizerData = await primary.model(constants.MODELS.organizers, organizerModel).findById(req.token.organizerid).select('-password').lean();
-        if(organizerData && organizerData.status == true && organizerData.mobileverified == true){
+        if(organizerData && organizerData.status == true && organizerData.mobileverified == true && organizerData.is_approved == true){
             if (req.file) {
                 if (allowedContentTypes.imagearray.includes(req.file.mimetype)) {
                     let filesizeinMb = parseFloat(parseFloat(req.file.size) / 1000000);

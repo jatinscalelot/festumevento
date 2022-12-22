@@ -11,8 +11,8 @@ router.post('/', async (req, res) => {
     const { mobile, password } = req.body;
     if(mobile && password && mobile.length == 10 && password.length >= 6){
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
-        let organizerData = await primary.model(constants.MODELS.organizers, organizerModel).findOne({mobile: mobile, status: true, mobileverified : true}).lean();
-        if(organizerData && organizerData != null && organizerData.status == true){
+        let organizerData = await primary.model(constants.MODELS.organizers, organizerModel).findOne({mobile: mobile, is_approved: true, status: true, mobileverified : true}).lean();
+        if(organizerData && organizerData != null && organizerData.status == true && organizerData.mobileverified == true && organizerData.is_approved == true){
             let decPassword = await helper.passwordDecryptor(organizerData.password);
             if(decPassword == password){
                 let accessToken = await helper.generateAccessToken({ organizerid : organizerData._id.toString() });

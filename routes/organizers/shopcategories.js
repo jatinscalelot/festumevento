@@ -11,7 +11,7 @@ router.post('/list', helper.authenticateToken, async (req, res) => {
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
         let organizerData = await primary.model(constants.MODELS.organizers, organizerModel).findById(req.token.organizerid).select('-password').lean();
-        if (organizerData && organizerData.status == true && organizerData.mobileverified == true) {
+        if (organizerData && organizerData.status == true && organizerData.mobileverified == true && organizerData.is_approved == true) {
             primary.model(constants.MODELS.shopcategories, shopcategoryModel).find({ status: true}).lean().then((shopcategories) => {
                 return responseManager.onSuccess('Shopcategories list!', shopcategories, res);
             }).catch((error) => {
@@ -30,7 +30,7 @@ router.post('/getone', helper.authenticateToken, async (req, res) => {
         if (categoryid && categoryid != '' && mongoose.Types.ObjectId.isValid(categoryid)) {
             let primary = mongoConnection.useDb(constants.DEFAULT_DB);
             let organizerData = await primary.model(constants.MODELS.organizers, organizerModel).findById(req.token.organizerid).select('-password').lean();
-            if (organizerData && organizerData.status == true && organizerData.mobileverified == true) {
+            if (organizerData && organizerData.status == true && organizerData.mobileverified == true && organizerData.is_approved == true) {
                 primary.model(constants.MODELS.shopcategories, shopcategoryModel).findById(categoryid).lean().then((category) => {
                     return responseManager.onSuccess('Category data!', category, res);
                 }).catch((error) => {

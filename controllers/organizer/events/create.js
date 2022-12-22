@@ -11,7 +11,7 @@ exports.createevent = async (req, res) => {
         const { eventid, name, event_type, event_category, other } = req.body;
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
         let organizerData = await primary.model(constants.MODELS.organizers, organizerModel).findById(req.token.organizerid).select('-password').lean();
-        if(organizerData && organizerData.status == true && organizerData.mobileverified == true){
+        if(organizerData && organizerData.status == true && organizerData.mobileverified == true && organizerData.is_approved == true){
             if (eventid && eventid != '' && mongoose.Types.ObjectId.isValid(eventid)) {
                 if (name && name.trim() != '' && event_type && event_type.trim() != '' && ((event_category && event_category.trim() != '') || (other && other.trim() != ''))) {
                     if(event_category && event_category != '' && mongoose.Types.ObjectId.isValid(event_category)){
@@ -132,7 +132,7 @@ exports.getevent = async (req, res) => {
         const { eventid } = req.query;
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
         let organizerData = await primary.model(constants.MODELS.organizers, organizerModel).findById(req.token.organizerid).select('-password').lean();
-        if(organizerData && organizerData.status == true && organizerData.mobileverified == true){
+        if(organizerData && organizerData.status == true && organizerData.mobileverified == true && organizerData.is_approved == true){
             if (eventid && eventid != '' && mongoose.Types.ObjectId.isValid(eventid)) {
                 let eventData = await primary.model(constants.MODELS.events, eventModel).findById(eventid).populate({
                     path: "event_category",

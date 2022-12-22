@@ -8,7 +8,7 @@ exports.save = async (req, res) => {
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
         let organizerData = await primary.model(constants.MODELS.organizers, organizerModel).findById(req.token.organizerid).select('-password').lean();
-        if (organizerData && organizerData.status == true && organizerData.mobileverified == true) {
+        if (organizerData && organizerData.status == true && organizerData.mobileverified == true && organizerData.is_approved == true) {
             const { shopid, offerid, offer_title, start_date, end_date, poster, video, description, status, offer_on_all_products, all_product_images, all_product_conditions, offer_type, offer_type_conditions, tandc } = req.body;
             if (shopid && shopid != '' && mongoose.Types.ObjectId.isValid(shopid)) {
                 if (offer_on_all_products && offer_on_all_products == true) {

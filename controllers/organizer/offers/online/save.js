@@ -10,7 +10,7 @@ exports.save = async (req, res) => {
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
         let organizerData = await primary.model(constants.MODELS.organizers, organizerModel).findById(req.token.organizerid).select('-password').lean();
-        if (organizerData && organizerData.status == true && organizerData.mobileverified == true) {
+        if (organizerData && organizerData.status == true && organizerData.mobileverified == true && organizerData.is_approved == true) {
             const { offerid, shop_name, offer_amount, offer_type, start_date, end_date, product_name, poster, images, description, status, product_links, company_name, company_gst, company_contact_no, company_email, about_company, tandc } = req.body;
             if(product_links && product_links.length > 0){
                 let finalproduct_links = [];

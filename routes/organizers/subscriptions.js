@@ -11,7 +11,7 @@ router.get('/list', helper.authenticateToken, async (req, res) => {
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
         let organizerData = await primary.model(constants.MODELS.organizers, organizerModel).findById(req.token.organizerid).select('-password').lean();
-        if (organizerData && organizerData.status == true && organizerData.mobileverified == true) {
+        if (organizerData && organizerData.status == true && organizerData.mobileverified == true && organizerData.is_approved == true) {
             primary.model(constants.MODELS.subscriptions, subscriptionModel).find({ status: true }).lean().then((subscriptionslist) => {
                 return responseManager.onSuccess('subscriptions list!', subscriptionslist, res);
             }).catch((error) => {
@@ -28,7 +28,7 @@ router.post('/getone', helper.authenticateToken, async (req, res) => {
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
         let organizerData = await primary.model(constants.MODELS.organizers, organizerModel).findById(req.token.organizerid).select('-password').lean();
-        if (organizerData && organizerData.status == true && organizerData.mobileverified == true) {
+        if (organizerData && organizerData.status == true && organizerData.mobileverified == true && organizerData.is_approved == true) {
             const { subscriptionid } = req.body;
             if (subscriptionid && subscriptionid != '' && mongoose.Types.ObjectId.isValid(subscriptionid)) {
                 let primary = mongoConnection.useDb(constants.DEFAULT_DB);

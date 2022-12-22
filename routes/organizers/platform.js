@@ -14,7 +14,7 @@ router.get('/list', helper.authenticateToken, async (req, res) => {
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
         let organizerData = await primary.model(constants.MODELS.organizers, organizerModel).findById(req.token.organizerid).select('-password').lean();
-        if (organizerData && organizerData.status == true && organizerData.mobileverified == true) {
+        if (organizerData && organizerData.status == true && organizerData.mobileverified == true && organizerData.is_approved == true) {
             primary.model(constants.MODELS.platforms, platformModel).find({ status: true, $or : [{createdBy : mongoose.Types.ObjectId(req.token.organizerid)}, {owner:'superadmin'}] }).lean().then((platforms) => {
                 return responseManager.onSuccess('Platforms list!', platforms, res);
             }).catch((error) => {
@@ -31,7 +31,7 @@ router.post('/getone', helper.authenticateToken, async (req, res) => {
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
         let organizerData = await primary.model(constants.MODELS.organizers, organizerModel).findById(req.token.organizerid).select('-password').lean();
-        if (organizerData && organizerData.status == true && organizerData.mobileverified == true) {
+        if (organizerData && organizerData.status == true && organizerData.mobileverified == true && organizerData.is_approved == true) {
             const { platformid } = req.body;
             if (platformid && platformid != '' && mongoose.Types.ObjectId.isValid(platformid)) {
                 let primary = mongoConnection.useDb(constants.DEFAULT_DB);
@@ -55,7 +55,7 @@ router.post('/save', helper.authenticateToken, async (req, res) => {
         const { platformid, name, platformimage, description, status } = req.body;
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
         let organizerData = await primary.model(constants.MODELS.organizers, organizerModel).findById(req.token.organizerid).select('-password').lean();
-        if (organizerData && organizerData.status == true && organizerData.mobileverified == true) {
+        if (organizerData && organizerData.status == true && organizerData.mobileverified == true && organizerData.is_approved == true) {
             if(platformid && platformid != '' && mongoose.Types.ObjectId.isValid(platformid)){
                 let existingplatform = await primary.model(constants.MODELS.platforms, platformModel).findOne({_id : {$ne : platformid}, name : name, $or: [{ owner : 'superadmin' },{ createdBy : mongoose.Types.ObjectId(req.token.organizerid) }]}).lean();
                 if(existingplatform == null){
@@ -103,7 +103,7 @@ router.post('/remove', helper.authenticateToken, async (req, res) => {
         const { platformid } = req.body;
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
         let organizerData = await primary.model(constants.MODELS.organizers, organizerModel).findById(req.token.organizerid).select('-password').lean();
-        if (organizerData && organizerData.status == true && organizerData.mobileverified == true) {
+        if (organizerData && organizerData.status == true && organizerData.mobileverified == true && organizerData.is_approved == true) {
             if(platformid && platformid != '' && mongoose.Types.ObjectId.isValid(platformid)){
                 let platformData = primary.model(constants.MODELS.platforms, platformModel).findById(platformid);
                 if(platformData && platformData.createdB && platformData.createdBy.toString() == req.token.organizerid.toString()){
@@ -126,7 +126,7 @@ router.post('/image', helper.authenticateToken, fileHelper.memoryUpload.single('
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
         let organizerData = await primary.model(constants.MODELS.organizers, organizerModel).findById(req.token.organizerid).select('-password').lean();
-        if (organizerData && organizerData.status == true && organizerData.mobileverified == true) {
+        if (organizerData && organizerData.status == true && organizerData.mobileverified == true && organizerData.is_approved == true) {
             if (req.file) {
                 if (allowedContentTypes.imagearray.includes(req.file.mimetype)) {
                     let filesizeinMb = parseFloat(parseFloat(req.file.size) / 1000000);

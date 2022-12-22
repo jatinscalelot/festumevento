@@ -21,7 +21,7 @@ router.post('/video', helper.authenticateToken, fileHelper.memoryUpload.single('
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
         let organizerData = await primary.model(constants.MODELS.organizers, organizerModel).findById(req.token.organizerid).select('-password').lean();
-        if(organizerData && organizerData.status == true && organizerData.mobileverified == true){
+        if(organizerData && organizerData.status == true && organizerData.mobileverified == true && organizerData.is_approved == true){
             if (req.file) {
                 if (allowedContentTypes.videoarray.includes(req.file.mimetype)) {
                     let filesizeinMb = parseFloat(parseFloat(req.file.size) / 1000000);
@@ -67,7 +67,7 @@ router.post('/banner', helper.authenticateToken, fileHelper.memoryUpload.single(
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
         let organizerData = await primary.model(constants.MODELS.organizers, organizerModel).findById(req.token.organizerid).select('-password').lean();
-        if(organizerData && organizerData.status == true && organizerData.mobileverified == true){
+        if(organizerData && organizerData.status == true && organizerData.mobileverified == true && organizerData.is_approved == true){
             if (req.file) {
                 if (allowedContentTypes.imagearray.includes(req.file.mimetype)) {
                     let filesizeinMb = parseFloat(parseFloat(req.file.size) / 1000000);
@@ -101,7 +101,7 @@ router.post('/image', helper.authenticateToken, fileHelper.memoryUpload.single('
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
         let organizerData = await primary.model(constants.MODELS.organizers, organizerModel).findById(req.token.organizerid).select('-password').lean();
-        if(organizerData && organizerData.status == true && organizerData.mobileverified == true){
+        if(organizerData && organizerData.status == true && organizerData.mobileverified == true && organizerData.is_approved == true){
             if (req.file) {
                 if (allowedContentTypes.imagearray.includes(req.file.mimetype)) {
                     let filesizeinMb = parseFloat(parseFloat(req.file.size) / 1000000);

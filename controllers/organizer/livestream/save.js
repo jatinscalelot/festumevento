@@ -11,7 +11,7 @@ exports.save = async (req, res) => {
         const { livestreamid, event_name, event_category, event_description, event_date, event_start_time, event_end_time, event_type, price_per_user } = req.body;
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
         let organizerData = await primary.model(constants.MODELS.organizers, organizerModel).findById(req.token.organizerid).select('-password').lean();
-        if(organizerData && organizerData.status == true && organizerData.mobileverified == true){
+        if(organizerData && organizerData.status == true && organizerData.mobileverified == true && organizerData.is_approved == true){
             if (livestreamid && livestreamid != '' && mongoose.Types.ObjectId.isValid(livestreamid)) {
                 if(event_name && event_name.trim() != ''){
                     if(event_category && event_category != '' && mongoose.Types.ObjectId.isValid(event_category)){
@@ -149,7 +149,7 @@ exports.getlivestream = async (req, res) => {
         const { livestreamid } = req.query;
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
         let organizerData = await primary.model(constants.MODELS.organizers, organizerModel).findById(req.token.organizerid).select('-password').lean();
-        if(organizerData && organizerData.status == true && organizerData.mobileverified == true){
+        if(organizerData && organizerData.status == true && organizerData.mobileverified == true && organizerData.is_approved == true){
             if (livestreamid && livestreamid != '' && mongoose.Types.ObjectId.isValid(livestreamid)) {
                 let livestreamData = await primary.model(constants.MODELS.livestreams, livestreamModel).findById(livestreamid).populate({
                     path: "event_category",

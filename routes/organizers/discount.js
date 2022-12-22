@@ -12,7 +12,7 @@ router.get('/list', helper.authenticateToken, async (req, res) => {
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
         let organizerData = await primary.model(constants.MODELS.organizers, organizerModel).findById(req.token.organizerid).select('-password').lean();
-        if (organizerData && organizerData.status == true && organizerData.mobileverified == true) {
+        if (organizerData && organizerData.status == true && organizerData.mobileverified == true && organizerData.is_approved == true) {
             primary.model(constants.MODELS.discounts, dicountModel).find({ status: true }).populate({
                 path: "items",
                 model: primary.model(constants.MODELS.items, itemModel),
@@ -35,7 +35,7 @@ router.post('/getone', helper.authenticateToken, async (req, res) => {
         if (discountid && discountid != '' && mongoose.Types.ObjectId.isValid(discountid)) {
             let primary = mongoConnection.useDb(constants.DEFAULT_DB);
             let organizerData = await primary.model(constants.MODELS.organizers, organizerModel).findById(req.token.organizerid).select('-password').lean();
-            if (organizerData && organizerData.status == true && organizerData.mobileverified == true) {
+            if (organizerData && organizerData.status == true && organizerData.mobileverified == true && organizerData.is_approved == true) {
                 primary.model(constants.MODELS.discounts, dicountModel).findById(discountid).populate({
                     path: "items",
                     model: primary.model(constants.MODELS.items, itemModel),

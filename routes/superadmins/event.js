@@ -55,8 +55,8 @@ router.post('/approve', helper.authenticateToken, async (req, res) => {
             if(eventid && eventid != '' && mongoose.Types.ObjectId.isValid(eventid)){
                 let eventData = await primary.model(constants.MODELS.events, eventModel).findById(eventid).lean();
                 if(eventData){
-                    if(eventData.status == false){
-                        await primary.model(constants.MODELS.events, eventModel).findByIdAndUpdate(eventid, {status : true});
+                    if(eventData.is_approved == false){
+                        await primary.model(constants.MODELS.events, eventModel).findByIdAndUpdate(eventid, {is_approved : true});
                         return responseManager.onSuccess('Event approved sucecssfully!', 1, res);
                     }else{
                         return responseManager.badrequest({ message: 'Event is already approved' }, res);
@@ -83,8 +83,8 @@ router.post('/disapprove', helper.authenticateToken, async (req, res) => {
             if(eventid && eventid != '' && mongoose.Types.ObjectId.isValid(eventid)){
                 let eventData = await primary.model(constants.MODELS.events, eventModel).findById(eventid).lean();
                 if(eventData){
-                    if(eventData.status == true){
-                        await primary.model(constants.MODELS.events, eventModel).findByIdAndUpdate(eventid, {status : false});
+                    if(eventData.is_approved == true){
+                        await primary.model(constants.MODELS.events, eventModel).findByIdAndUpdate(eventid, {is_approved : false});
                         return responseManager.onSuccess('Event disapproved sucecssfully!', 1, res);
                     }else{
                         return responseManager.badrequest({ message: 'Event is already disapproved' }, res);

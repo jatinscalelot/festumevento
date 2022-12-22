@@ -11,7 +11,7 @@ exports.getone = async (req, res) => {
         const { livestreamid } = req.body;
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
         let organizerData = await primary.model(constants.MODELS.organizers, organizerModel).findById(req.token.organizerid).select('-password').lean();
-        if(organizerData && organizerData.status == true && organizerData.mobileverified == true){
+        if(organizerData && organizerData.status == true && organizerData.mobileverified == true && organizerData.is_approved == true){
             if (livestreamid && livestreamid != '' && mongoose.Types.ObjectId.isValid(livestreamid)) {
                 let livestreamData = await primary.model(constants.MODELS.livestreams, livestreamModel).findById(livestreamid).populate({
                     path: "event_category",
