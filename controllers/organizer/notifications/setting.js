@@ -17,6 +17,7 @@ exports.getsettings = async (req, res) => {
                     if (notificationData.usertype && (notificationData.usertype == 'eventusers' || notificationData.usertype == 'shopusers' || notificationData.usertype == 'onlineofferusers' || notificationData.usertype == 'livestreamusers')) {
                         let defaultSetting = await primary.model(constants.MODELS.settings, settingModel).find({}).lean();
                         if (defaultSetting && defaultSetting.length > 0) {
+                            console.log('11111111',{settings : defaultSetting, numberofusers : notificationData.numberofusers});
                             return responseManager.onSuccess('settings data', {settings : defaultSetting, numberofusers : notificationData.numberofusers}, res);
                         } else {
                             return responseManager.badrequest({ message: 'Something went wrong, please try again' }, res);
@@ -26,6 +27,7 @@ exports.getsettings = async (req, res) => {
                             let defaultSetting = await primary.model(constants.MODELS.settings, settingModel).find({}).lean();
                             let planData = await primary.model(constants.MODELS.promotionplans, promotionplanModel).findById(notificationData.selected_plan).lean();
                             if (defaultSetting && defaultSetting.length > 0) {
+                                console.log('2222',{settings : defaultSetting, planData : planData});
                                 return responseManager.onSuccess('settings data', {settings : defaultSetting, planData : planData}, res);
                             } else {
                                 return responseManager.badrequest({ message: 'Something went wrong, please try again' }, res);
@@ -33,6 +35,7 @@ exports.getsettings = async (req, res) => {
                         } else if (notificationData.numberofusers) {
                             let defaultSetting = await primary.model(constants.MODELS.settings, settingModel).find({}).lean();
                             if (defaultSetting && defaultSetting.length > 0) {
+                                console.log('3333',{settings : defaultSetting, numberofusers : notificationData.numberofusers});
                                 return responseManager.onSuccess('settings data', {settings : defaultSetting, numberofusers : notificationData.numberofusers}, res);
                             } else {
                                 return responseManager.badrequest({ message: 'Something went wrong, please try again' }, res);
@@ -42,6 +45,7 @@ exports.getsettings = async (req, res) => {
                         let numberofusers = await primary.model(constants.MODELS.customerimports, customerimportModel).countDocuments({ notificationid: mongoose.Types.ObjectId(notificationid), selected: true });
                         let defaultSetting = await primary.model(constants.MODELS.settings, settingModel).find({}).lean();
                         if (defaultSetting && defaultSetting.length > 0) {
+                            console.log('4444',{settings : defaultSetting, numberofusers : numberofusers});
                             return responseManager.onSuccess('settings data', {settings : defaultSetting, numberofusers : numberofusers}, res);
                         } else {
                             return responseManager.badrequest({ message: 'Something went wrong, please try again' }, res);
