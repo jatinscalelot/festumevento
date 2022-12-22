@@ -20,6 +20,7 @@ const userlistCtrl = require("../../controllers/organizer/notifications/userlist
 const checkalluserCtrl = require("../../controllers/organizer/notifications/checkallusers");
 const checkuserCtrl = require("../../controllers/organizer/notifications/checkuser");
 const settingCtrl = require("../../controllers/organizer/notifications/setting");
+const paymentCtrl = require("../../controllers/organizer/notifications/payment");
 router.post('/', helper.authenticateToken, listCtrl.list);
 router.post('/save', helper.authenticateToken, saveCtrl.save);
 router.post('/getone', helper.authenticateToken, getOneCtrl.getone);
@@ -31,6 +32,7 @@ router.post('/userlist', helper.authenticateToken, userlistCtrl.userlist);
 router.post('/checkalluser', helper.authenticateToken, checkalluserCtrl.checkalluser);
 router.post('/checkuser', helper.authenticateToken, checkuserCtrl.checkuser);
 router.get('/setting', helper.authenticateToken, settingCtrl.getsettings);
+router.post('/paynow', helper.authenticateToken, paymentCtrl.paynow);
 router.post('/banner', helper.authenticateToken, fileHelper.memoryUpload.single('file'), async (req, res) => {
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);

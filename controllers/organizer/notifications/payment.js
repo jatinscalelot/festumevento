@@ -5,10 +5,13 @@ const organizerModel = require('../../../models/organizers.model');
 const notificationModel = require('../../../models/notifications.model');
 const settingModel = require('../../../models/settings.model');
 const mongoose = require('mongoose');
-exports.getsettings = async (req, res) => {
+exports.paynow = async (req, res) => {
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
-        const { notificationid } = req.query;
+        const { notificationid, notification_amt, sms_amt, email_amt, discount_coupon, total } = req.query;
+        var bk_notificationcost = 0;
+        var bk_emailcost = 0;
+        var bk_smscost = 0;
         let organizerData = await primary.model(constants.MODELS.organizers, organizerModel).findById(req.token.organizerid).select('-password').lean();
         if (organizerData && organizerData.status == true && organizerData.mobileverified == true && organizerData.is_approved == true) {
             if (notificationid && notificationid != '' && mongoose.Types.ObjectId.isValid(notificationid)) {
@@ -17,7 +20,19 @@ exports.getsettings = async (req, res) => {
                     if (notificationData.usertype && (notificationData.usertype == 'eventusers' || notificationData.usertype == 'shopusers' || notificationData.usertype == 'onlineofferusers' || notificationData.usertype == 'livestreamusers')) {
                         let defaultSetting = await primary.model(constants.MODELS.settings, settingModel).find({}).lean();
                         if (defaultSetting && defaultSetting.length > 0) {
-                            return responseManager.onSuccess('settings data', {settings : defaultSetting, numberofusers : notificationData.numberofusers}, res);
+                            if(notificationData.is_notification){
+                                bk_notificationcost = parseFloat(numberofusers * defaultSetting.notificationcost);
+                            }
+                            if(notificationData.is_email){
+                                bk_emailcost = parseFloat(numberofusers * defaultSetting.emailcost);
+                            }
+                            if(notificationData.is_sms){
+                                bk_smscost = parseFloat(numberofusers * defaultSetting.smscost);
+                            }
+                           
+                            
+
+                            return responseManager.onSuccess('Promotion schedule set successfully', {settings : defaultSetting, numberofusers : notificationData.numberofusers}, res);
                         } else {
                             return responseManager.badrequest({ message: 'Something went wrong, please try again' }, res);
                         }
@@ -26,14 +41,14 @@ exports.getsettings = async (req, res) => {
                             let defaultSetting = await primary.model(constants.MODELS.settings, settingModel).find({}).lean();
                             let planData = await primary.model(constants.MODELS.promotionplans, promotionplanModel).findById(notificationData.selected_plan).lean();
                             if (defaultSetting && defaultSetting.length > 0) {
-                                return responseManager.onSuccess('settings data', {settings : defaultSetting, planData : planData}, res);
+                                return responseManager.onSuccess('Promotion schedule set successfully', {settings : defaultSetting, planData : planData}, res);
                             } else {
                                 return responseManager.badrequest({ message: 'Something went wrong, please try again' }, res);
                             }
-                        } else if (notificationData.numberofusers) {
+                        } else if (numberofusers) {
                             let defaultSetting = await primary.model(constants.MODELS.settings, settingModel).find({}).lean();
                             if (defaultSetting && defaultSetting.length > 0) {
-                                return responseManager.onSuccess('settings data', {settings : defaultSetting, numberofusers : notificationData.numberofusers}, res);
+                                return responseManager.onSuccess('Promotion schedule set successfully', {settings : defaultSetting, numberofusers : notificationData.numberofusers}, res);
                             } else {
                                 return responseManager.badrequest({ message: 'Something went wrong, please try again' }, res);
                             }
@@ -42,7 +57,7 @@ exports.getsettings = async (req, res) => {
                         let numberofusers = await primary.model(constants.MODELS.customerimports, customerimportModel).countDocuments({ notificationid: mongoose.Types.ObjectId(notificationid), selected: true });
                         let defaultSetting = await primary.model(constants.MODELS.settings, settingModel).find({}).lean();
                         if (defaultSetting && defaultSetting.length > 0) {
-                            return responseManager.onSuccess('settings data', {settings : defaultSetting, numberofusers : numberofusers}, res);
+                            return responseManager.onSuccess('Promotion schedule set successfully', {settings : defaultSetting, numberofusers : numberofusers}, res);
                         } else {
                             return responseManager.badrequest({ message: 'Something went wrong, please try again' }, res);
                         }
@@ -53,7 +68,7 @@ exports.getsettings = async (req, res) => {
             } else {
                 let defaultSetting = await primary.model(constants.MODELS.settings, settingModel).find({}).lean();
                 if (defaultSetting && defaultSetting.length > 0) {
-                    return responseManager.onSuccess('settings data', defaultSetting, res);
+                    return responseManager.onSuccess('Promotion schedule set successfully', defaultSetting, res);
                 } else {
                     return responseManager.badrequest({ message: 'Something went wrong, please try again' }, res);
                 }
