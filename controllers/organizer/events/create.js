@@ -71,6 +71,8 @@ exports.createevent = async (req, res) => {
                             createdBy: mongoose.Types.ObjectId(req.token.organizerid),
                             updatedBy: mongoose.Types.ObjectId(req.token.organizerid),
                             timestamp: Date.now(),
+                            is_approved : false,
+                            is_live : false,
                             status: false
                         };
                         let createdEvent = await primary.model(constants.MODELS.events, eventModel).create(obj);
@@ -94,6 +96,8 @@ exports.createevent = async (req, res) => {
                                 createdBy: mongoose.Types.ObjectId(req.token.organizerid),
                                 updatedBy: mongoose.Types.ObjectId(req.token.organizerid),
                                 timestamp: Date.now(),
+                                is_approved : false,
+                                is_live : false,
                                 status: false
                             };
                             let createdEvent = await primary.model(constants.MODELS.events, eventModel).create(obj);
@@ -136,7 +140,7 @@ exports.getevent = async (req, res) => {
                     select: '-createdAt -updatedAt -__v -createdBy -updatedBy -status'
                 }).lean();
                 if(eventData && eventData != null){
-                    return responseManager.onSuccess('Organizer event data!', {_id : eventData._id, name: eventData.name, event_type: eventData.event_type, event_category : eventData.event_category, other: eventData.other}, res);
+                    return responseManager.onSuccess('Organizer event data!', {_id : eventData._id, name: eventData.name, event_type: eventData.event_type, event_category : eventData.event_category, other: eventData.other, is_approved : eventData.is_approved, is_live : eventData.is_live}, res);
                 }else{
                     return responseManager.badrequest({ message: 'Invalid event id get event data, please try again' }, res);
                 }

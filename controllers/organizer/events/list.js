@@ -24,7 +24,7 @@ exports.list = async (req, res) => {
                 limit: parseInt(limit),
                 sort: { _id : -1 },
                 populate:  { path: 'event_category', model: primary.model(constants.MODELS.eventcategories, categoryModel), select: "categoryname description event_type" },
-                select: 'name event_type event_category other timestamp status createdAt updatedAt about event_location banner accept_booking',
+                select: 'name event_type event_category other timestamp status createdAt updatedAt about event_location banner accept_booking is_approved is_live',
                 lean: true
             }).then((events) => {
                 return responseManager.onSuccess('Events list!', events, res);
