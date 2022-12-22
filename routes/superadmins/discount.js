@@ -39,55 +39,59 @@ router.post('/', helper.authenticateToken, async (req, res) => {
 router.post('/save', helper.authenticateToken, async (req, res) => {
     if (req.token.superadminid && mongoose.Types.ObjectId.isValid(req.token.superadminid)) {
         const { discountid, discountname, discounttype, description, discount, status, tandc, items } = req.body;
-        let itemsArray = [];
-        if(items && items.length > 0){
-            items.forEach(element => {
-                itemsArray.push(mongoose.Types.ObjectId(element));
-            });
-        }
-        let primary = mongoConnection.useDb(constants.DEFAULT_DB);
-        let superadmin = await primary.model(constants.MODELS.superadmins, superadminModel).findById(req.token.superadminid).lean();
-        if(superadmin){
-            if(discountid && discountid != '' && mongoose.Types.ObjectId.isValid(discountid)){
-                let existingdiscount = await primary.model(constants.MODELS.discounts, discountModel).findOne({_id : {$ne : discountid}, discountname : discountname}).lean();
-                if(existingdiscount == null){
-                    let obj = {
-                        discountname : discountname,
-                        discounttype : discounttype,
-                        description : description,
-                        discount : discount,
-                        tandc : tandc,
-                        status : status,
-                        items : itemsArray,
-                        updatedBy : mongoose.Types.ObjectId(req.token.superadminid)
-                    };
-                    await primary.model(constants.MODELS.discounts, discountModel).findByIdAndUpdate(discountid, obj);
-                    return responseManager.onSuccess('Discount updated sucecssfully!', 1, res);
+        if(!isNaN(discount)){
+            let itemsArray = [];
+            if(items && items.length > 0){
+                items.forEach(element => {
+                    itemsArray.push(mongoose.Types.ObjectId(element));
+                });
+            }
+            let primary = mongoConnection.useDb(constants.DEFAULT_DB);
+            let superadmin = await primary.model(constants.MODELS.superadmins, superadminModel).findById(req.token.superadminid).lean();
+            if(superadmin){
+                if(discountid && discountid != '' && mongoose.Types.ObjectId.isValid(discountid)){
+                    let existingdiscount = await primary.model(constants.MODELS.discounts, discountModel).findOne({_id : {$ne : discountid}, discountname : discountname}).lean();
+                    if(existingdiscount == null){
+                        let obj = {
+                            discountname : discountname,
+                            discounttype : discounttype,
+                            description : description,
+                            discount : parseFloat(discount),
+                            tandc : tandc,
+                            status : status,
+                            items : itemsArray,
+                            updatedBy : mongoose.Types.ObjectId(req.token.superadminid)
+                        };
+                        await primary.model(constants.MODELS.discounts, discountModel).findByIdAndUpdate(discountid, obj);
+                        return responseManager.onSuccess('Discount updated sucecssfully!', 1, res);
+                    }else{
+                        return responseManager.badrequest({ message: 'Discount name can not be identical, please try again' }, res);
+                    }
                 }else{
-                    return responseManager.badrequest({ message: 'Discount name can not be identical, please try again' }, res);
+                    let existingdiscount = await primary.model(constants.MODELS.discounts, discountModel).findOne({discountname : discountname}).lean();
+                    if(existingdiscount == null) {
+                        let obj = {
+                            discountname : discountname,
+                            discounttype : discounttype,
+                            description : description,
+                            discount : parseFloat(discount),
+                            tandc : tandc,
+                            status : status,
+                            items : itemsArray,
+                            createdBy : mongoose.Types.ObjectId(req.token.superadminid),
+                            updatedBy : mongoose.Types.ObjectId(req.token.superadminid)
+                        };
+                        await primary.model(constants.MODELS.discounts, discountModel).create(obj);
+                        return responseManager.onSuccess('Discount created sucecssfully!', 1, res);
+                    }else{
+                        return responseManager.badrequest({ message: 'Discount name can not be identical, please try again' }, res);
+                    }
                 }
             }else{
-                let existingdiscount = await primary.model(constants.MODELS.discounts, discountModel).findOne({discountname : discountname}).lean();
-                if(existingdiscount == null) {
-                    let obj = {
-                        discountname : discountname,
-                        discounttype : discounttype,
-                        description : description,
-                        discount : discount,
-                        tandc : tandc,
-                        status : status,
-                        items : itemsArray,
-                        createdBy : mongoose.Types.ObjectId(req.token.superadminid),
-                        updatedBy : mongoose.Types.ObjectId(req.token.superadminid)
-                    };
-                    await primary.model(constants.MODELS.discounts, discountModel).create(obj);
-                    return responseManager.onSuccess('Discount created sucecssfully!', 1, res);
-                }else{
-                    return responseManager.badrequest({ message: 'Discount name can not be identical, please try again' }, res);
-                }
+                return responseManager.badrequest({ message: 'Invalid token to create Discount, please try again' }, res);
             }
         }else{
-            return responseManager.badrequest({ message: 'Invalid token to create Discount, please try again' }, res);
+            return responseManager.badrequest({ message: 'Invalid discount percentage to create Discount, please try again' }, res);
         }
     }else{
         return responseManager.badrequest({ message: 'Invalid token to create Discount, please try again' }, res);
