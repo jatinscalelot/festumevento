@@ -11,7 +11,7 @@ exports.makeonelive = async (req, res) => {
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
         let organizerData = await primary.model(constants.MODELS.organizers, organizerModel).findById(req.token.organizerid).select('-password').lean();
         if (organizerData && organizerData.status == true && organizerData.mobileverified == true && organizerData.is_approved == true) {
-            const { eventid } = req.query;
+            const { eventid } = req.body;
             if(eventid && eventid != '' && mongoose.Types.ObjectId.isValid(eventid)){
                 let eventData = await primary.model(constants.MODELS.events, eventModel).findById(eventid).lean();
                 if(eventData && eventData != null && (eventData.createdBy.toString() == req.token.organizerid.toString())){
@@ -45,7 +45,7 @@ exports.makemultilive = async (req, res) => {
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
         let organizerData = await primary.model(constants.MODELS.organizers, organizerModel).findById(req.token.organizerid).select('-password').lean();
         if (organizerData && organizerData.status == true && organizerData.mobileverified == true && organizerData.is_approved == true) {
-            const { eventids } = req.query;
+            const { eventids } = req.body;
             if(eventids && eventids.length > 0){
                 async.forEachSeries(eventids, (eventid, next_eventid) => {
                     ( async () => {
