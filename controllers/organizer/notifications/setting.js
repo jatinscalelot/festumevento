@@ -5,6 +5,7 @@ const organizerModel = require('../../../models/organizers.model');
 const notificationModel = require('../../../models/notifications.model');
 const settingModel = require('../../../models/settings.model');
 const customerimportModel = require('../../../models/customerimports.model');
+const promotionplanModel = require('../../../models/promotionplans.model');
 const mongoose = require('mongoose');
 exports.getsettings = async (req, res) => {
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
