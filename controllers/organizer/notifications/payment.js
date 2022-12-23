@@ -4,6 +4,7 @@ const constants = require('../../../utilities/constants');
 const organizerModel = require('../../../models/organizers.model');
 const notificationModel = require('../../../models/notifications.model');
 const notificationcouponModel = require('../../../models/notificationcoupons.model'); 
+const customerimportModel = require('../../../models/customerimports.model');
 const settingModel = require('../../../models/settings.model');
 const mongoose = require('mongoose');
 exports.paynow = async (req, res) => {
