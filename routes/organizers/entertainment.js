@@ -62,7 +62,8 @@ router.get('/', helper.authenticateToken, async (req, res) => {
                             media : 'photo',
                             name : offlineoffer.offer_title,
                             event_type : '',
-                            category : ''
+                            category : '',
+                            shopid : offlineoffer.shopid
                         };
                         finalArray.push(obj);
                     }
@@ -74,7 +75,8 @@ router.get('/', helper.authenticateToken, async (req, res) => {
                             media : 'video',
                             name : offlineoffer.offer_title,
                             event_type : '',
-                            category : ''
+                            category : '',
+                            shopid : offlineoffer.shopid
                         };
                         finalArray.push(obj);
                     }
