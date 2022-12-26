@@ -76,6 +76,12 @@ exports.paynow = async (req, res) => {
                     } else if (notificationData.usertype && notificationData.usertype == 'existingusers') {
                         let numberofusers = await primary.model(constants.MODELS.customerimports, customerimportModel).countDocuments({ notificationid: mongoose.Types.ObjectId(notificationid), selected: true });
                         let defaultSetting = await primary.model(constants.MODELS.settings, settingModel).find({}).lean();
+                        console.log('notificationid', notificationid);
+                        console.log('notification_amt', notification_amt);
+                        console.log('sms_amt', sms_amt);
+                        console.log('email_amt', email_amt);
+                        console.log('discount_coupon', discount_coupon);
+                        console.log('total', total);
                         if(numberofusers && numberofusers != '' && !isNaN(numberofusers) && parseInt(numberofusers) > 0){
                             if (defaultSetting && defaultSetting.length > 0) {
                                 if(notificationData.is_notification){
@@ -87,7 +93,13 @@ exports.paynow = async (req, res) => {
                                 if(notificationData.is_sms){
                                     bk_smscost = parseFloat(parseInt(numberofusers) * parseFloat(defaultSetting.smscost));
                                 }
+                                console.log('bk_notificationcost', bk_notificationcost);
+                                console.log('bk_emailcost', bk_emailcost);
+                                console.log('bk_smscost', bk_smscost);
+                               
                                 let bk_total = parseFloat(bk_notificationcost + bk_emailcost + bk_smscost);
+                                console.log('bk_total 111', bk_total);
+                         
                                 if(discount_coupon && discount_coupon != '' && mongoose.Types.ObjectId.isValid(discount_coupon)){
                                     let discountData = await primary.model(constants.MODELS.notificationcoupons, notificationcouponModel).findById(discount_coupon).lean();
                                     if (discountData){
@@ -102,6 +114,8 @@ exports.paynow = async (req, res) => {
                                         }else{
                                             // total not match
                                         }
+                                        console.log('bk_total 222', bk_total);
+                                     
                                     }else{
                                         if(parseFloat(total) == parseFloat(bk_total) && parseFloat(notification_amt) == parseFloat(bk_notificationcost) && parseFloat(sms_amt) == parseFloat(bk_smscost) && parseFloat(email_amt) == parseFloat(bk_emailcost)){
                                             // total match
@@ -109,6 +123,7 @@ exports.paynow = async (req, res) => {
                                             // total not match
                                         }
                                         // dicount not apply
+                                        console.log('bk_total 333', bk_total);
                                     }
                                 }else{
                                     if(parseFloat(total) == parseFloat(bk_total) && parseFloat(notification_amt) == parseFloat(bk_notificationcost) && parseFloat(sms_amt) == parseFloat(bk_smscost) && parseFloat(email_amt) == parseFloat(bk_emailcost)){
@@ -117,6 +132,7 @@ exports.paynow = async (req, res) => {
                                         // total not match
                                     }
                                     // dicount not apply
+                                    console.log('bk_total 4444', bk_total);
                                 }
                                 //return responseManager.onSuccess('Promotion schedule set successfully', {settings : defaultSetting, numberofusers : numberofusers}, res);
                             } else {
