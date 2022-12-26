@@ -14,6 +14,12 @@ exports.paynow = async (req, res) => {
         var bk_notificationcost = 0;
         var bk_emailcost = 0;
         var bk_smscost = 0;
+        console.log('notificationid', notificationid);
+                        console.log('notification_amt', notification_amt);
+                        console.log('sms_amt', sms_amt);
+                        console.log('email_amt', email_amt);
+                        console.log('discount_coupon', discount_coupon);
+                        console.log('total', total);
         let organizerData = await primary.model(constants.MODELS.organizers, organizerModel).findById(req.token.organizerid).select('-password').lean();
         if (organizerData && organizerData.status == true && organizerData.mobileverified == true && organizerData.is_approved == true) {
             if (notificationid && notificationid != '' && mongoose.Types.ObjectId.isValid(notificationid)) {
