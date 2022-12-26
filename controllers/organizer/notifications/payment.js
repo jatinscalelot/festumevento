@@ -10,7 +10,7 @@ const mongoose = require('mongoose');
 exports.paynow = async (req, res) => {
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
-        const { notificationid, notification_amt, sms_amt, email_amt, discount_coupon, total } = req.query;
+        const { notificationid, notification_amt, sms_amt, email_amt, discount_coupon, total } = req.body;
         var bk_notificationcost = 0;
         var bk_emailcost = 0;
         var bk_smscost = 0;
