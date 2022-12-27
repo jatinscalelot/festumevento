@@ -8,7 +8,6 @@ const customerimportModel = require('../../../models/customerimports.model');
 const settingModel = require('../../../models/settings.model');
 const mongoose = require('mongoose');
 const Razorpay = require('razorpay');
-
 var instance = new Razorpay({
     key_id: process.env.RAZORPAY_SANDBOX_KEY,
     key_secret: process.env.RAZORPAY_SANDBOX_KEY_SECRET
