@@ -108,7 +108,7 @@ exports.paynow = async (req, res) => {
                                         }
                                         if (parseFloat(total) == parseFloat(bk_total) && parseFloat(notification_amt) == parseFloat(bk_notificationcost) && parseFloat(sms_amt) == parseFloat(bk_smscost) && parseFloat(email_amt) == parseFloat(bk_emailcost)) {
                                             let paymentLink = await instance.paymentLink.create({
-                                                "amount": parseFloat(bk_total),
+                                                "amount": parseFloat(bk_total) * 100,
                                                 "currency": "INR",
                                                 "accept_partial": false,
                                                 "reference_id": notificationData._id.toString(),
