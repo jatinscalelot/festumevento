@@ -7,6 +7,12 @@ const notificationcouponModel = require('../../../models/notificationcoupons.mod
 const customerimportModel = require('../../../models/customerimports.model');
 const settingModel = require('../../../models/settings.model');
 const mongoose = require('mongoose');
+const Razorpay = require('razorpay');
+
+var instance = new Razorpay({
+    key_id: process.env.RAZORPAY_SANDBOX_KEY,
+    key_secret: process.env.RAZORPAY_SANDBOX_KEY_SECRET
+});
 exports.paynow = async (req, res) => {
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
@@ -14,12 +20,6 @@ exports.paynow = async (req, res) => {
         var bk_notificationcost = 0;
         var bk_emailcost = 0;
         var bk_smscost = 0;
-        console.log('notificationid', notificationid);
-        console.log('notification_amt', notification_amt);
-        console.log('sms_amt', sms_amt);
-        console.log('email_amt', email_amt);
-        console.log('discount_coupon', discount_coupon);
-        console.log('total', total);
         let organizerData = await primary.model(constants.MODELS.organizers, organizerModel).findById(req.token.organizerid).select('-password').lean();
         if (organizerData && organizerData.status == true && organizerData.mobileverified == true && organizerData.is_approved == true) {
             if (notificationid && notificationid != '' && mongoose.Types.ObjectId.isValid(notificationid)) {
@@ -85,12 +85,6 @@ exports.paynow = async (req, res) => {
                     } else if (notificationData.usertype && notificationData.usertype == 'existingusers') {
                         let numberofusers = await primary.model(constants.MODELS.customerimports, customerimportModel).countDocuments({ notificationid: mongoose.Types.ObjectId(notificationid), selected: true });
                         let defaultSetting = await primary.model(constants.MODELS.settings, settingModel).find({}).lean();
-                        console.log('notificationid', notificationid);
-                        console.log('notification_amt', notification_amt);
-                        console.log('sms_amt', sms_amt);
-                        console.log('email_amt', email_amt);
-                        console.log('discount_coupon', discount_coupon);
-                        console.log('total', total);
                         if (numberofusers && numberofusers != '' && !isNaN(numberofusers) && parseInt(numberofusers) > 0) {
                             if (defaultSetting && defaultSetting.length > 0) {
                                 defaultSetting = defaultSetting[0];
@@ -103,13 +97,7 @@ exports.paynow = async (req, res) => {
                                 if (notificationData.is_sms) {
                                     bk_smscost = parseFloat(parseInt(numberofusers) * parseFloat(defaultSetting.smscost));
                                 }
-                                console.log('bk_notificationcost', bk_notificationcost);
-                                console.log('bk_emailcost', bk_emailcost);
-                                console.log('bk_smscost', bk_smscost);
-
                                 let bk_total = parseFloat(bk_notificationcost + bk_emailcost + bk_smscost);
-                                console.log('bk_total 111', bk_total);
-
                                 if (discount_coupon && discount_coupon != '' && mongoose.Types.ObjectId.isValid(discount_coupon)) {
                                     let discountData = await primary.model(constants.MODELS.notificationcoupons, notificationcouponModel).findById(discount_coupon).lean();
                                     if (discountData) {
@@ -120,17 +108,42 @@ exports.paynow = async (req, res) => {
                                             bk_total = bk_total - parseFloat(per);
                                         }
                                         if (parseFloat(total) == parseFloat(bk_total) && parseFloat(notification_amt) == parseFloat(bk_notificationcost) && parseFloat(sms_amt) == parseFloat(bk_smscost) && parseFloat(email_amt) == parseFloat(bk_emailcost)) {
+                                            let paymentLink = await instance.paymentLink.create({
+                                                "amount": parseFloat(bk_total),
+                                                "currency": "INR",
+                                                "accept_partial": false,
+                                                "reference_id": notificationData._id.toString(),
+                                                "description": "Festum Evento Notification Promotional Plan",
+                                                "customer": {
+                                                  "name": organizerData.name,
+                                                  "email": organizerData.email,
+                                                  "contact": organizerData.country_code+organizerData.mobile
+                                                },
+                                                "notify": {
+                                                  "sms": true,
+                                                  "email": true
+                                                },
+                                                "reminder_enable": true,
+                                                "notes": {
+                                                  "policy_name": "Festum Evento Notification Promotional Plan"
+                                                },
+                                                "callback_url": process.env.APP_URI+'/notification/paymentcallback',
+                                                "callback_method": "post"
+                                              });
+
+                                              console.log('paymentLink', paymentLink);
+                                              return responseManager.onSuccess('Promotion payment link created successfully', {paymentLink : paymentLink}, res);
+                                            //   paymentLink
                                             // total match
                                         } else {
-                                            // total not match
+                                            return responseManager.badrequest({ message: 'Something went wrong, please try again' }, res);
                                         }
                                         console.log('bk_total 222', bk_total);
-
                                     } else {
                                         if (parseFloat(total) == parseFloat(bk_total) && parseFloat(notification_amt) == parseFloat(bk_notificationcost) && parseFloat(sms_amt) == parseFloat(bk_smscost) && parseFloat(email_amt) == parseFloat(bk_emailcost)) {
                                             // total match
                                         } else {
-                                            // total not match
+                                            return responseManager.badrequest({ message: 'Something went wrong, please try again' }, res);
                                         }
                                         // dicount not apply
                                         console.log('bk_total 333', bk_total);
@@ -139,7 +152,7 @@ exports.paynow = async (req, res) => {
                                     if (parseFloat(total) == parseFloat(bk_total) && parseFloat(notification_amt) == parseFloat(bk_notificationcost) && parseFloat(sms_amt) == parseFloat(bk_smscost) && parseFloat(email_amt) == parseFloat(bk_emailcost)) {
                                         // total match
                                     } else {
-                                        // total not match
+                                        return responseManager.badrequest({ message: 'Something went wrong, please try again' }, res);
                                     }
                                     // dicount not apply
                                     console.log('bk_total 4444', bk_total);
@@ -149,7 +162,7 @@ exports.paynow = async (req, res) => {
                                 return responseManager.badrequest({ message: 'Something went wrong, please try again' }, res);
                             }
                         } else {
-                            // no user selected
+                            return responseManager.badrequest({ message: 'Something went wrong, please try again' }, res);
                         }
                     } else {
                         return responseManager.badrequest({ message: 'Invalid notification data to set notification user data, please try again' }, res);
