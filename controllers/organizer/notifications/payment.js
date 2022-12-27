@@ -127,7 +127,7 @@ exports.paynow = async (req, res) => {
                                                   "policy_name": "Festum Evento Notification Promotional Plan"
                                                 },
                                                 "callback_url": process.env.APP_URI+'/notification/paymentcallback',
-                                                "callback_method": "post"
+                                                "callback_method": "get"
                                               });
 
                                               console.log('paymentLink', paymentLink);
