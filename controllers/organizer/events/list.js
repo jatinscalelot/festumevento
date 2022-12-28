@@ -4,6 +4,7 @@ const responseManager = require('../../../utilities/response.manager');
 const mongoConnection = require('../../../utilities/connections');
 const constants = require('../../../utilities/constants');
 const categoryModel = require('../../../models/eventcategories.model');
+const eventreviewModel = require('../../../models/eventreviews.model');
 const mongoose = require('mongoose');
 exports.list = async (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
@@ -27,7 +28,24 @@ exports.list = async (req, res) => {
                 select: 'name event_type event_category other timestamp status createdAt updatedAt about event_location banner accept_booking is_approved is_live',
                 lean: true
             }).then((events) => {
-                return responseManager.onSuccess('Events list!', events, res);
+                async.forEachSeries(events.docs, (event, next_event) => {
+                    ( async () => {
+                        let noofreview = parseInt(await primary.model(constants.MODELS.eventreviews, eventreviewModel).countDocuments({ eventid: mongoose.Types.ObjectId(event._id) }));
+                        if (noofreview > 0) {
+                            let totalReviewsCountObj = await primary.model(constants.MODELS.eventreviews, eventreviewModel).aggregate([{ $match: { eventid: mongoose.Types.ObjectId(event._id) } }, { $group: { _id: null, sum: { $sum: "$ratings" } } }]);
+                            if (totalReviewsCountObj && totalReviewsCountObj.length > 0 && totalReviewsCountObj[0].sum) {
+                                event.ratings = parseFloat(parseFloat(totalReviewsCountObj[0].sum) / noofreview).toFixed(1);
+                                event.totalreview = parseInt(noofreview);
+                            }
+                        } else {
+                            event.ratings = '0.0';
+                            event.totalreview = parseInt(0);
+                        }
+                    })().catch((error) => {});
+                    next_event();
+                }, () => {
+                    return responseManager.onSuccess('Events list!', events, res);
+                });
             }).catch((error) => {
                 return responseManager.onError(error, res);
             });
