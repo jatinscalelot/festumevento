@@ -6,6 +6,7 @@ const constants = require('../../../utilities/constants');
 const categoryModel = require('../../../models/eventcategories.model');
 const eventreviewModel = require('../../../models/eventreviews.model');
 const mongoose = require('mongoose');
+const async = require('async');
 exports.list = async (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
