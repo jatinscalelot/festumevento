@@ -29,22 +29,26 @@ exports.list = async (req, res) => {
                 select: 'name event_type event_category other timestamp status createdAt updatedAt about event_location banner accept_booking is_approved is_live',
                 lean: true
             }).then((events) => {
+                let allEvents = [];
                 async.forEachSeries(events.docs, (event, next_event) => {
                     ( async () => {
                         let noofreview = parseInt(await primary.model(constants.MODELS.eventreviews, eventreviewModel).countDocuments({ eventid: mongoose.Types.ObjectId(event._id) }));
                         if (noofreview > 0) {
                             let totalReviewsCountObj = await primary.model(constants.MODELS.eventreviews, eventreviewModel).aggregate([{ $match: { eventid: mongoose.Types.ObjectId(event._id) } }, { $group: { _id: null, sum: { $sum: "$ratings" } } }]);
                             if (totalReviewsCountObj && totalReviewsCountObj.length > 0 && totalReviewsCountObj[0].sum) {
-                                event.ratings = parseFloat(parseFloat(totalReviewsCountObj[0].sum) / noofreview).toFixed(1);
+                                event.ratings = parseFloat(parseFloat(totalReviewsCountObj[0].sum) / parseInt(noofreview)).toFixed(1);
                                 event.totalreview = parseInt(noofreview);
+                                allEvents.push(event);
                             }
                         } else {
                             event.ratings = '0.0';
                             event.totalreview = parseInt(0);
+                            allEvents.push(event);
                         }
                     })().catch((error) => {});
                     next_event();
                 }, () => {
+                    events.docs = allEvents;
                     return responseManager.onSuccess('Events list!', events, res);
                 });
             }).catch((error) => {
