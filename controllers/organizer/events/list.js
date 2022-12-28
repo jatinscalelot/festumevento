@@ -32,22 +32,18 @@ exports.list = async (req, res) => {
                 let allEvents = [];
                 async.forEachSeries(events.docs, (event, next_event) => {
                     ( async () => {
-                        console.log('event name', event.name);
                         let noofreview = parseInt(await primary.model(constants.MODELS.eventreviews, eventreviewModel).countDocuments({ eventid: mongoose.Types.ObjectId(event._id) }));
-                        console.log('noofreview', noofreview);
                         if (noofreview > 0) {
                             let totalReviewsCountObj = await primary.model(constants.MODELS.eventreviews, eventreviewModel).aggregate([{ $match: { eventid: mongoose.Types.ObjectId(event._id) } }, { $group: { _id: null, sum: { $sum: "$ratings" } } }]);
                             if (totalReviewsCountObj && totalReviewsCountObj.length > 0 && totalReviewsCountObj[0].sum) {
                                 event.ratings = parseFloat(parseFloat(totalReviewsCountObj[0].sum) / parseInt(noofreview)).toFixed(1);
                                 event.totalreview = parseInt(noofreview);
                                 allEvents.push(event);
-                                console.log('event data', event);
                             }
                         } else {
                             event.ratings = '0.0';
                             event.totalreview = parseInt(0);
                             allEvents.push(event);
-                            console.log('event data in else', event);
                         }
                         next_event();
                     })().catch((error) => {
