@@ -32,7 +32,7 @@ exports.getone = async (req, res) => {
                         livestreamData.ratings = '0.0';
                         livestreamData.totalreview = parseInt(0);
                     }
-                    let allreview = await primary.model(constants.MODELS.livestreamreviews, livestreamreviewModel).find({ livestreamid: mongoose.Types.ObjectId(livestreamData._id) }).populate({ path: 'userid', model: primary.model(constants.MODELS.users, userModel), select: "name mobile profilepic" }).lean();
+                    let allreview = await primary.model(constants.MODELS.livestreamreviews, livestreamreviewModel).find({ livestreamid: mongoose.Types.ObjectId(livestreamData._id) }).populate({ path: 'userid', model: primary.model(constants.MODELS.users, userModel), select: "name mobile profilepic createdAt timestamp" }).lean();
                     livestreamData.reviews = allreview;
                     return responseManager.onSuccess('Organizer event live stream data!', livestreamData, res);
                 }else{

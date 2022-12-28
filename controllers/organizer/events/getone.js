@@ -33,7 +33,7 @@ exports.getone = async (req, res) => {
                         eventData.ratings = '0.0';
                         eventData.totalreview = parseInt(0);
                     }
-                    let allreview = await primary.model(constants.MODELS.eventreviews, eventreviewModel).find({ eventid: mongoose.Types.ObjectId(eventid) }).populate({ path: 'userid', model: primary.model(constants.MODELS.users, userModel), select: "name mobile profilepic" }).lean();
+                    let allreview = await primary.model(constants.MODELS.eventreviews, eventreviewModel).find({ eventid: mongoose.Types.ObjectId(eventid) }).populate({ path: 'userid', model: primary.model(constants.MODELS.users, userModel), select: "name mobile profilepic createdAt timestamp" }).lean();
                     eventData.reviews = allreview;
                     return responseManager.onSuccess('Organizer event data!', eventData, res);
                 }else{
