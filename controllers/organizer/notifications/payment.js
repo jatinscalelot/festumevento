@@ -48,35 +48,272 @@ exports.paynow = async (req, res) => {
                                         bk_total = bk_total - parseFloat(per);
                                     }
                                     if (parseFloat(total) == parseFloat(bk_total) && parseFloat(notification_amt) == parseFloat(bk_notificationcost) && parseFloat(sms_amt) == parseFloat(bk_smscost) && parseFloat(email_amt) == parseFloat(bk_emailcost)) {
-                                        // total match
+                                        let paymentLink = await instance.paymentLink.create({
+                                            "amount": parseFloat(bk_total) * 100,
+                                            "currency": "INR",
+                                            "accept_partial": false,
+                                            "reference_id": notificationData._id.toString(),
+                                            "description": "Festum Evento Notification Promotional Plan",
+                                            "customer": {
+                                                "name": organizerData.name,
+                                                "email": organizerData.email,
+                                                "contact": organizerData.country_code + organizerData.mobile
+                                            },
+                                            "notify": {
+                                                "sms": true,
+                                                "email": true
+                                            },
+                                            "reminder_enable": true,
+                                            "notes": {
+                                                "policy_name": "Festum Evento Notification Promotional Plan"
+                                            },
+                                            "callback_url": process.env.APP_URI + '/notification/paymentcallback',
+                                            "callback_method": "get"
+                                        });
+                                        await primary.model(constants.notifications, notificationModel).findByIdAndUpdate(notificationData._id, { paymentLink: paymentLink });
+                                        return responseManager.onSuccess('Promotion payment link created successfully', { paymentLink: paymentLink }, res);
                                     } else {
-                                        // total not match
+                                        return responseManager.badrequest({ message: 'Something went wrong, please try again' }, res);
                                     }
                                 } else {
-                                    // dicount not apply
+                                    if (parseFloat(total) == parseFloat(bk_total) && parseFloat(notification_amt) == parseFloat(bk_notificationcost) && parseFloat(sms_amt) == parseFloat(bk_smscost) && parseFloat(email_amt) == parseFloat(bk_emailcost)) {
+                                        let paymentLink = await instance.paymentLink.create({
+                                            "amount": parseFloat(bk_total) * 100,
+                                            "currency": "INR",
+                                            "accept_partial": false,
+                                            "reference_id": notificationData._id.toString(),
+                                            "description": "Festum Evento Notification Promotional Plan",
+                                            "customer": {
+                                                "name": organizerData.name,
+                                                "email": organizerData.email,
+                                                "contact": organizerData.country_code + organizerData.mobile
+                                            },
+                                            "notify": {
+                                                "sms": true,
+                                                "email": true
+                                            },
+                                            "reminder_enable": true,
+                                            "notes": {
+                                                "policy_name": "Festum Evento Notification Promotional Plan"
+                                            },
+                                            "callback_url": process.env.APP_URI + '/notification/paymentcallback',
+                                            "callback_method": "get"
+                                        });
+                                        await primary.model(constants.notifications, notificationModel).findByIdAndUpdate(notificationData._id, { paymentLink: paymentLink });
+                                        return responseManager.onSuccess('Promotion payment link created successfully', { paymentLink: paymentLink }, res);
+                                    } else {
+                                        return responseManager.badrequest({ message: 'Something went wrong, please try again' }, res);
+                                    }
                                 }
                             } else {
-                                // dicount not apply
+                                if (parseFloat(total) == parseFloat(bk_total) && parseFloat(notification_amt) == parseFloat(bk_notificationcost) && parseFloat(sms_amt) == parseFloat(bk_smscost) && parseFloat(email_amt) == parseFloat(bk_emailcost)) {
+                                    let paymentLink = await instance.paymentLink.create({
+                                        "amount": parseFloat(bk_total) * 100,
+                                        "currency": "INR",
+                                        "accept_partial": false,
+                                        "reference_id": notificationData._id.toString(),
+                                        "description": "Festum Evento Notification Promotional Plan",
+                                        "customer": {
+                                            "name": organizerData.name,
+                                            "email": organizerData.email,
+                                            "contact": organizerData.country_code + organizerData.mobile
+                                        },
+                                        "notify": {
+                                            "sms": true,
+                                            "email": true
+                                        },
+                                        "reminder_enable": true,
+                                        "notes": {
+                                            "policy_name": "Festum Evento Notification Promotional Plan"
+                                        },
+                                        "callback_url": process.env.APP_URI + '/notification/paymentcallback',
+                                        "callback_method": "get"
+                                    });
+                                    await primary.model(constants.notifications, notificationModel).findByIdAndUpdate(notificationData._id, { paymentLink: paymentLink });
+                                    return responseManager.onSuccess('Promotion payment link created successfully', { paymentLink: paymentLink }, res);
+                                } else {
+                                    return responseManager.badrequest({ message: 'Something went wrong, please try again' }, res);
+                                }
                             }
-                            return responseManager.onSuccess('Promotion schedule set successfully', { settings: defaultSetting, numberofusers: notificationData.numberofusers }, res);
                         } else {
                             return responseManager.badrequest({ message: 'Something went wrong, please try again' }, res);
                         }
                     } else if (notificationData.usertype && notificationData.usertype == 'allusers') {
                         if (notificationData.selected_plan && notificationData.selected_plan != '' && mongoose.Types.ObjectId.isValid(notificationData.selected_plan)) {
-                            let defaultSetting = await primary.model(constants.MODELS.settings, settingModel).find({}).lean();
                             let planData = await primary.model(constants.MODELS.promotionplans, promotionplanModel).findById(notificationData.selected_plan).lean();
-                            if (defaultSetting && defaultSetting.length > 0) {
-                                defaultSetting = defaultSetting[0];
-                                return responseManager.onSuccess('Promotion schedule set successfully', { settings: defaultSetting, planData: planData }, res);
-                            } else {
+                            if(planData){
+                                if (notificationData.is_notification) {
+                                    bk_notificationcost = parseFloat(planData.notification_amount);
+                                }
+                                if (notificationData.is_email) {
+                                    bk_emailcost = parseFloat(planData.email_amount);
+                                }
+                                if (notificationData.is_sms) {
+                                    bk_smscost = parseFloat(planData.sms_amount);
+                                }
+                                var bk_total = 0;
+                                if(notificationData.is_notification && notificationData.is_email && notificationData.is_sms){
+                                    bk_total = planData.combo_amount;
+                                }else{
+                                    bk_total = parseFloat(bk_notificationcost + bk_emailcost + bk_smscost);
+                                }
+                                if (discount_coupon && discount_coupon != '' && mongoose.Types.ObjectId.isValid(discount_coupon)) {
+                                    let discountData = await primary.model(constants.MODELS.notificationcoupons, notificationcouponModel).findById(discount_coupon).lean();
+                                    if (discountData) {
+                                        if (discountData.amount && discountData.amount != '' && discountData.amount != 0 && !isNaN(discountData.amount)) {
+                                            bk_total = bk_total - parseFloat(discountData.amount);
+                                        } else if (discountData.percentage && discountData.percentage != '' && discountData.percentage != 0 && !isNaN(discountData.percentage)) {
+                                            let per = (bk_total * parseFloat(discountData.percentage)) / 100;
+                                            bk_total = bk_total - parseFloat(per);
+                                        }
+                                        if (parseFloat(total) == parseFloat(bk_total) && parseFloat(notification_amt) == parseFloat(bk_notificationcost) && parseFloat(sms_amt) == parseFloat(bk_smscost) && parseFloat(email_amt) == parseFloat(bk_emailcost)) {
+                                            let paymentLink = await instance.paymentLink.create({
+                                                "amount": parseFloat(bk_total) * 100,
+                                                "currency": "INR",
+                                                "accept_partial": false,
+                                                "reference_id": notificationData._id.toString(),
+                                                "description": "Festum Evento Notification Promotional Plan",
+                                                "customer": {
+                                                    "name": organizerData.name,
+                                                    "email": organizerData.email,
+                                                    "contact": organizerData.country_code + organizerData.mobile
+                                                },
+                                                "notify": {
+                                                    "sms": true,
+                                                    "email": true
+                                                },
+                                                "reminder_enable": true,
+                                                "notes": {
+                                                    "policy_name": "Festum Evento Notification Promotional Plan"
+                                                },
+                                                "callback_url": process.env.APP_URI + '/notification/paymentcallback',
+                                                "callback_method": "get"
+                                            });
+                                            await primary.model(constants.notifications, notificationModel).findByIdAndUpdate(notificationData._id, { paymentLink: paymentLink });
+                                            return responseManager.onSuccess('Promotion payment link created successfully', { paymentLink: paymentLink }, res);
+                                        } else {
+                                            return responseManager.badrequest({ message: 'Something went wrong, please try again' }, res);
+                                        }
+                                    }else{
+                                        return responseManager.badrequest({ message: 'Something went wrong, please try again' }, res);
+                                    }
+                                }else{
+                                    if (parseFloat(total) == parseFloat(bk_total) && parseFloat(notification_amt) == parseFloat(bk_notificationcost) && parseFloat(sms_amt) == parseFloat(bk_smscost) && parseFloat(email_amt) == parseFloat(bk_emailcost)) {
+                                        let paymentLink = await instance.paymentLink.create({
+                                            "amount": parseFloat(bk_total) * 100,
+                                            "currency": "INR",
+                                            "accept_partial": false,
+                                            "reference_id": notificationData._id.toString(),
+                                            "description": "Festum Evento Notification Promotional Plan",
+                                            "customer": {
+                                                "name": organizerData.name,
+                                                "email": organizerData.email,
+                                                "contact": organizerData.country_code + organizerData.mobile
+                                            },
+                                            "notify": {
+                                                "sms": true,
+                                                "email": true
+                                            },
+                                            "reminder_enable": true,
+                                            "notes": {
+                                                "policy_name": "Festum Evento Notification Promotional Plan"
+                                            },
+                                            "callback_url": process.env.APP_URI + '/notification/paymentcallback',
+                                            "callback_method": "get"
+                                        });
+                                        await primary.model(constants.notifications, notificationModel).findByIdAndUpdate(notificationData._id, { paymentLink: paymentLink });
+                                        return responseManager.onSuccess('Promotion payment link created successfully', { paymentLink: paymentLink }, res);
+                                    } else {
+                                        return responseManager.badrequest({ message: 'Something went wrong, please try again' }, res);
+                                    }
+                                }
+                            }else{
                                 return responseManager.badrequest({ message: 'Something went wrong, please try again' }, res);
                             }
-                        } else if (numberofusers) {
+                        } else if (notificationData.numberofusers) {
                             let defaultSetting = await primary.model(constants.MODELS.settings, settingModel).find({}).lean();
                             if (defaultSetting && defaultSetting.length > 0) {
                                 defaultSetting = defaultSetting[0];
-                                return responseManager.onSuccess('Promotion schedule set successfully', { settings: defaultSetting, numberofusers: notificationData.numberofusers }, res);
+                                if (notificationData.is_notification) {
+                                    bk_notificationcost = parseFloat(parseInt(notificationData.numberofusers) * parseFloat(defaultSetting.notificationcost));
+                                }
+                                if (notificationData.is_email) {
+                                    bk_emailcost = parseFloat(parseInt(notificationData.numberofusers) * parseFloat(defaultSetting.emailcost));
+                                }
+                                if (notificationData.is_sms) {
+                                    bk_smscost = parseFloat(parseInt(notificationData.numberofusers) * parseFloat(defaultSetting.smscost));
+                                }
+                                let bk_total = parseFloat(bk_notificationcost + bk_emailcost + bk_smscost);
+                                if (discount_coupon && discount_coupon != '' && mongoose.Types.ObjectId.isValid(discount_coupon)) {
+                                    let discountData = await primary.model(constants.MODELS.notificationcoupons, notificationcouponModel).findById(discount_coupon).lean();
+                                    if (discountData) {
+                                        if (discountData.amount && discountData.amount != '' && discountData.amount != 0 && !isNaN(discountData.amount)) {
+                                            bk_total = bk_total - parseFloat(discountData.amount);
+                                        } else if (discountData.percentage && discountData.percentage != '' && discountData.percentage != 0 && !isNaN(discountData.percentage)) {
+                                            let per = (bk_total * parseFloat(discountData.percentage)) / 100;
+                                            bk_total = bk_total - parseFloat(per);
+                                        }
+                                        if (parseFloat(total) == parseFloat(bk_total) && parseFloat(notification_amt) == parseFloat(bk_notificationcost) && parseFloat(sms_amt) == parseFloat(bk_smscost) && parseFloat(email_amt) == parseFloat(bk_emailcost)) {
+                                            let paymentLink = await instance.paymentLink.create({
+                                                "amount": parseFloat(bk_total) * 100,
+                                                "currency": "INR",
+                                                "accept_partial": false,
+                                                "reference_id": notificationData._id.toString(),
+                                                "description": "Festum Evento Notification Promotional Plan",
+                                                "customer": {
+                                                    "name": organizerData.name,
+                                                    "email": organizerData.email,
+                                                    "contact": organizerData.country_code + organizerData.mobile
+                                                },
+                                                "notify": {
+                                                    "sms": true,
+                                                    "email": true
+                                                },
+                                                "reminder_enable": true,
+                                                "notes": {
+                                                    "policy_name": "Festum Evento Notification Promotional Plan"
+                                                },
+                                                "callback_url": process.env.APP_URI + '/notification/paymentcallback',
+                                                "callback_method": "get"
+                                            });
+                                            await primary.model(constants.notifications, notificationModel).findByIdAndUpdate(notificationData._id, { paymentLink: paymentLink });
+                                            return responseManager.onSuccess('Promotion payment link created successfully', { paymentLink: paymentLink }, res);
+                                        } else {
+                                            return responseManager.badrequest({ message: 'Something went wrong, please try again' }, res);
+                                        }
+                                    } else {
+                                        return responseManager.badrequest({ message: 'Something went wrong, please try again' }, res);
+                                    }
+                                } else {
+                                    if (parseFloat(total) == parseFloat(bk_total) && parseFloat(notification_amt) == parseFloat(bk_notificationcost) && parseFloat(sms_amt) == parseFloat(bk_smscost) && parseFloat(email_amt) == parseFloat(bk_emailcost)) {
+                                        let paymentLink = await instance.paymentLink.create({
+                                            "amount": parseFloat(bk_total) * 100,
+                                            "currency": "INR",
+                                            "accept_partial": false,
+                                            "reference_id": notificationData._id.toString(),
+                                            "description": "Festum Evento Notification Promotional Plan",
+                                            "customer": {
+                                                "name": organizerData.name,
+                                                "email": organizerData.email,
+                                                "contact": organizerData.country_code + organizerData.mobile
+                                            },
+                                            "notify": {
+                                                "sms": true,
+                                                "email": true
+                                            },
+                                            "reminder_enable": true,
+                                            "notes": {
+                                                "policy_name": "Festum Evento Notification Promotional Plan"
+                                            },
+                                            "callback_url": process.env.APP_URI + '/notification/paymentcallback',
+                                            "callback_method": "get"
+                                        });
+                                        await primary.model(constants.notifications, notificationModel).findByIdAndUpdate(notificationData._id, { paymentLink: paymentLink });
+                                        return responseManager.onSuccess('Promotion payment link created successfully', { paymentLink: paymentLink }, res);
+                                    } else {
+                                        return responseManager.badrequest({ message: 'Something went wrong, please try again' }, res);
+                                    }
+                                }
                             } else {
                                 return responseManager.badrequest({ message: 'Something went wrong, please try again' }, res);
                             }
@@ -114,49 +351,86 @@ exports.paynow = async (req, res) => {
                                                 "reference_id": notificationData._id.toString(),
                                                 "description": "Festum Evento Notification Promotional Plan",
                                                 "customer": {
-                                                  "name": organizerData.name,
-                                                  "email": organizerData.email,
-                                                  "contact": organizerData.country_code+organizerData.mobile
+                                                    "name": organizerData.name,
+                                                    "email": organizerData.email,
+                                                    "contact": organizerData.country_code + organizerData.mobile
                                                 },
                                                 "notify": {
-                                                  "sms": true,
-                                                  "email": true
+                                                    "sms": true,
+                                                    "email": true
                                                 },
                                                 "reminder_enable": true,
                                                 "notes": {
-                                                  "policy_name": "Festum Evento Notification Promotional Plan"
+                                                    "policy_name": "Festum Evento Notification Promotional Plan"
                                                 },
-                                                "callback_url": process.env.APP_URI+'/notification/paymentcallback',
+                                                "callback_url": process.env.APP_URI + '/notification/paymentcallback',
                                                 "callback_method": "get"
-                                              });
-
-                                              console.log('paymentLink', paymentLink);
-                                              return responseManager.onSuccess('Promotion payment link created successfully', {paymentLink : paymentLink}, res);
-                                            //   paymentLink
-                                            // total match
+                                            });
+                                            await primary.model(constants.notifications, notificationModel).findByIdAndUpdate(notificationData._id, { paymentLink: paymentLink });
+                                            return responseManager.onSuccess('Promotion payment link created successfully', { paymentLink: paymentLink }, res);
                                         } else {
                                             return responseManager.badrequest({ message: 'Something went wrong, please try again' }, res);
                                         }
-                                        console.log('bk_total 222', bk_total);
                                     } else {
                                         if (parseFloat(total) == parseFloat(bk_total) && parseFloat(notification_amt) == parseFloat(bk_notificationcost) && parseFloat(sms_amt) == parseFloat(bk_smscost) && parseFloat(email_amt) == parseFloat(bk_emailcost)) {
-                                            // total match
+                                            let paymentLink = await instance.paymentLink.create({
+                                                "amount": parseFloat(bk_total) * 100,
+                                                "currency": "INR",
+                                                "accept_partial": false,
+                                                "reference_id": notificationData._id.toString(),
+                                                "description": "Festum Evento Notification Promotional Plan",
+                                                "customer": {
+                                                    "name": organizerData.name,
+                                                    "email": organizerData.email,
+                                                    "contact": organizerData.country_code + organizerData.mobile
+                                                },
+                                                "notify": {
+                                                    "sms": true,
+                                                    "email": true
+                                                },
+                                                "reminder_enable": true,
+                                                "notes": {
+                                                    "policy_name": "Festum Evento Notification Promotional Plan"
+                                                },
+                                                "callback_url": process.env.APP_URI + '/notification/paymentcallback',
+                                                "callback_method": "get"
+                                            });
+                                            await primary.model(constants.notifications, notificationModel).findByIdAndUpdate(notificationData._id, { paymentLink: paymentLink });
+                                            return responseManager.onSuccess('Promotion payment link created successfully', { paymentLink: paymentLink }, res);
                                         } else {
                                             return responseManager.badrequest({ message: 'Something went wrong, please try again' }, res);
                                         }
-                                        // dicount not apply
-                                        console.log('bk_total 333', bk_total);
                                     }
                                 } else {
                                     if (parseFloat(total) == parseFloat(bk_total) && parseFloat(notification_amt) == parseFloat(bk_notificationcost) && parseFloat(sms_amt) == parseFloat(bk_smscost) && parseFloat(email_amt) == parseFloat(bk_emailcost)) {
-                                        // total match
+                                        let paymentLink = await instance.paymentLink.create({
+                                            "amount": parseFloat(bk_total) * 100,
+                                            "currency": "INR",
+                                            "accept_partial": false,
+                                            "reference_id": notificationData._id.toString(),
+                                            "description": "Festum Evento Notification Promotional Plan",
+                                            "customer": {
+                                                "name": organizerData.name,
+                                                "email": organizerData.email,
+                                                "contact": organizerData.country_code + organizerData.mobile
+                                            },
+                                            "notify": {
+                                                "sms": true,
+                                                "email": true
+                                            },
+                                            "reminder_enable": true,
+                                            "notes": {
+                                                "policy_name": "Festum Evento Notification Promotional Plan"
+                                            },
+                                            "callback_url": process.env.APP_URI + '/notification/paymentcallback',
+                                            "callback_method": "get"
+                                        });
+                                        await primary.model(constants.notifications, notificationModel).findByIdAndUpdate(notificationData._id, { paymentLink: paymentLink });
+                                        return responseManager.onSuccess('Promotion payment link created successfully', { paymentLink: paymentLink }, res);
                                     } else {
                                         return responseManager.badrequest({ message: 'Something went wrong, please try again' }, res);
                                     }
-                                    // dicount not apply
-                                    console.log('bk_total 4444', bk_total);
                                 }
-                                //return responseManager.onSuccess('Promotion schedule set successfully', {settings : defaultSetting, numberofusers : numberofusers}, res);
                             } else {
                                 return responseManager.badrequest({ message: 'Something went wrong, please try again' }, res);
                             }
@@ -168,12 +442,7 @@ exports.paynow = async (req, res) => {
                     }
                 }
             } else {
-                let defaultSetting = await primary.model(constants.MODELS.settings, settingModel).find({}).lean();
-                if (defaultSetting && defaultSetting.length > 0) {
-                    return responseManager.onSuccess('Promotion schedule set successfully', defaultSetting, res);
-                } else {
-                    return responseManager.badrequest({ message: 'Something went wrong, please try again' }, res);
-                }
+                return responseManager.badrequest({ message: 'Invalid notification to pay, please try again' }, res);
             }
         } else {
             return responseManager.badrequest({ message: 'Invalid organizerid to get settings data, please try again' }, res);
