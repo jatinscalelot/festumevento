@@ -45,7 +45,9 @@ exports.list = async (req, res) => {
                             event.totalreview = parseInt(0);
                             allEvents.push(event);
                         }
-                    })().catch((error) => {});
+                    })().catch((error) => {
+                        console.log('error', error);
+                    });
                     next_event();
                 }, () => {
                     events.docs = allEvents;
