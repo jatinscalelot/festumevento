@@ -54,7 +54,7 @@ router.post('/findoffer', helper.authenticateToken, async (req, res) => {
             next_offer();
           })().catch((error) => { });
         }, () => {
-          return responseManager.onSuccess("online offer List", alloffers, res);
+          return responseManager.onSuccess("online offer List", { onlineshopoffer : alloffers}, res);
         });
       }).catch((error) => {
         return responseManager.onError(error, res);
