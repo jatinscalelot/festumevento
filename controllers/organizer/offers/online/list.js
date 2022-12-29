@@ -19,8 +19,15 @@ exports.list = async (req, res) => {
             }
             primary.model(constants.MODELS.onlineoffers, onlineofferModel).paginate({
                 $or: [
-                    { offer_title: { '$regex': new RegExp(search, "i") } },
-                    { description: { '$regex': new RegExp(search, "i") } }
+                    { description: { '$regex': new RegExp(search, "i") } },
+                    { shop_name: { '$regex': new RegExp(search, "i") }},
+                    { start_date: { '$regex': new RegExp(search, "i") }},
+                    { end_date: { '$regex': new RegExp(search, "i") }},
+                    { product_name: { '$regex': new RegExp(search, "i") }},
+                    { company_name: { '$regex': new RegExp(search, "i") }},
+                    { company_contact_no: { '$regex': new RegExp(search, "i") }},
+                    { company_email: { '$regex': new RegExp(search, "i") }},
+                    { about_company: { '$regex': new RegExp(search, "i") }}
                 ],
                 createdBy: mongoose.Types.ObjectId(req.token.organizerid),
                 ...query

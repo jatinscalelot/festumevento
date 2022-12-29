@@ -58,7 +58,8 @@ const organizerpaths = [
   { pathUrl: '/platform', routeFile: 'platform'},
   { pathUrl: '/livestream', routeFile: 'livestream'},
   { pathUrl: '/subscriptions', routeFile: 'subscriptions'},
-  { pathUrl: '/entertainment', routeFile: 'entertainment'}
+  { pathUrl: '/entertainment', routeFile: 'entertainment'},
+  { pathUrl: '/search', routeFile: 'search' }
 ];
 const subadminpaths = [
   { pathUrl: '/', routeFile: 'index'}
