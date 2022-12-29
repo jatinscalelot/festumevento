@@ -135,3 +135,4 @@ router.post('/', helper.authenticateToken, async (req, res) => {
         return responseManager.badrequest({ message: 'Invalid token to search globally, please try again' }, res);
     }
 });
+module.exports = router;
