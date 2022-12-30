@@ -31,7 +31,8 @@ let constants = {
         shopreviews : 'shopreviews',
         offlineofferwishlists : 'offlineofferwishlists',
         onlineofferreviews : 'onlineofferreviews',
-        onlineofferwishlists : 'onlineofferwishlists'
+        onlineofferwishlists : 'onlineofferwishlists',
+        eventbookingcoupons : 'eventbookingcoupons'
     }
 };
 module.exports = constants;
