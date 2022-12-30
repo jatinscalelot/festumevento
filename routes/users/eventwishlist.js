@@ -10,6 +10,7 @@ const organizerModel = require('../../models/organizers.model');
 const eventwishlistModel = require('../../models/eventwishlists.model');
 const itemModel = require('../../models/items.model');
 const helper = require('../../utilities/helper');
+const eventreviewModel = require('../../models/eventreviews.model');
 const mongoose = require('mongoose');
 const async = require('async');
 router.post('/', helper.authenticateToken, async (req, res) => {
