@@ -29,7 +29,7 @@ exports.getone = async (req, res) => {
                     }
                     let allreview = await primary.model(constants.MODELS.shopreviews, shopreviewModel).find({ shopid: mongoose.Types.ObjectId(shopid), offerid : mongoose.Types.ObjectId(offlineofferid) }).populate({ path: 'userid', model: primary.model(constants.MODELS.users, userModel), select: "name mobile profilepic" }).lean();
                     offlineOfferData.reviews = allreview;
-                    return responseManager.onSuccess("shop offer data", offerDetails, res);
+                    return responseManager.onSuccess("shop offer data", offlineOfferData, res);
                 } else {
                     return responseManager.badrequest({ message: 'Invalid shop id to get offline offer data, please try again' }, res);
                 }
