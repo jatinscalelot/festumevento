@@ -32,7 +32,6 @@ exports.getone = async (req, res) => {
                         offlineOfferData.reviews = allreview;
                         return responseManager.onSuccess("shop offer data", offerDetails, res);
                     })().catch((error) => {});
-                    return responseManager.onSuccess('Offline offer data!', offlineOfferData, res);
                 } else {
                     return responseManager.badrequest({ message: 'Invalid shop id to get offline offer data, please try again' }, res);
                 }
