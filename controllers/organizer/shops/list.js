@@ -40,10 +40,12 @@ exports.list = async (req, res) => {
                             let totalReviewsCountObj = await primary.model(constants.MODELS.shopreviews, shopreviewModel).aggregate([{ $match: { shopid: mongoose.Types.ObjectId(shop._id) } }, { $group: { _id: null, sum: { $sum: "$ratings" } } }]);
                             if (totalReviewsCountObj && totalReviewsCountObj.length > 0 && totalReviewsCountObj[0].sum) {
                                 shop.ratings = parseFloat(parseFloat(totalReviewsCountObj[0].sum) / noofreview).toFixed(1);
+                                shop.totalreviews = noofreview;
                                 finalShops.push(shop);
                             }
                         } else {
                             shop.ratings = '0.0';
+                            shop.totalreviews = 0;
                             finalShops.push(shop);
                         }
                         next_shop();

@@ -3,6 +3,7 @@ const responseManager = require('../../../../utilities/response.manager');
 const constants = require('../../../../utilities/constants');
 const organizerModel = require('../../../../models/organizers.model');
 const offlineofferModel = require('../../../../models/offlineoffers.model');
+const shopreviewModel = require('../../../../models/shopreviews.model');
 const mongoose = require('mongoose');
 exports.list = async (req, res) => {
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
@@ -24,7 +25,28 @@ exports.list = async (req, res) => {
                     sort: { _id: -1 },
                     lean: true
                 }).then((offlineoffers) => {
-                    return responseManager.onSuccess('Offline Offers list!', offlineoffers, res);
+                    let alloffers = [];
+                    async.forEachSeries(offlineoffers.docs, (offer, next_offer) => {
+                        (async () => {
+                            let noofreview = parseInt(await primary.model(constants.MODELS.shopreviews, shopreviewModel).countDocuments({ shopid: mongoose.Types.ObjectId(shopid), offerid: mongoose.Types.ObjectId(offer._id) }));
+                            if (noofreview > 0) {
+                                let totalReviewsCountObj = await primary.model(constants.MODELS.shopreviews, shopreviewModel).aggregate([{ $match: { shopid: mongoose.Types.ObjectId(shopid), offerid: mongoose.Types.ObjectId(offer._id) } }, { $group: { _id: null, sum: { $sum: "$ratings" } } }]);
+                                if (totalReviewsCountObj && totalReviewsCountObj.length > 0 && totalReviewsCountObj[0].sum) {
+                                    offer.ratings = parseFloat(parseFloat(totalReviewsCountObj[0].sum) / noofreview).toFixed(1);
+                                    offer.totalratings = noofreview;
+                                    alloffers.push(offer);
+                                }
+                            } else {
+                                offer.ratings = '0.0';
+                                offer.totalratings = 0;
+                                alloffers.push(offer);
+                            }
+                            next_offer();
+                        })().catch((error) => { });
+                    }, () => {
+                        offlineoffers.docs = alloffers;
+                        return responseManager.onSuccess('Offline Offers list!', offlineoffers, res);
+                    });
                 }).catch((error) => {
                     return responseManager.onError(error, res);
                 });
