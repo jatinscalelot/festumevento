@@ -5,6 +5,10 @@ let schema = new mongoose.Schema({
         type: mongoose.Types.ObjectId,
 		require: true
     },
+    offerid : {
+        type: mongoose.Types.ObjectId,
+		require: true
+    },
     shopid : {
         type: mongoose.Types.ObjectId,
 		require: true

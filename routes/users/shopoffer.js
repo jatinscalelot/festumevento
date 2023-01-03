@@ -61,15 +61,15 @@ router.post('/findoffer', helper.authenticateToken, async (req, res) => {
                   (async () => {
                     let wishlist = await primary.model(constants.MODELS.offlineofferwishlists, offlineofferwishlistModel).findOne({offerid : mongoose.Types.ObjectId(offer._id), userid : mongoose.Types.ObjectId(req.token.userid)}).lean();
                     offer.wishlist_status = (wishlist == null) ? false : true;
-                    let noofreview = parseInt(await primary.model(constants.MODELS.shopreviews, shopreviewModel).countDocuments({ shopid: mongoose.Types.ObjectId(offer.shopid._id) }));
+                    let noofreview = parseInt(await primary.model(constants.MODELS.shopreviews, shopreviewModel).countDocuments({ shopid: mongoose.Types.ObjectId(offer.shopid._id), offerid : mongoose.Types.ObjectId(offer._id) }));
                     if (noofreview > 0) {
-                      let totalReviewsCountObj = await primary.model(constants.MODELS.shopreviews, shopreviewModel).aggregate([{ $match: { shopid: mongoose.Types.ObjectId(offer.shopid._id) } }, { $group: { _id: null, sum: { $sum: "$ratings" } } }]);
+                      let totalReviewsCountObj = await primary.model(constants.MODELS.shopreviews, shopreviewModel).aggregate([{ $match: { shopid: mongoose.Types.ObjectId(offer.shopid._id), offerid : mongoose.Types.ObjectId(offer._id) } }, { $group: { _id: null, sum: { $sum: "$ratings" } } }]);
                       if (totalReviewsCountObj && totalReviewsCountObj.length > 0 && totalReviewsCountObj[0].sum) {
-                        offer.shopid.ratings = parseFloat(parseFloat(totalReviewsCountObj[0].sum) / noofreview).toFixed(1);
+                        offer.ratings = parseFloat(parseFloat(totalReviewsCountObj[0].sum) / noofreview).toFixed(1);
                         alloffers.push(offer);
                       }
                     } else {
-                      offer.shopid.ratings = '0.0';
+                      offer.ratings = '0.0';
                       alloffers.push(offer);
                     }
                     next_offer();
@@ -116,17 +116,17 @@ router.post('/getone', helper.authenticateToken, async (req, res) => {
           (async () => {
             let wishlist = await primary.model(constants.MODELS.offlineofferwishlists, offlineofferwishlistModel).findOne({offerid : mongoose.Types.ObjectId(offerDetails._id), userid : mongoose.Types.ObjectId(req.token.userid)}).lean();
             offerDetails.wishlist_status = (wishlist == null) ? false : true;
-            let noofreview = parseInt(await primary.model(constants.MODELS.shopreviews, shopreviewModel).countDocuments({ shopid: mongoose.Types.ObjectId(offerDetails.shopid._id) }));
+            let noofreview = parseInt(await primary.model(constants.MODELS.shopreviews, shopreviewModel).countDocuments({ shopid: mongoose.Types.ObjectId(offerDetails.shopid._id), offerid : mongoose.Types.ObjectId(offerDetails._id) }));
             if (noofreview > 0) {
-              let totalReviewsCountObj = await primary.model(constants.MODELS.shopreviews, shopreviewModel).aggregate([{ $match: { shopid: mongoose.Types.ObjectId(offerDetails.shopid._id) } }, { $group: { _id: null, sum: { $sum: "$ratings" } } }]);
+              let totalReviewsCountObj = await primary.model(constants.MODELS.shopreviews, shopreviewModel).aggregate([{ $match: { shopid: mongoose.Types.ObjectId(offerDetails.shopid._id), offerid : mongoose.Types.ObjectId(offerDetails._id) } }, { $group: { _id: null, sum: { $sum: "$ratings" } } }]);
               if (totalReviewsCountObj && totalReviewsCountObj.length > 0 && totalReviewsCountObj[0].sum) {
-                offerDetails.shopid.ratings = parseFloat(parseFloat(totalReviewsCountObj[0].sum) / noofreview).toFixed(1);
+                offerDetails.ratings = parseFloat(parseFloat(totalReviewsCountObj[0].sum) / noofreview).toFixed(1);
               }
             } else {
-              offerDetails.shopid.ratings = '0.0';
+              offerDetails.ratings = '0.0';
             }
-            let allreview = await primary.model(constants.MODELS.shopreviews, shopreviewModel).find({ shopid: mongoose.Types.ObjectId(offerDetails.shopid._id) }).populate({ path: 'userid', model: primary.model(constants.MODELS.users, userModel), select: "name mobile profilepic" }).lean();
-            offerDetails.shopreviews = allreview;
+            let allreview = await primary.model(constants.MODELS.shopreviews, shopreviewModel).find({ shopid: mongoose.Types.ObjectId(offerDetails.shopid._id), offerid : mongoose.Types.ObjectId(offerDetails._id) }).populate({ path: 'userid', model: primary.model(constants.MODELS.users, userModel), select: "name mobile profilepic" }).lean();
+            offerDetails.reviews = allreview;
             return responseManager.onSuccess("shop offer data", offerDetails, res);
           })().catch((error) => {
             return responseManager.onError(error, res);
@@ -149,13 +149,14 @@ router.post('/rate', helper.authenticateToken, async (req, res) => {
     let primary = mongoConnection.useDb(constants.DEFAULT_DB);
     let userdata = await primary.model(constants.MODELS.users, userModel).findById(req.token.userid).lean();
     if (userdata && userdata.status == true && userdata.mobileverified == true) {
-      const { shopid, ratings, title, review } = req.body;
-      if (shopid && shopid != '' && mongoose.Types.ObjectId.isValid(shopid)) {
+      const { shopid, offerid, ratings, title, review } = req.body;
+      if (shopid && shopid != '' && mongoose.Types.ObjectId.isValid(shopid) && offerid && offerid != '' && mongoose.Types.ObjectId.isValid(offerid)) {
         let existingreview = await primary.model(constants.MODELS.shopreviews, shopreviewModel).findOne({ shopid: mongoose.Types.ObjectId(shopid), userid: mongoose.Types.ObjectId(req.token.userid) }).lean();
         if (existingreview == null) {
           if (!isNaN(ratings) && title && title.trim() != '' && review && review.trim() != '') {
             let obj = {
               shopid: mongoose.Types.ObjectId(shopid),
+              offerid: mongoose.Types.ObjectId(offerid),
               userid: mongoose.Types.ObjectId(req.token.userid),
               ratings: parseFloat(ratings),
               title: title,
@@ -171,7 +172,7 @@ router.post('/rate', helper.authenticateToken, async (req, res) => {
           return responseManager.badrequest({ message: 'Review already register for the shop, please try again with other event' }, res);
         }
       } else {
-        return responseManager.badrequest({ message: 'Invalid shop id to rate event data, please try again' }, res);
+        return responseManager.badrequest({ message: 'Invalid shop id or offer id to rate event data, please try again' }, res);
       }
     } else {
       return responseManager.badrequest({ message: 'Invalid user id to rate shop data, please try again' }, res);

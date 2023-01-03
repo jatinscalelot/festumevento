@@ -4,6 +4,7 @@ const shopcategoryModel = require('../../../models/shopcategories.model');
 const responseManager = require('../../../utilities/response.manager');
 const mongoConnection = require('../../../utilities/connections');
 const constants = require('../../../utilities/constants');
+const shopreviewModel = require('../../../models/shopreviews.model');
 const mongoose = require('mongoose');
 exports.list = async (req, res) => {
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
@@ -29,8 +30,27 @@ exports.list = async (req, res) => {
                 sort: { _id: -1 },
                 populate: { path: 'shop_category', model: primary.model(constants.MODELS.shopcategories, shopcategoryModel), select: "categoryname description" },
                 lean: true
-            }).then((shops) => {
-                return responseManager.onSuccess('Shops list!', shops, res);
+            }).then((shoplist) => {
+                let finalShops = [];
+                async.forEachSeries(shoplist.docs, (shop, next_shop) => {
+                    (async () => {
+                        let noofreview = parseInt(await primary.model(constants.MODELS.shopreviews, shopreviewModel).countDocuments({ shopid: mongoose.Types.ObjectId(shop._id) }));
+                        if (noofreview > 0) {
+                            let totalReviewsCountObj = await primary.model(constants.MODELS.shopreviews, shopreviewModel).aggregate([{ $match: { shopid: mongoose.Types.ObjectId(shop._id) } }, { $group: { _id: null, sum: { $sum: "$ratings" } } }]);
+                            if (totalReviewsCountObj && totalReviewsCountObj.length > 0 && totalReviewsCountObj[0].sum) {
+                                shop.ratings = parseFloat(parseFloat(totalReviewsCountObj[0].sum) / noofreview).toFixed(1);
+                                finalShops.push(shop);
+                            }
+                        } else {
+                            shop.ratings = '0.0';
+                            finalShops.push(shop);
+                        }
+                        next_shop();
+                    })().catch((error) => { });
+                }, () => {
+                    shoplist.docs = finalShops;
+                    return responseManager.onSuccess('Shops list!', shoplist, res);
+                });
             }).catch((error) => {
                 return responseManager.onError(error, res);
             });
