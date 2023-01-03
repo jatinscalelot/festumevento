@@ -16,22 +16,20 @@ exports.getone = async (req, res) => {
             if (shopid && shopid != '' && mongoose.Types.ObjectId.isValid(shopid) && offlineofferid && offlineofferid != '' && mongoose.Types.ObjectId.isValid(offlineofferid)) {
                 let offlineOfferData = await primary.model(constants.MODELS.offlineoffers, offlineofferModel).findById(offlineofferid).lean();
                 if (offlineOfferData && offlineOfferData.shopid.toString() == shopid.toString()) {
-                    ( async () => {
-                        let noofreview = parseInt(await primary.model(constants.MODELS.shopreviews, shopreviewModel).countDocuments({ shopid: mongoose.Types.ObjectId(shopid), offerid : mongoose.Types.ObjectId(offlineofferid) }));
-                        if (noofreview > 0) {
-                          let totalReviewsCountObj = await primary.model(constants.MODELS.shopreviews, shopreviewModel).aggregate([{ $match: { shopid: mongoose.Types.ObjectId(shopid), offerid : mongoose.Types.ObjectId(offlineofferid) } }, { $group: { _id: null, sum: { $sum: "$ratings" } } }]);
-                          if (totalReviewsCountObj && totalReviewsCountObj.length > 0 && totalReviewsCountObj[0].sum) {
-                            offlineOfferData.ratings = parseFloat(parseFloat(totalReviewsCountObj[0].sum) / noofreview).toFixed(1);
-                            offlineOfferData.totalreview = noofreview;
-                          }
-                        } else {
-                            offlineOfferData.ratings = '0.0';
-                            offlineOfferData.totalreview = 0;
-                        }
-                        let allreview = await primary.model(constants.MODELS.shopreviews, shopreviewModel).find({ shopid: mongoose.Types.ObjectId(shopid), offerid : mongoose.Types.ObjectId(offlineofferid) }).populate({ path: 'userid', model: primary.model(constants.MODELS.users, userModel), select: "name mobile profilepic" }).lean();
-                        offlineOfferData.reviews = allreview;
-                        return responseManager.onSuccess("shop offer data", offerDetails, res);
-                    })().catch((error) => {});
+                    let noofreview = parseInt(await primary.model(constants.MODELS.shopreviews, shopreviewModel).countDocuments({ shopid: mongoose.Types.ObjectId(shopid), offerid : mongoose.Types.ObjectId(offlineofferid) }));
+                    if (noofreview > 0) {
+                      let totalReviewsCountObj = await primary.model(constants.MODELS.shopreviews, shopreviewModel).aggregate([{ $match: { shopid: mongoose.Types.ObjectId(shopid), offerid : mongoose.Types.ObjectId(offlineofferid) } }, { $group: { _id: null, sum: { $sum: "$ratings" } } }]);
+                      if (totalReviewsCountObj && totalReviewsCountObj.length > 0 && totalReviewsCountObj[0].sum) {
+                        offlineOfferData.ratings = parseFloat(parseFloat(totalReviewsCountObj[0].sum) / noofreview).toFixed(1);
+                        offlineOfferData.totalreview = noofreview;
+                      }
+                    } else {
+                        offlineOfferData.ratings = '0.0';
+                        offlineOfferData.totalreview = 0;
+                    }
+                    let allreview = await primary.model(constants.MODELS.shopreviews, shopreviewModel).find({ shopid: mongoose.Types.ObjectId(shopid), offerid : mongoose.Types.ObjectId(offlineofferid) }).populate({ path: 'userid', model: primary.model(constants.MODELS.users, userModel), select: "name mobile profilepic" }).lean();
+                    offlineOfferData.reviews = allreview;
+                    return responseManager.onSuccess("shop offer data", offerDetails, res);
                 } else {
                     return responseManager.badrequest({ message: 'Invalid shop id to get offline offer data, please try again' }, res);
                 }
