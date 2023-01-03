@@ -6,6 +6,7 @@ const mongoConnection = require('../../../utilities/connections');
 const constants = require('../../../utilities/constants');
 const shopreviewModel = require('../../../models/shopreviews.model');
 const mongoose = require('mongoose');
+const async = require('async');
 exports.list = async (req, res) => {
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
