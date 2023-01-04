@@ -5,6 +5,7 @@ const organizerModel = require('../../../../models/organizers.model');
 const onlineofferModel = require('../../../../models/onlineoffers.model');
 const platformModel = require('../../../../models/platforms.model');
 const onlineofferreviewModel = require('../../../../models/onlineofferreviews.model');
+const userModel = require('../../../../models/users.model');
 const mongoose = require('mongoose');
 exports.getone = async (req, res) => {
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
