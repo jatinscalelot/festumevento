@@ -6,6 +6,7 @@ const onlineofferModel = require('../../../../models/onlineoffers.model');
 const platformModel = require('../../../../models/platforms.model');
 const onlineofferreviewModel = require('../../../../models/onlineofferreviews.model');
 const mongoose = require('mongoose');
+const async = require('async');
 exports.list = async (req, res) => {
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
