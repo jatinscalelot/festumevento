@@ -37,11 +37,7 @@ router.post('/', async (req, res) => {
                 sender,
                 to: receivers,
                 subject: 'Testing API for Send In Blue',
-                textContent: `testing testing Cules Coding will teach you how to become a developer.`,
-                htmlContent: `<h1>`+company_name+`</h1><a href="https://scalelot.com/">Visit</a>`+ description,
-                params: {
-                    role: 'Backend',
-                },
+                htmlContent: `<h1>`+company_name+`</h1><br/><h5>`+ description +`</h5>`,
             }).then((response) => {
                 console.log('success', response);
                 return responseManager.onSuccess('Thank you for getting in touch. we will reply by email as soon as possible.', 1, res);
