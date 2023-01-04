@@ -36,6 +36,9 @@ app.use('/', indexRouter);
 const adminpaths = [
   { pathUrl: '/', routeFile: 'index'}
 ];
+const landingpaths = [
+  { pathUrl: '/getintouch', routeFile: 'getintouch'}
+];
 const executivepaths = [
   { pathUrl: '/', routeFile: 'index'}
 ];
@@ -98,6 +101,9 @@ const userpaths = [
   { pathUrl: '/search', routeFile: 'search'},
   { pathUrl: '/eventbookingcoupons', routeFile: 'eventbookingcoupons'},
 ];
+landingpaths.forEach((path) => {
+	app.use('/landing'+path.pathUrl, require('./routes/landing/' + path.routeFile));
+});
 adminpaths.forEach((path) => {
 	app.use('/admin'+path.pathUrl, require('./routes/admins/' + path.routeFile));
 });

@@ -32,7 +32,8 @@ let constants = {
         offlineofferwishlists : 'offlineofferwishlists',
         onlineofferreviews : 'onlineofferreviews',
         onlineofferwishlists : 'onlineofferwishlists',
-        eventbookingcoupons : 'eventbookingcoupons'
+        eventbookingcoupons : 'eventbookingcoupons',
+        getintouches : 'getintouches'
     }
 };
 module.exports = constants;
