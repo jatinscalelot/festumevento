@@ -24,12 +24,13 @@ router.post('/', async (req, res) => {
             await primary.model(constants.MODELS.getintouches, getintouchModel).create(obj);
             const tranEmailApi = new Sib.TransactionalEmailsApi()
             const sender = {
-                email: 'jatin.scalelot@gmail.com',
-                name: 'Jatin Patel',
+                email:  'raj.scalelot@gmail.com',
+                name: 'Raaz Patel'
             }
             const receivers = [
                 {
-                    email: 'raj.scalelot@gmail.com',
+                    email: 'jatin.scalelot@gmail.com',
+                    name: 'Jatin Patel'
                 },
             ];
             tranEmailApi.sendTransacEmail({
