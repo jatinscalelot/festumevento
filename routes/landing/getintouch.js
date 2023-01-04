@@ -37,7 +37,7 @@ router.post('/', async (req, res) => {
                 sender,
                 to: receivers,
                 subject: 'Testing API for Send In Blue',
-                textContent: `testing testing Cules Coding will teach you how to become {{params.role}} a developer.`,
+                textContent: `testing testing Cules Coding will teach you how to become a developer.`,
                 htmlContent: `<h1>Scalelot Technologies</h1><a href="https://scalelot.com/">Visit</a>`,
                 params: {
                     role: 'Backend',
