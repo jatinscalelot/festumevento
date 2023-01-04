@@ -24,8 +24,8 @@ router.post('/', async (req, res) => {
             await primary.model(constants.MODELS.getintouches, getintouchModel).create(obj);
             const tranEmailApi = new Sib.TransactionalEmailsApi()
             const sender = {
-                email:  'raj.scalelot@gmail.com',
-                name: 'Raaz Patel'
+                email: email,
+                name: name
             }
             const receivers = [
                 {
@@ -38,7 +38,7 @@ router.post('/', async (req, res) => {
                 to: receivers,
                 subject: 'Testing API for Send In Blue',
                 textContent: `testing testing Cules Coding will teach you how to become a developer.`,
-                htmlContent: `<h1>Scalelot Technologies</h1><a href="https://scalelot.com/">Visit</a>`,
+                htmlContent: `<h1>`+company_name+`</h1><a href="https://scalelot.com/">Visit</a>`+ description,
                 params: {
                     role: 'Backend',
                 },
