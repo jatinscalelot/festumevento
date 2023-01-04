@@ -33,7 +33,8 @@ let constants = {
         onlineofferreviews : 'onlineofferreviews',
         onlineofferwishlists : 'onlineofferwishlists',
         eventbookingcoupons : 'eventbookingcoupons',
-        getintouches : 'getintouches'
+        getintouches : 'getintouches',
+        eventbookings : 'eventbookings'
     }
 };
 module.exports = constants;
