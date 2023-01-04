@@ -4,6 +4,10 @@ const mongoConnection = require('../../utilities/connections');
 const responseManager = require('../../utilities/response.manager');
 const constants = require('../../utilities/constants');
 const getintouchModel = require('../../models/getintouches.model');
+const Sib = require('sib-api-v3-sdk');
+const client = Sib.ApiClient.instance;
+const apiKey = client.authentications['api-key'];
+apiKey.apiKey = process.env.SIB_API_KEY;
 router.post('/', async (req, res) => {
     res.setHeader('Access-Control-Allow-Origin', '*');
     const { name, company_name, email, description } = req.body;
@@ -18,7 +22,32 @@ router.post('/', async (req, res) => {
                 description: description,
             };
             await primary.model(constants.MODELS.getintouches, getintouchModel).create(obj);
-            return responseManager.onSuccess('Thank you for getting in touch. we will reply by email as soon as possible.', 1, res);
+            const tranEmailApi = new Sib.TransactionalEmailsApi()
+            const sender = {
+                email: 'jatin.scalelot@gmail.com',
+                name: 'Jatin Patel',
+            }
+            const receivers = [
+                {
+                    email: 'raj.scalelot@gmail.com',
+                },
+            ];
+            tranEmailApi.sendTransacEmail({
+                sender,
+                to: receivers,
+                subject: 'Testing API for Send In Blue',
+                textContent: `testing testing Cules Coding will teach you how to become {{params.role}} a developer.`,
+                htmlContent: `<h1>Scalelot Technologies</h1><a href="https://scalelot.com/">Visit</a>`,
+                params: {
+                    role: 'Backend',
+                },
+            }).then((response) => {
+                console.log('success', response);
+                return responseManager.onSuccess('Thank you for getting in touch. we will reply by email as soon as possible.', 1, res);
+            }).catch((error) => {
+                console.log('error', error);
+                return responseManager.onError(error, res);
+            });
         } else {
             return responseManager.badrequest({ message: 'User already send to query with same email, Please try again...' }, res);
         }
