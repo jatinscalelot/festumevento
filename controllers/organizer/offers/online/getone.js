@@ -4,6 +4,7 @@ const constants = require('../../../../utilities/constants');
 const organizerModel = require('../../../../models/organizers.model');
 const onlineofferModel = require('../../../../models/onlineoffers.model');
 const platformModel = require('../../../../models/platforms.model');
+const onlineofferreviewModel = require('../../../../models/onlineofferreviews.model');
 const mongoose = require('mongoose');
 exports.getone = async (req, res) => {
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
@@ -18,7 +19,20 @@ exports.getone = async (req, res) => {
                     select : 'name platformimage'
                 }).lean();
                 if (onlineOfferData && onlineOfferData.createdBy.toString() == req.token.organizerid.toString()) {
-                    return responseManager.onSuccess('Online offer data!', onlineOfferData, res);
+                    let noofreview = parseInt(await primary.model(constants.MODELS.onlineofferreviews, onlineofferreviewModel).countDocuments({ offerid: mongoose.Types.ObjectId(onlineOfferData._id) }));
+                    if (noofreview > 0) {
+                        let totalReviewsCountObj = await primary.model(constants.MODELS.onlineofferreviews, onlineofferreviewModel).aggregate([{ $match: { offerid: mongoose.Types.ObjectId(onlineOfferData._id) } }, { $group: { _id: null, sum: { $sum: "$ratings" } } }]);
+                        if (totalReviewsCountObj && totalReviewsCountObj.length > 0 && totalReviewsCountObj[0].sum) {
+                            onlineOfferData.ratings = parseFloat(parseFloat(totalReviewsCountObj[0].sum) / noofreview).toFixed(1);
+                            onlineOfferData.totalreviews = noofreview;
+                        }
+                    } else {
+                        onlineOfferData.ratings = '0.0';
+                        onlineOfferData.totalreviews = 0;
+                    }
+                    let allreview = await primary.model(constants.MODELS.onlineofferreviews, onlineofferreviewModel).find({ offerid: mongoose.Types.ObjectId(onlineOfferData._id) }).populate({ path: 'userid', model: primary.model(constants.MODELS.users, userModel), select: "name mobile profilepic" }).lean();
+                    onlineOfferData.offerreviews = allreview;
+                    return responseManager.onSuccess("online offer data", onlineOfferData, res);
                 } else {
                     return responseManager.badrequest({ message: 'Invalid offer id to get online offer data, please try again' }, res);
                 }

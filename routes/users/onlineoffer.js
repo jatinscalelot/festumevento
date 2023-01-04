@@ -45,10 +45,12 @@ router.post('/findoffer', helper.authenticateToken, async (req, res) => {
               let totalReviewsCountObj = await primary.model(constants.MODELS.onlineofferreviews, onlineofferreviewModel).aggregate([{ $match: { offerid: mongoose.Types.ObjectId(offer._id) } }, { $group: { _id: null, sum: { $sum: "$ratings" } } }]);
               if (totalReviewsCountObj && totalReviewsCountObj.length > 0 && totalReviewsCountObj[0].sum) {
                 offer.ratings = parseFloat(parseFloat(totalReviewsCountObj[0].sum) / noofreview).toFixed(1);
+                offer.totalreviews = noofreview;
                 alloffers.push(offer);
               }
             } else {
               offer.ratings = '0.0';
+              offer.totalreviews = 0;
               alloffers.push(offer);
             }
             next_offer();
@@ -90,9 +92,11 @@ router.post('/getone', helper.authenticateToken, async (req, res) => {
               let totalReviewsCountObj = await primary.model(constants.MODELS.onlineofferreviews, onlineofferreviewModel).aggregate([{ $match: { offerid: mongoose.Types.ObjectId(offerDetails._id) } }, { $group: { _id: null, sum: { $sum: "$ratings" } } }]);
               if (totalReviewsCountObj && totalReviewsCountObj.length > 0 && totalReviewsCountObj[0].sum) {
                 offerDetails.ratings = parseFloat(parseFloat(totalReviewsCountObj[0].sum) / noofreview).toFixed(1);
+                offerDetails.totalreviews = noofreview;
               }
             } else {
               offerDetails.ratings = '0.0';
+              offerDetails.totalreviews = 0;
             }
             let allreview = await primary.model(constants.MODELS.onlineofferreviews, onlineofferreviewModel).find({ offerid: mongoose.Types.ObjectId(offerDetails._id) }).populate({ path: 'userid', model: primary.model(constants.MODELS.users, userModel), select: "name mobile profilepic" }).lean();
             offerDetails.offerreviews = allreview;
