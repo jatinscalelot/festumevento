@@ -27,7 +27,7 @@ exports.tandc = async (req, res) => {
                     await primary.model(constants.MODELS.livestreams, livestreamModel).findByIdAndUpdate(livestreamid, { updatedBy: mongoose.Types.ObjectId(req.token.organizerid), tandc: obj });
                     let livestreamData = await primary.model(constants.MODELS.livestreams, livestreamModel).findById(livestreamid).lean();
                     if (livestreamData && livestreamData != null) {
-                        let encId = helper.passwordEncryptor(livestreamData._id);
+                        let encId = await helper.passwordEncryptor(livestreamData._id);
                         await primary.model(constants.MODELS.livestreams, livestreamModel).findByIdAndUpdate(livestreamid, {media_content_link : '/livestream/mcl?lsd='+encId, join_user_link : '/livestream/jul?lsd='+encId}).lean();
                         return responseManager.onSuccess('Organizer event live stream tandc updated successfully!', {
                             _id: livestreamData._id,
