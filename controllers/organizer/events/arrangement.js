@@ -18,8 +18,24 @@ exports.arrangement = async (req, res) => {
                 if(seating_arrangements && seating_arrangements.length > 0){
                     async.forEachSeries(seating_arrangements, (arrangement, next_arrangement) => {
                         arrangement.seating_item = mongoose.Types.ObjectId(arrangement.seating_item);
-                        finalArrangements.push(arrangement);
-                        next_arrangement();
+                        async.forEachSeries(arrangement.arrangements, (inner_arrangement, next_inner_arrangement) => {
+                            inner_arrangement.number_of_seating_item = parseInt(inner_arrangement.number_of_seating_item);
+                            inner_arrangement.per_seating_person = parseInt(inner_arrangement.per_seating_person);
+                            inner_arrangement.total_person = parseInt(inner_arrangement.total_person);
+                            inner_arrangement.per_seating_price = parseFloat(inner_arrangement.per_seating_price);
+                            inner_arrangement.per_person_price = parseFloat(inner_arrangement.per_person_price);
+                            inner_arrangement.total_amount = parseFloat(inner_arrangement.total_amount);
+                        }, () => {
+                            arrangement.totalCalculations.total_number_of_seating_items = parseInt(arrangement.totalCalculations.total_number_of_seating_items);
+                            arrangement.totalCalculations.total_per_seating_persons = parseInt(arrangement.totalCalculations.total_per_seating_persons);
+                            arrangement.totalCalculations.total_persons = parseInt(arrangement.totalCalculations.total_persons);
+                            arrangement.totalCalculations.per_seating_price = parseFloat(arrangement.totalCalculations.per_seating_price);
+                            arrangement.totalCalculations.per_person_price = parseFloat(arrangement.totalCalculations.per_person_price);
+                            arrangement.totalCalculations.total_amount = parseFloat(arrangement.totalCalculations.total_amount);
+                            arrangement.totalCalculations.total_booked = parseInt(arrangement.totalCalculations.total_booked);
+                            finalArrangements.push(arrangement);
+                            next_arrangement();
+                        });
                     }, () => {
                         ( async () => {
                             let primary = mongoConnection.useDb(constants.DEFAULT_DB);
