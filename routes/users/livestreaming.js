@@ -57,6 +57,7 @@ router.post('/findlivestreams', helper.authenticateToken, async (req, res) => {
                             let totalReviewsCountObj = await primary.model(constants.MODELS.livestreamreviews, livestreamreviewModel).aggregate([{ $match: { livestreamid: mongoose.Types.ObjectId(lstream._id) } }, { $group: { _id: null, sum: { $sum: "$ratings" } } }]);
                             if (totalReviewsCountObj && totalReviewsCountObj.length > 0 && totalReviewsCountObj[0].sum) {
                                 lstream.ratings = parseFloat(parseFloat(totalReviewsCountObj[0].sum) / noofreview).toFixed(1);
+                                lstream.totalreviews = noofreview;
                                 if (lstream.event_start_timestamp && lstream.event_end_timestamp && (lstream.event_start_timestamp <= currentTime && lstream.event_end_timestamp >= currentTime)) {
                                     liveStream.push(lstream);
                                 } else if (lstream.event_start_timestamp && lstream.event_end_timestamp && (lstream.event_start_timestamp > currentTime && lstream.event_end_timestamp > currentTime)) {
@@ -65,6 +66,7 @@ router.post('/findlivestreams', helper.authenticateToken, async (req, res) => {
                             }
                         } else {
                             lstream.ratings = '0.0';
+                            lstream.totalreviews = 0;
                             if (lstream.event_start_timestamp && lstream.event_end_timestamp && (lstream.event_start_timestamp <= currentTime && lstream.event_end_timestamp >= currentTime)) {
                                 liveStream.push(lstream);
                             } else if (lstream.event_start_timestamp && lstream.event_end_timestamp && (lstream.event_start_timestamp > currentTime && lstream.event_end_timestamp > currentTime)) {
@@ -109,10 +111,12 @@ router.post('/getone', helper.authenticateToken, async (req, res) => {
                         if (noofreview > 0) {
                             let totalReviewsCountObj = await primary.model(constants.MODELS.livestreamreviews, livestreamreviewModel).aggregate([{ $match: { livestreamid: mongoose.Types.ObjectId(livestreamid) } }, { $group: { _id: null, sum: { $sum: "$ratings" } } }]);
                             if (totalReviewsCountObj && totalReviewsCountObj.length > 0 && totalReviewsCountObj[0].sum) {
+                                result.totalreviews = noofreview;
                                 result.ratings = parseFloat(parseFloat(totalReviewsCountObj[0].sum) / noofreview).toFixed(1);
                             }
                         } else {
                             result.ratings = '0.0';
+                            result.totalreviews = 0;
                         }
                         let allreview = await primary.model(constants.MODELS.livestreamreviews, livestreamreviewModel).find({ livestreamid: mongoose.Types.ObjectId(livestreamid) }).populate({ path: 'userid', model: primary.model(constants.MODELS.users, userModel), select: "name mobile profilepic" }).lean();
                         result.reviews = allreview;
