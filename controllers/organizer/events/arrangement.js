@@ -25,6 +25,7 @@ exports.arrangement = async (req, res) => {
                             inner_arrangement.per_seating_price = parseFloat(inner_arrangement.per_seating_price);
                             inner_arrangement.per_person_price = parseFloat(inner_arrangement.per_person_price);
                             inner_arrangement.total_amount = parseFloat(inner_arrangement.total_amount);
+                            next_inner_arrangement();
                         }, () => {
                             arrangement.totalCalculations.total_number_of_seating_items = parseInt(arrangement.totalCalculations.total_number_of_seating_items);
                             arrangement.totalCalculations.total_per_seating_persons = parseInt(arrangement.totalCalculations.total_per_seating_persons);
