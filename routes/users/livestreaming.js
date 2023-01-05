@@ -44,7 +44,7 @@ router.post('/findlivestreams', helper.authenticateToken, async (req, res) => {
                 path: 'event_category',
                 model: primary.model(constants.MODELS.eventcategories, eventcategoriesModel),
                 select: 'categoryname description'
-            }]).select("event_name photos event_date event_start_time event_end_time event_type price_per_user").lean().then((result) => {
+            }]).select("event_name photos event_date event_start_timestamp event_end_timestamp event_type price_per_user").lean().then((result) => {
                 let liveStream = [];
                 let upcomingStream = [];
                 let currentTime = Date.now() + 19800000;
