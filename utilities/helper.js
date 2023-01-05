@@ -60,3 +60,23 @@ exports.passwordEncryptor = async (passwordKeyEncrypt) => {
         throw err;
     }
 };
+exports.getInvoiceNo = (invno) => {
+    var inv_number = invno + 1;
+    var lengoftemp = inv_number.toString().length;
+    if(lengoftemp == 1){
+        inv_number = '0000000'+inv_number;
+    }else if(lengoftemp == 2){
+        inv_number = '000000'+inv_number;
+    }else if(lengoftemp == 3){
+        inv_number = '00000'+inv_number;
+    }else if(lengoftemp == 4){
+        inv_number = '0000'+inv_number;
+    }else if(lengoftemp == 5){
+        inv_number = '000'+inv_number;
+    }else if(lengoftemp == 6){
+        inv_number = '00'+inv_number;
+    }else if(lengoftemp == 7){
+        inv_number = '00'+inv_number;
+    }
+    return inv_number;
+};

@@ -23,6 +23,8 @@ router.post('/', helper.authenticateToken, async (req, res) => {
             body.createdBy = mongoose.Types.ObjectId(req.token.userid);
             body.updatedBy = mongoose.Types.ObjectId(req.token.userid);
             body.timestamp = Date.now();
+            let totalInvoice = parseInt(await primary.model(constants.MODELS.eventbookings, eventbookingModel).countDocuments({}));
+            body.invoice_no = helper.getInvoiceNo(totalInvoice);
             let addedEventBokking = await primary.model(constants.MODELS.eventbookings, eventbookingModel).create(body);
             return responseManager.onSuccess("event booked successfully...", addedEventBokking, res);
         } else {
