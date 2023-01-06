@@ -5,6 +5,7 @@ const responseManager = require('../../utilities/response.manager');
 const constants = require('../../utilities/constants');
 const helper = require('../../utilities/helper');
 const userModel = require('../../models/users.model');
+const organizerModel = require('../../models/organizers.model');
 const axios = require('axios');
 const config = {
     headers : {
@@ -21,6 +22,21 @@ router.post('/', async (req, res) => {
         if(userData && userData != null && userData.mobileverified == true){
             let decPassword = await helper.passwordDecryptor(userData.password);
             if(decPassword == password){
+                if((userData.lastloginAt == undefined || userData.lastloginAt == null || userData.lastloginAt == 0) && (userData.first_login_at == undefined)){
+                    if(userData.refer_code && userData.refer_code != '' && userData.refer_code != null && userData.refer_code != 0){
+                        let referbyuser = await  primary.model(constants.MODELS.users, userModel).findOne({my_refer_code : userData.refer_code}).lean();
+                        if(referbyuser) {
+                            await primary.model(constants.MODELS.users, userModel).findByIdAndUpdate(referbyuser._id, {f_coin : (referbyuser.f_coin) ? parseFloat(referbyuser.f_coin + 10) : parseFloat(10)});
+                            await primary.model(constants.MODELS.users, userModel).findByIdAndUpdate(userData._id, {f_coin : parseFloat(10), first_login_at : Date.now()});
+                        }else{
+                            let referbyOrganiser = await primary.model(constants.MODELS.organizers, organizerModel).findOne({my_refer_code : userData.refer_code}).lean();
+                            if(referbyOrganiser){
+                                await primary.model(constants.MODELS.organizers, organizerModel).findByIdAndUpdate(referbyOrganiser._id, {f_coin : (referbyOrganiser.f_coin) ? parseFloat(referbyOrganiser.f_coin + 10) : parseFloat(10)});
+                                await primary.model(constants.MODELS.users, userModel).findByIdAndUpdate(userData._id, {f_coin : parseFloat(10), first_login_at : Date.now()});
+                            }
+                        }
+                    }
+                }
                 let accessToken = await helper.generateAccessToken({ userid : userData._id.toString() });
                 await primary.model(constants.MODELS.users, userModel).findByIdAndUpdate(userData._id, {fcm_token : (fcm_token) ? fcm_token : '', lastloginAt : Date.now()});
                 return responseManager.onSuccess('User login successfully!', {token : accessToken, s3Url : process.env.AWS_BUCKET_URI}, res);
