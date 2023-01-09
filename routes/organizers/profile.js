@@ -28,7 +28,7 @@ router.get('/', helper.authenticateToken, async (req, res, next) => {
 router.post('/', helper.authenticateToken, async (req, res, next) => {
     res.setHeader('Access-Control-Allow-Headers','Content-Type,Authorization');
     res.setHeader('Access-Control-Allow-Origin', '*');
-    const { name, dob, city, pincode, state, country, about } = req.body;
+    const { name, dob, flat_no, street, area, city, pincode, state, country, about } = req.body;
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
         let organizerData = await primary.model(constants.MODELS.organizers, organizerModel).findById(req.token.organizerid).select('-password').lean();
@@ -36,6 +36,9 @@ router.post('/', helper.authenticateToken, async (req, res, next) => {
             let obj = {
                 name : name,
                 dob : dob,
+                flat_no : flat_no,
+                street : street,
+                area : area,
                 city : city,
                 pincode : pincode,
                 state : state,
