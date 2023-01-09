@@ -29,15 +29,15 @@ router.post('/', async (req, res) => {
             }
             const receivers = [
                 {
-                    email: 'jatin.scalelot@gmail.com',
-                    name: 'Jatin Patel'
+                    email: process.env.SIB_EMAIL_ID,
+                    name: 'Festum Evento'
                 },
             ];
             tranEmailApi.sendTransacEmail({
                 sender,
                 to: receivers,
-                subject: 'Testing API for Send In Blue',
-                htmlContent: `<h1>`+company_name+`</h1><br/><h5>`+ description +`</h5>`,
+                subject: name + ' Query ' +company_name,
+                htmlContent: `<h3>`+company_name+`</h3><br/><h5>`+ description +`</h5>`,
             }).then((response) => {
                 console.log('success', response);
                 return responseManager.onSuccess('Thank you for getting in touch. we will reply by email as soon as possible.', 1, res);
