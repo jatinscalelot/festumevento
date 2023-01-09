@@ -175,9 +175,11 @@ router.post('/getone', helper.authenticateToken, async (req, res) => {
                                     let totalReviewsCountObj = await primary.model(constants.MODELS.eventreviews, eventreviewModel).aggregate([{ $match: { eventid: mongoose.Types.ObjectId(eventid) } }, { $group: { _id: null, sum: { $sum: "$ratings" } } }]);
                                     if (totalReviewsCountObj && totalReviewsCountObj.length > 0 && totalReviewsCountObj[0].sum) {
                                         result.ratings = parseFloat(parseFloat(totalReviewsCountObj[0].sum) / noofreview).toFixed(1);
+                                        result.totalreviews = noofreview;
                                     }
                                 } else {
                                     result.ratings = '0.0';
+                                    result.totalreviews = 0;
                                 }
                                 let allreview = await primary.model(constants.MODELS.eventreviews, eventreviewModel).find({ eventid: mongoose.Types.ObjectId(eventid) }).populate({ path: 'userid', model: primary.model(constants.MODELS.users, userModel), select: "name mobile profilepic" }).lean();
                                 result.reviews = allreview;
