@@ -87,6 +87,8 @@ router.post('/getone', helper.authenticateToken, async (req, res) => {
           (async () => {
             let wishlist = await primary.model(constants.MODELS.onlineofferwishlists, onlineofferwishlistModel).findOne({offerid : mongoose.Types.ObjectId(offerDetails._id), userid : mongoose.Types.ObjectId(req.token.userid)}).lean();
             offerDetails.wishlist_status = (wishlist == null) ? false : true;
+            let user_review = await primary.model(constants.MODELS.onlineofferreviews, onlineofferreviewModel).findOne({ offerid: mongoose.Types.ObjectId(offerDetails._id), userid: mongoose.Types.ObjectId(req.token.userid) }).lean();
+            offerDetails.is_user_review = (user_review == null) ? false : true;
             let noofreview = parseInt(await primary.model(constants.MODELS.onlineofferreviews, onlineofferreviewModel).countDocuments({ offerid: mongoose.Types.ObjectId(offerDetails._id) }));
             if (noofreview > 0) {
               let totalReviewsCountObj = await primary.model(constants.MODELS.onlineofferreviews, onlineofferreviewModel).aggregate([{ $match: { offerid: mongoose.Types.ObjectId(offerDetails._id) } }, { $group: { _id: null, sum: { $sum: "$ratings" } } }]);

@@ -170,6 +170,8 @@ router.post('/getone', helper.authenticateToken, async (req, res) => {
                                 result.startingat = parseFloat(result.startingat).toFixed(2);
                                 let wishlist = await primary.model(constants.MODELS.eventwishlists, eventwishlistModel).findOne({ eventid: mongoose.Types.ObjectId(eventid), userid: mongoose.Types.ObjectId(req.token.userid) }).lean();
                                 result.wishlist_status = (wishlist == null) ? false : true;
+                                let user_review = await primary.model(constants.MODELS.eventreviews, eventreviewModel).findOne({ eventid: mongoose.Types.ObjectId(eventid), userid: mongoose.Types.ObjectId(req.token.userid) }).lean();
+                                result.is_user_review = (user_review == null) ? false : true;
                                 let noofreview = parseInt(await primary.model(constants.MODELS.eventreviews, eventreviewModel).countDocuments({ eventid: mongoose.Types.ObjectId(eventid) }));
                                 if (noofreview > 0) {
                                     let totalReviewsCountObj = await primary.model(constants.MODELS.eventreviews, eventreviewModel).aggregate([{ $match: { eventid: mongoose.Types.ObjectId(eventid) } }, { $group: { _id: null, sum: { $sum: "$ratings" } } }]);

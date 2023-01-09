@@ -107,6 +107,8 @@ router.post('/getone', helper.authenticateToken, async (req, res) => {
                     (async () => {
                         let wishlist = await primary.model(constants.MODELS.livestreamwishlists, livestreamwishlistModel).findOne({ livestreamid: mongoose.Types.ObjectId(livestreamid), userid: mongoose.Types.ObjectId(req.token.userid) }).lean();
                         result.wishlist_status = (wishlist == null) ? false : true;
+                        let user_review = await primary.model(constants.MODELS.livestreamreviews, livestreamreviewModel).findOne({ livestreamid: mongoose.Types.ObjectId(livestreamid), userid: mongoose.Types.ObjectId(req.token.userid) }).lean();
+                        result.is_user_review = (user_review == null) ? false : true;
                         let noofreview = parseInt(await primary.model(constants.MODELS.livestreamreviews, livestreamreviewModel).countDocuments({ livestreamid: mongoose.Types.ObjectId(livestreamid) }));
                         if (noofreview > 0) {
                             let totalReviewsCountObj = await primary.model(constants.MODELS.livestreamreviews, livestreamreviewModel).aggregate([{ $match: { livestreamid: mongoose.Types.ObjectId(livestreamid) } }, { $group: { _id: null, sum: { $sum: "$ratings" } } }]);
