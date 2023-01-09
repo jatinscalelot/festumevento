@@ -100,7 +100,7 @@ router.post('/profilepic', helper.authenticateToken, fileHelper.memoryUpload.sin
 router.post('/businessprofile', helper.authenticateToken, async (req, res, next) => {
     res.setHeader('Access-Control-Allow-Headers','Content-Type,Authorization');
     res.setHeader('Access-Control-Allow-Origin', '*');
-    const { name, email, mobile, country_code, street, area, city, state, pincode, dob, country, about } = req.body;
+    const { name, email, mobile, country_code, flat_no,street, area, city, state, pincode, dob, country, about } = req.body;
     if (req.token.organizerid && mongoose.Types.ObjectId.isValid(req.token.organizerid)) {
         let primary = mongoConnection.useDb(constants.DEFAULT_DB);
         let organizerData = await primary.model(constants.MODELS.organizers, organizerModel).findById(req.token.organizerid).select('-password').lean();
@@ -111,6 +111,7 @@ router.post('/businessprofile', helper.authenticateToken, async (req, res, next)
                 email : email,
                 mobile : mobile,
                 country_code : country_code,
+                flat_no : flat_no,
                 street : street,
                 area : area,
                 city : city,
