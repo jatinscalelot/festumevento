@@ -74,7 +74,7 @@ router.post('/findlivestreams', helper.authenticateToken, async (req, res) => {
                             }
                         }
                         next_lstream();
-                    })().catch((error) => { console.log('error', error); })
+                    })().catch((error) => { console.log('error', error); });
                 }, () => {
                     return responseManager.onSuccess("Live Stream List", { liveStream: liveStream, upcomingStream: upcomingStream }, res);
                 });

@@ -86,7 +86,7 @@ router.post('/list', helper.authenticateToken, async (req, res) => {
                 liveStream.push(lstream);
               }
               next_lstream();
-            })().catch((error) => { console.log('error', error); })
+            })().catch((error) => { console.log('error', error); });
           }, () => {
             return responseManager.onSuccess("Live Stream wishlist List", liveStream, res);
           });
